@@ -28,6 +28,8 @@ from esstoolkit.utilities import shapefile_helpers as shph, layer_field_helpers 
 from .AnalysisDialog import AnalysisDialog
 from esstoolkit.analysis.engines.AnalysisEngine import AnalysisEngine
 from .AxialVerification import AxialVerification
+from .DepthmapEngine import DepthmapEngine
+from .DepthmapCLIEngine import DepthmapCLIEngine
 from .UnlinksVerification import UnlinksVerification, UnlinksIdUpdate
 from esstoolkit.analysis.engines.EngineRegistry import EngineRegistry
 
