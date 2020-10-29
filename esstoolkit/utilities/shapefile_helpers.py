@@ -273,7 +273,6 @@ def createShapeFile(layer, path, crs):
     )
     return shapefile
 
-
 def createShapeFileLayer(path, name, srid, attributes, types, geometrytype):
     # create new layer with given attributes
     # todo: created table has no attributes. not used
