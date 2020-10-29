@@ -169,8 +169,11 @@ class FrontageTool(QObject):
             if str(e) == 'wrapped C/C++ object of type QgsVectorLayer has been deleted':
                 # QT object has already been deleted
                 return
+<<<<<<< HEAD
             else:
                 raise e
+=======
+>>>>>>> 23bb4b2 (Catch deletion of qt object and ignore error)
 
     # Create New Layer
     def newFrontageLayer(self):
