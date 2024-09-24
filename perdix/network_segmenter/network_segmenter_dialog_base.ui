@@ -1,10 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
 
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>RoadNetworkCleanerDialogBase</class>
  <widget class="QDialog" name="RoadNetworkCleanerDialogBase">

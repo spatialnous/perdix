@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 SPDX-FileCopyrightText: 2015 - 2016 Jorge Gil <jorge.gil@ucl.ac.uk>
 SPDX-FileCopyrightText: 2015 - 2016 UCL
@@ -8,7 +9,6 @@ SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
 
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>AnalysisDialog</class>
  <widget class="QDockWidget" name="AnalysisDialog">

@@ -14,9 +14,10 @@ from builtins import str
 
 from qgis.PyQt.QtCore import (QObject)
 
-from perdix.analysis.AnalysisEngine import AnalysisEngine
-from perdix.analysis.DepthmapEngine import DepthmapEngine
+from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
+from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
 from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
+from perdix.utilities.utility_functions import overrides
 from perdix.utilities.exceptions import BadInputError
 
 
