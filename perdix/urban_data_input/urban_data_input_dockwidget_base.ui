@@ -1,10 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 SPDX-FileCopyrightText: 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
 SPDX-FileCopyrightText: 2017 UCL
 
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DockWidget</class>
  <widget class="QDockWidget" name="DockWidget">
