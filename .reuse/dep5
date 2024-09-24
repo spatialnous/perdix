@@ -1,0 +1,32 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+Files: .gitignore README.md
+Copyright: Perdix contributors
+License: GPL-2.0-or-later
+
+# Assets
+Files: perdix/drawing/custom_icons/*.png perdix/icons/*.png perdix/icons/*.xml
+Copyright: Perdix contributors
+License: GPL-2.0-or-later
+
+# Documentation
+Files: documents/*
+Copyright: Perdix contributors
+License: CC-BY-SA-4.0
+
+# External
+Files: perdix/external/pyqtgraph/*
+Copyright: 2012 University of North Carolina at Chapel Hill, Luke Campagnola
+License: MIT
+
+Files: perdix/external/networkx/*
+Copyright: Aric Hagberg, Dan Schult, Pieter Swart
+License: BSD-3-Clause
+
+Files: perdix/external/decorator.py
+Copyright: 2005-2020 Michele Simionato
+License: MIT
+
+Files: scripts/plugin_upload.py
+Copyright: A. Pasotti, V. Picavet
+License: GPL-2.0-or-later

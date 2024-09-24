@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 #/bin/sh
 
 # Note: For this to work with QGIS, install sphinx, sphinxExtensions
@@ -11,7 +15,7 @@ cd ../docs/
 # delete existing autogen directory
 rm -rf source/_autogen
 # generate the rst files
-sphinx-apidoc -f -e -o source/_autogen/modules/ ../esstoolkit/ ../esstoolkit/external/* ../esstoolkit/tests/* ../esstoolkit/*/ui_* ../esstoolkit/ui_*
+sphinx-apidoc -f -e -o source/_autogen/modules/ ../perdix/ ../perdix/external/* ../perdix/tests/* ../perdix/*/ui_* ../perdix/ui_*
 # generate the html files
 pwd
 sphinx-build -b html source build

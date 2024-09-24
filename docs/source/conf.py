@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
+# SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -17,9 +22,9 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Space Syntax Toolkit'
-copyright = '2020, Jorge Jil'
-author = 'Jorge Jil'
+project = 'Perdix'
+copyright = '2016-2024, Perdix contributors'
+author = 'Perdix contributors'
 
 # The full version, including alpha/beta/rc tags
 release = '0.3'
@@ -28,7 +33,7 @@ release = '0.3'
 # -- General configuration ---------------------------------------------------
 
 add_module_names = False
-modindex_common_prefix = ['esstoolkit.']
+modindex_common_prefix = ['perdix.']
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom

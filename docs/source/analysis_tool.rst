@@ -10,4 +10,4 @@ Relevant API
 .. toctree::
    :maxdepth: 3
 
-   _autogen/modules/esstoolkit.analysis.rst
+   _autogen/modules/perdix.analysis.rst

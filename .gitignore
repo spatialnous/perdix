@@ -2,6 +2,6 @@
 .idea
 .workspace.xml
 *.pyc
-esstoolkit/help/
-esstoolkit/.idea
-scripts/esstoolkit.zip
+perdix/help/
+perdix/.idea
+scripts/perdix.zip
