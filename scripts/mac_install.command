@@ -1,8 +1,13 @@
-# Script for installing Space Syntax Toolkit plugin for QGIS on Mac OS/X
+# SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
+# SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# 
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# Script for installing Perdix plugin for QGIS on Mac OS/X
 
 # Path variables
 qgis_user_dir=~/.qgis2
-rcl_plugin_dir=$qgis_user_dir/python/plugins/esstoolkit
+rcl_plugin_dir=$qgis_user_dir/python/plugins/perdix
 
 # Make sure QGIS is installed
 if [ ! -d "$qgis_user_dir" ]; then
@@ -12,10 +17,10 @@ fi
 
 # Remove previously installed plugin
 if [ -d "$rcl_plugin_dir" ]; then
-	echo "Removing currently installed Space Syntax Toolkit QGIS plugin..."
+	echo "Removing currently installed Perdix QGIS plugin..."
 	rm -rf "$rcl_plugin_dir"
 	if [ $? -ne 0 ]; then
-		echo "ERROR: Couldn't remove currently installed Space Syntax Toolkit QGIS plugin."
+		echo "ERROR: Couldn't remove currently installed Perdix QGIS plugin."
 		echo "Please close QGIS if it is running, and then try installing again."
 		exit 1
 	fi
@@ -29,15 +34,15 @@ if [ ! -d "$rcl_plugin_dir" ]; then
 	fi
 fi
 
-echo "Copying Space Syntax Toolkit QGIS plugin to QGIS plugin directory..."
+echo "Copying Perdix QGIS plugin to QGIS plugin directory..."
 dir=${0%/*}
 echo $dir 
 cp -r $dir/* "$rcl_plugin_dir/"
 if [ $? -ne 0 ]; then
-	echo "ERROR: Couldn't copy 'esstoolkit' to '$rcl_plugin_dir/'"
+	echo "ERROR: Couldn't copy 'perdix' to '$rcl_plugin_dir/'"
 	exit 1
 fi
 
-echo "Space Syntax Toolkit QGIS plugin was successfully installed!"
+echo "Perdix QGIS plugin was successfully installed!"
 echo "Please see readme.txt for instructions on how to enable it."
 exit 0
