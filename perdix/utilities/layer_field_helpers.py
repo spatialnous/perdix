@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -488,7 +489,8 @@ def createTempLayer(name, srid, attributes, types, values, coords):
     vlayer.startEditing()
     try:
         provider.addAttributes(fields)
-    except:
+    except Exception as e:
+        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         return None
     # add features by iterating the values
     features = []
@@ -501,7 +503,8 @@ def createTempLayer(name, srid, attributes, types, values, coords):
             elif type == 'LineString':
                 feat.setGeometry(QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
                                                            QgsPoint(float(val[coords[2]]), float(val[coords[3]]))]))
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         # add attribute values
         feat.setAttributes(list(val))
@@ -509,7 +512,8 @@ def createTempLayer(name, srid, attributes, types, values, coords):
     # add the features to the layer
     try:
         provider.addFeatures(features)
-    except:
+    except Exception as e:
+        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         return None
 
     vlayer.commitChanges()

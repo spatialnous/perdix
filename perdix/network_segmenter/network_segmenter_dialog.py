@@ -202,7 +202,7 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         elif self.postgisRadioButton.isChecked():
             self.dbsettings_dlg.show()
             # Run the dialog event loop
-            result2 = self.dbsettings_dlg.exec_()
+            self.dbsettings_dlg.exec_()
             self.dbsettings = self.dbsettings_dlg.getDbSettings()
         return
 
@@ -220,7 +220,8 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
                 db_layer_name = "%s:%s:%s" % (
                     self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
                 self.outputCleaned.setText(db_layer_name)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.outputCleaned.clear()
 
     def setTempOutput(self):
@@ -233,6 +234,7 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         self.disable_browse()
         try:
             self.outputCleaned.setText(self.file_name)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             self.outputCleaned.clear()
         self.outputCleaned.setDisabled(True)

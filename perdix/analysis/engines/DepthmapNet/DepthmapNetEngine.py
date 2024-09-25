@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,6 +15,7 @@ from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
 from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
 from perdix.analysis.engines.DepthmapNet.DepthmapNetSocket import DepthmapNetSocket
 from perdix.utilities import layer_field_helpers as lfh
+from perdix.utilities import utility_functions as uf
 from perdix.utilities.utility_functions import overrides
 from perdix.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import DepthmapNetSettingsWidget
 
@@ -379,7 +381,8 @@ class ExportMap(QThread):
                             nr += 1
             self.status.emit('Model exported for analysis.')
             self.result.emit(segment_data)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             self.error.emit('Exporting segment map failed.')
 
     def stop(self):

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -29,12 +30,13 @@ def listShapeFolders():
     res['path'] = []
     layers = lfh.getVectorLayers('all', 'ogr')
     for layer in layers:
-        provider = layer.dataProvider()
+        layer.dataProvider()
         if layer.storageType() == 'ESRI Shapefile':
             path = os.path.dirname(layer.dataProvider().dataSourceUri())
             try:
-                idx = res['path'].index(path)
-            except:
+                res['path'].index(path)
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 res['name'].append(os.path.basename(os.path.normpath(path)))  # layer.name()
                 res['path'].append(path)
             # for the file name: os.path.basename(uri).split('|')[0]
@@ -153,7 +155,8 @@ def create_shapefile_full_layer_data_provider(path, name, srid, attributes, type
                                                      QgsPoint(float(val[coords[2]]),
                                                               float(val[coords[3]]))])
             feat.setGeometry(geometry)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         # add attributes
         attrs = []
@@ -235,7 +238,8 @@ def create_shapefile_full_layer_writer(path, name, srid, attributes, types, valu
                                                      QgsPoint(float(val[coords[2]]),
                                                               float(val[coords[3]]))])
             feat.setGeometry(geometry)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         # add attributes
         attrs = []
@@ -323,7 +327,8 @@ def insertShapeFileValues(layer, attributes, values, coords):
                         feat.setGeometry(
                             QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
                                                       QgsPoint(float(val[coords[2]]), float(val[coords[3]]))]))
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     pass
                 # add attributes
                 for i, x in enumerate(val):

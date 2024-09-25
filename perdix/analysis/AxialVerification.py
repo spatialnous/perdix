@@ -1,11 +1,16 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import print_function
 
 import time
+import sys
+import inspect
+import os
+
 from builtins import str
 # Import the PyQt and QGIS libraries
 from builtins import zip
@@ -17,11 +22,16 @@ from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
 
 # try to import installed networkx, if not
 # available use the one shipped with this package
+
 try:
     import networkx as nx
-
     has_networkx = True
+
 except ImportError:
+    cmd_subfolder = os.path.realpath(
+        os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0], "external")))
+    if cmd_subfolder not in sys.path:
+        sys.path.insert(0, cmd_subfolder)
     has_networkx = False
 
 # Import the debug library
@@ -172,7 +182,8 @@ class AxialVerification(QThread):
             g = nx.Graph()
             g.add_nodes_from(graph_nodes)
             g.add_edges_from(graph_links)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             return False
         # networkx just accepts all sorts of node ids... no need to fix
         if not nx.is_connected(g):
@@ -210,7 +221,8 @@ class AxialVerification(QThread):
         else:
             idcol = self.user_id
         # geometry is valid (generally)
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s" WHERE NOT ST_IsSimple("%s") OR NOT ST_IsValid("%s")""" % (
             idcol, axialname, geomname, geomname)
@@ -223,7 +235,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse valid: %s" % str(time.time() - start_time))
         # geometry is polyline
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s" WHERE ST_NPoints("%s") <> 2 """ % (idcol, axialname, geomname)
         header, data, error = dbh.executeSpatialiteQuery(connection, query)
@@ -235,7 +248,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse polyline: %s" % str(time.time() - start_time))
         # has two coinciding points
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s" WHERE ST_Equals(ST_StartPoint("%s"),ST_EndPoint("%s"))""" % (
             idcol, axialname, geomname, geomname)
@@ -248,7 +262,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse coinciding: %s" % str(time.time() - start_time))
         # small lines, with small length
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s" WHERE ST_Length("%s")<%s""" % (idcol, axialname, geomname, length)
         header, data, error = dbh.executeSpatialiteQuery(connection, query)
@@ -260,7 +275,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse small: %s" % str(time.time() - start_time))
         # short lines, just about touch without intersecting
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s" a, "%s" b WHERE a."%s" <> b."%s" AND NOT ST_Intersects(a."%s",b."%s") AND ' \
                 '(PtDistWithin(ST_StartPoint(a."%s"),b."%s",%s) OR PtDistWithin(ST_EndPoint(a."%s"),b."%s",%s)) ' \
@@ -276,7 +292,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse short: %s" % str(time.time() - start_time))
         # duplicate geometry
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s" a, "%s" b WHERE a."%s" <> b."%s" AND ST_Equals(a."%s",b."%s") ' \
                 'AND a.ROWID IN (SELECT ROWID FROM SpatialIndex WHERE f_table_name="%s" AND search_frame=b."%s")' \
@@ -290,7 +307,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse duplicate: %s" % str(time.time() - start_time))
         # geometry overlaps
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s" a, "%s" b WHERE a."%s" <> b."%s" AND NOT ST_Equals(a."%s",b."%s") AND ST_Overlaps(a."%s",b."%s") ' \
                 'AND a.ROWID IN (SELECT ROWID FROM SpatialIndex WHERE f_table_name="%s" AND search_frame=b."%s")' \
@@ -363,7 +381,8 @@ class AxialVerification(QThread):
         if idcol == '':
             return
         # geometry is valid (generally)
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
 
         query = """CREATE INDEX sidx_"%s"_"%s" ON "%s"."%s" USING GIST("%s");""" % (
@@ -381,7 +400,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse valid: %s" % str(time.time() - start_time))
         # geometry is polyline
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s"."%s" WHERE ST_NPoints("%s") <> 2 """ % (idcol, schema, axialname, geomname)
         header, data, error = dbh.executePostgisQuery(connection, query)
@@ -393,7 +413,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse polyline: %s" % str(time.time() - start_time))
         # has two coinciding points
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s"."%s" WHERE ST_Equals(ST_StartPoint("%s"),ST_EndPoint("%s"))""" % (
             idcol, schema, axialname, geomname, geomname)
@@ -406,7 +427,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse coinciding: %s" % str(time.time() - start_time))
         # small lines, with small length
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = """SELECT "%s" FROM "%s"."%s" WHERE ST_Length("%s")<%s""" % (idcol, schema, axialname, geomname, length)
         header, data, error = dbh.executePostgisQuery(connection, query)
@@ -418,7 +440,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse small: %s" % str(time.time() - start_time))
         # short lines, just about touch without intersecting
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s"."%s" a, "%s"."%s" b WHERE a."%s" <> b."%s" AND NOT ST_Intersects(a."%s",b."%s") AND ' \
                 '(ST_DWithin(ST_StartPoint(a."%s"),b."%s",%s) OR ST_DWithin(ST_EndPoint(a."%s"),b."%s",%s))' \
@@ -434,7 +457,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse short: %s" % str(time.time() - start_time))
         # duplicate geometry
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s"."%s" a, "%s"."%s" b WHERE a."%s" <> b."%s" AND ST_Equals(a."%s",b."%s")' \
                 % (idcol, schema, axialname, schema, axialname, idcol, idcol, geomname, geomname)
@@ -447,7 +471,8 @@ class AxialVerification(QThread):
         if is_debug:
             print("analyse duplicate: %s" % str(time.time() - start_time))
         # geometry overlaps
-        if not self.running: return
+        if not self.running:
+            return
         start_time = time.time()
         query = 'SELECT a."%s" FROM "%s"."%s" a, "%s"."%s" b WHERE a."%s" <> b."%s" AND NOT ST_Equals(a."%s",b."%s") AND ST_Overlaps(a."%s",b."%s")' \
                 % (idcol, schema, axialname, schema, axialname, idcol, idcol, geomname, geomname, geomname, geomname)
@@ -511,14 +536,16 @@ class AxialVerification(QThread):
         axial_links = []
         unlinks_list = []
         # get unlinks pairs
-        if not self.running: return
+        if not self.running:
+            return
         if unlinks:
             if lfh.fieldExists(unlinks, 'line1') and lfh.fieldExists(unlinks, 'line2'):
                 features = unlinks.getFeatures(
                     QgsFeatureRequest().setSubsetOfAttributes(['line1', 'line2'], unlinks.fields()))
                 for feature in features:
                     unlinks_list.append((feature.attribute('line1'), feature.attribute('line2')))
-        if not self.running: return
+        if not self.running:
+            return
         if self.user_id == '':
             features = axial.getFeatures(QgsFeatureRequest().setSubsetOfAttributes([]))
         else:
@@ -529,7 +556,8 @@ class AxialVerification(QThread):
         start_buff = QgsGeometry()
         end_buff = QgsGeometry()
         for i, feature in enumerate(features):
-            if not self.running: break
+            if not self.running:
+                break
             has_problem = False
             geom = feature.geometry()
             if self.user_id == '':
@@ -586,7 +614,8 @@ class AxialVerification(QThread):
                 request.setSubsetOfAttributes([field])
             targets = axial.getFeatures(request)
             for target in targets:
-                if not self.running: break
+                if not self.running:
+                    break
                 geom_b = target.geometry()
                 if self.user_id == '':
                     id_b = target.id()

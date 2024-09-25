@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,6 +13,7 @@ import catchment_analyser.catchment_analysis as catchment
 import catchment_analyser.utility_functions as uf
 from catchment_analyser.analysis_tools import CustomCost
 from perdix.utilities import layer_field_helpers as lfh
+from qgis.networkanalysis import (QgsDistanceArcProperter, QgsLineVectorLayerDirector)
 
 origin_vector = lfh.getLayerByName('2595D_pr_tfl_bus_stops')
 network = lfh.getLayerByName('2595D_spm_pr2_seg2')
@@ -80,30 +82,30 @@ centroids = {}
 i = 0
 for f in network.getFeatures():
     if f.geometry().type() == QgsWkbTypes.LineGeometry:
-    if not f.geometry().isMultipart():
-        attributes_dict[f.id()] = f.attributes()
-        polyline = f.geometry().asPolyline()
-        for idx, p in enumerate(polyline[1:]):
-            ml = QgsGeometry.fromPolyline([polyline[idx], p])
-            new_f = QgsFeature()
-            new_f.setGeometry(ml.centroid())
-            new_f.setAttributes([f.id()])
-            new_f.setFeatureId(i)
-            i += 1
-            spIndex.addFeature(new_f)
-            centroids[i] = f.id()
-    else:
-        attributes_dict[f.id()] = f.attributes()
-        for pl in f.geometry().asMultiPolyline():
-            for idx, p in enumerate(pl[1:]):
-                ml = QgsGeometry.fromPolyline([pl[idx], p])
+        if not f.geometry().isMultipart():
+            attributes_dict[f.id()] = f.attributes()
+            polyline = f.geometry().asPolyline()
+            for idx, p in enumerate(polyline[1:]):
+                ml = QgsGeometry.fromPolyline([polyline[idx], p])
                 new_f = QgsFeature()
                 new_f.setGeometry(ml.centroid())
                 new_f.setAttributes([f.id()])
                 new_f.setFeatureId(i)
+                i += 1
                 spIndex.addFeature(new_f)
                 centroids[i] = f.id()
-                i += 1
+        else:
+            attributes_dict[f.id()] = f.attributes()
+            for pl in f.geometry().asMultiPolyline():
+                for idx, p in enumerate(pl[1:]):
+                    ml = QgsGeometry.fromPolyline([pl[idx], p])
+                    new_f = QgsFeature()
+                    new_f.setGeometry(ml.centroid())
+                    new_f.setAttributes([f.id()])
+                    new_f.setFeatureId(i)
+                    spIndex.addFeature(new_f)
+                    centroids[i] = f.id()
+                    i += 1
 
 network_fields = network_fields
 

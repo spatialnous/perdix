@@ -86,7 +86,8 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
                 db_layer_name = "%s:%s:%s" % (
                     self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
                 self.lineEditEntrances.setText(db_layer_name)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.lineEditEntrances.clear()
         return
 

@@ -15,7 +15,6 @@ from qgis.PyQt.QtWidgets import (QAction, QDialog)
 from qgis.PyQt.uic import (loadUiType)
 
 # Import the debug library
-is_debug = False
 try:
     import pydevd_pycharm as pydevd
 
@@ -24,21 +23,6 @@ except ImportError:
     has_pydevd = False
 
 import os.path
-# change sys path to networkx package if not installed
-import sys
-import inspect
-
-try:
-    import networkx as nx
-except ImportError:
-    cmd_subfolder = os.path.realpath(
-        os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0], "external")))
-    if cmd_subfolder not in sys.path:
-        sys.path.insert(0, cmd_subfolder)
-
-# Import general modules
-Ui_AboutDialog, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'about_dialog.ui'))
 
 from .SettingsManager import SettingsManager
 from .ProjectManager import ProjectManager
@@ -55,6 +39,11 @@ from perdix.urban_data_input import urban_data_input_tool
 from perdix.network_segmenter import network_segmenter_tool
 from perdix.drawing import DrawingTool
 
+is_debug = False
+
+# Import general modules
+Ui_AboutDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'about_dialog.ui'))
 
 # import additional modules here
 ###########
@@ -297,7 +286,8 @@ class Perdix(object):
         # remove the toolbar
         try:
             del self.toolbar
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
 
         ###########

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -87,7 +88,8 @@ class UrbanDataInputTool(QObject):
             # Landuse
             self.iface.mapCanvas().selectionChanged.disconnect(self.dockwidget.addLUDataFields)
             self.dockwidget.disconnectLULayer()
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
 
     def updateLayers(self):

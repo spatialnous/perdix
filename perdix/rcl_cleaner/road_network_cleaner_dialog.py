@@ -330,7 +330,8 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
                 db_layer_name = "%s:%s:%s" % (
                     self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
                 self.outputCleaned.setText(db_layer_name)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.outputCleaned.clear()
         return
 
@@ -344,6 +345,7 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         self.disable_browse()
         try:
             self.outputCleaned.setText(self.file_name)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             self.outputCleaned.clear()
         self.outputCleaned.setDisabled(True)

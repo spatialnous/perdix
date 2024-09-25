@@ -9,7 +9,6 @@ from __future__ import print_function
 
 from future import standard_library
 
-standard_library.install_aliases()
 from builtins import str
 import traceback
 from qgis.PyQt.QtCore import (QObject, QThread, pyqtSignal)
@@ -32,6 +31,7 @@ except ImportError:
     has_pydevd = False
     is_debug = False
 
+standard_library.install_aliases()
 
 # sys.path.append("pydevd-pycharm.egg")
 
@@ -79,7 +79,7 @@ class NetworkCleanerTool(QObject):
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        self.dlg.exec_()
 
     def unloadGUI(self):
         if self.dlg:

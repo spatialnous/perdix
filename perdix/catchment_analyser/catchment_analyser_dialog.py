@@ -92,14 +92,16 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
                 db_layer_name = "%s:%s:%s" % (
                     self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
                 self.networkText.setText(db_layer_name)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.networkText.clear()
 
     def setShpOutput(self):
         self.disable_browse()
         try:
             self.networkText.setText(self.file_name)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             self.networkText.clear()
         self.networkText.setDisabled(True)
 

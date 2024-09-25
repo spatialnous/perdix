@@ -428,7 +428,7 @@ class LanduseTool(QObject):
 
     # Update Feature
     def updateSelectedLUAttribute(self):
-        mc = self.canvas
+        self.canvas
         layer = self.dockwidget.setLULayer()
         features = layer.selectedFeatures()
 

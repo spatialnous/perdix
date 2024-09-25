@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -414,7 +415,8 @@ class AnalysisTool(QObject):
             self.verificationThread.verificationFinished.disconnect(self.processAxialIdUpdateResults)
             self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
             self.verificationThread.verificationError.disconnect(self.cancelAxialIdUpdate)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         # self.verificationThread = None
         self.dlg.updateAxialVerifyProgressbar(0)
@@ -427,7 +429,8 @@ class AnalysisTool(QObject):
         try:
             self.verificationThread.verificationFinished.disconnect(self.processAxialIdUpdateResults)
             self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         self.verificationThread = None
         # reload the layer if columns were added with the ID update
@@ -463,7 +466,8 @@ class AnalysisTool(QObject):
             self.verificationThread.verificationFinished.disconnect(self.processAxialVerificationResults)
             self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
             self.verificationThread.verificationError.disconnect(self.cancelAxialVerification)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         # self.verificationThread = None
         self.dlg.updateAxialVerifyProgressbar(0)
@@ -476,7 +480,8 @@ class AnalysisTool(QObject):
         try:
             self.verificationThread.verificationFinished.disconnect(self.processAxialVerificationResults)
             self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             pass
         self.verificationThread = None
         self.dlg.setAxialProblems(results, nodes)
@@ -527,7 +532,7 @@ class AnalysisTool(QObject):
             features = []
             items = self.dlg.getAxialVerifyProblems()
             for id in items:
-                if type(id) == list:
+                if type(id) is list:
                     for i in id:
                         if int(i) in self.all_ids:
                             features.append(int(i))

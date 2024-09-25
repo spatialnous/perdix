@@ -278,7 +278,7 @@ class FrontageTool(QObject):
 
         QgsMessageLog.logMessage("feature added, id = " + str(fid))
 
-        mc = self.canvas
+        self.canvas
         v_layer = self.dockwidget.setFrontageLayer()
         features = v_layer.getFeatures()
         inputid = v_layer.featureCount()
@@ -319,7 +319,7 @@ class FrontageTool(QObject):
 
     # Update Feature
     def updateSelectedFrontageAttribute(self):
-        mc = self.canvas
+        self.canvas
         layer = self.dockwidget.setFrontageLayer()
         features = layer.selectedFeatures()
 
@@ -363,7 +363,7 @@ class FrontageTool(QObject):
     def pushID(self):
         buildinglayer = self.dockwidget.getSelectedLayerPushID()
 
-        mc = self.canvas
+        self.canvas
         frontlayer = self.dockwidget.setFrontageLayer()
         frontlayer.startEditing()
 

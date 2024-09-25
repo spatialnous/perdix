@@ -529,7 +529,7 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
         self.tableWidgetlanduse.clear()
 
     def clearLuTabledel(self):
-        layer = self.dockwidget.setLULayer()
+        self.dockwidget.setLULayer()
         # layer.featureDeleted.connect(self.dockwidget.clearLUDataFields)
 
     def setLuFloors(self, value):

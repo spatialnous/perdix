@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -103,8 +104,8 @@ def angular_change(geom1, geom2):
     points1 = {pl1[0], pl1[-1]}
     points2 = {pl2[0], pl2[-1]}
     inter_point = points1.intersection(points2)
-    point1 = [p for p in points1 if p != inter_point]
-    point2 = [p for p in points1 if p != inter_point]
+    [p for p in points1 if p != inter_point]
+    [p for p in points1 if p != inter_point]
 
     # find index in geom1
     # if index 0, then get first vertex
