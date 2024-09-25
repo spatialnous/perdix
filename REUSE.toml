@@ -1,0 +1,67 @@
+version = 1
+
+[[annotations]]
+path = ["REUSE.toml", ".gitignore", "README.md", ".ruff.toml"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = ["**/icons/**.png", "**/icons/**.xml", "**/resources.qrc"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "**/styles/**.qml"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "sample_data/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = "docs/.gitignore"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "documents/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Perdix contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = "**/external/pyqtgraph/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2012 University of North Carolina at Chapel Hill, Luke Campagnola"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "**/external/networkx/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Aric Hagberg, Dan Schult, Pieter Swart"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = "**/external/decorator.py"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2005-2020 Michele Simionato"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "scripts/plugin_upload.py"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "A. Pasotti, V. Picavet"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "**/analysis/engines/DepthmapCLI/depthmapXcli/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "depthmapX developers"
+SPDX-License-Identifier = "GPL-3.0-or-later"
