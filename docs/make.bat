@@ -1,3 +1,8 @@
+REM SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
+REM SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
+REM
+REM SPDX-License-Identifier: GPL-2.0-or-later
+
 @ECHO OFF
 
 pushd %~dp0

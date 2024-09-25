@@ -1,6 +1,10 @@
+# SPDX-FileCopyrightText: 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
+# SPDX-FileCopyrightText: 2021 Space Syntax Ltd
+# 
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 from qgis.PyQt.QtWidgets import QWidget
 from perdix.utilities.utility_functions import isNumeric
-
 
 class SettingsWidget(QWidget):
     def __init__(self, dock_widget):
