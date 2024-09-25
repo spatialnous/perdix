@@ -1,4 +1,4 @@
-# Space Syntax Toolkit for QGIS
+# Perdix for QGIS
 
 ## News
 19.04.2024 - JISCMAIL mailing list is closing. Post questions, suggestions or comments in the [issues list](https://github.com/SpaceGroupUCL/qgisSpaceSyntaxToolkit/issues) of this repository
