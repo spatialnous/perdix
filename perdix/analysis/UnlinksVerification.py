@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -82,10 +83,10 @@ class UnlinksVerification(QThread):
             # update the unlinks
             start_time = time.time()
             if 'spatialite' in datastore:
-                added = dbh.addSpatialiteColumns(connection, unlinkname, ['line1', 'line2'],
+                dbh.addSpatialiteColumns(connection, unlinkname, ['line1', 'line2'],
                                                 [QVariant.Int, QVariant.Int])
             else:
-                added = dbh.addPostgisColumns(connection, unlinkinfo['schema'], unlinkname, ['line1', 'line2'],
+                dbh.addPostgisColumns(connection, unlinkinfo['schema'], unlinkname, ['line1', 'line2'],
                                              [QVariant.Int, QVariant.Int])
             print("Updating unlinks: %s" % str(time.time() - start_time))
             self.verificationProgress.emit(10)
@@ -538,7 +539,7 @@ class UnlinksIdUpdate(QThread):
         unlinkgeom = dbh.getSpatialiteGeometryColumn(connection, unlinkname)
         axialgeom = dbh.getSpatialiteGeometryColumn(connection, axialname)
         # add line id columns
-        added = dbh.addSpatialiteColumns(connection, unlinkname, ['line1', 'line2'], [QVariant.Int, QVariant.Int])
+        dbh.addSpatialiteColumns(connection, unlinkname, ['line1', 'line2'], [QVariant.Int, QVariant.Int])
         self.verificationProgress.emit(22)
         # prepare variables for update query
         if self.user_id == '':
@@ -595,7 +596,7 @@ class UnlinksIdUpdate(QThread):
         # todo: ensure that it has a spatial index
         # dbh.createPostgisSpatialIndex(connection, axialschema, axialname, axialgeom)
         # add line id columns
-        added = dbh.addPostgisColumns(connection, unlinkschema, unlinkname, ['line1', 'line2'],
+        dbh.addPostgisColumns(connection, unlinkschema, unlinkname, ['line1', 'line2'],
                                      [QVariant.Int, QVariant.Int])
         self.verificationProgress.emit(33)
         # prepare variables for update query
@@ -624,7 +625,7 @@ class UnlinksIdUpdate(QThread):
 
     def qgisUpdateIDs(self, unlinktype):
         # create spatial index
-        unlinksindex = lfh.createIndex(self.unlinks_layer)
+        lfh.createIndex(self.unlinks_layer)
         axialindex = lfh.createIndex(self.axial_layer)
         # add line id columns if necessary
         lfh.addFields(self.unlinks_layer, ['line1', 'line2'], [QVariant.Int, QVariant.Int])

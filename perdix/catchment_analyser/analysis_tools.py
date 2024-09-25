@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -132,7 +133,8 @@ class ConcaveHull(object):
                 return angle1 + abs(angle2)
             else:
                 return 0
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             print(('fail %s, %s', angle1, angle2))
             return 0
 

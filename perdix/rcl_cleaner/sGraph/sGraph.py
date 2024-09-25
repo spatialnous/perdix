@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -278,7 +279,7 @@ class sGraph(QObject):
     # group points based on proximity - spatial index is not updated
     def snap_endpoints(self, snap_threshold):
         QgsMessageLog.logMessage('starting snapping', level=Qgis.Critical)
-        res = [self.ndSpIndex.addFeature(snode.feature) for snode in list(self.sNodes.values())]
+        [self.ndSpIndex.addFeature(snode.feature) for snode in list(self.sNodes.values())]
         filtered_nodes = {}
         # exclude nodes where connectivity = 2 - they will be merged
         self.step = self.step / float(2)
@@ -361,7 +362,7 @@ class sGraph(QObject):
                 self.errors.append(err_f)
 
             # delete old nodes
-            res = [self.delete_node(item) for item in group]
+            [self.delete_node(item) for item in group]
 
         return
 
@@ -505,7 +506,8 @@ class sGraph(QObject):
         if duplicates:
             input = [(e.id, frozenset(e.nodes)) for e in list(self.sEdges.values())]
             groups = defaultdict(list)
-            for v, k in input: groups[k].append(v)
+            for v, k in input:
+                groups[k].append(v)
 
             dupl_candidates = dict([nodes_edges for nodes_edges in list(groups.items()) if len(nodes_edges[1]) > 1])
 
@@ -794,12 +796,12 @@ class sGraph(QObject):
     def simplify_circles(self):
         roundabouts = NULL
         short = NULL
-        res = [self.collapse_to_node(group) for group in con_components(roundabouts + short)]
+        [self.collapse_to_node(group) for group in con_components(roundabouts + short)]
         return
 
     def simplify_parallel_lines(self):
         dual_car = NULL
-        res = [self.collapse_to_medial_axis(group) for group in con_components(dual_car)]
+        [self.collapse_to_medial_axis(group) for group in con_components(dual_car)]
         pass
 
     def collapse_to_medial_axis(self):
@@ -819,7 +821,7 @@ class sGraph(QObject):
         point_on_line = shortest_line.intersection(edge_geom)
         fraction = edge_geom.lineLocatePoint(point_on_line)
         fractions = [fraction, 1 - fraction]
-        degree = 0
+        # degree = 0
         for node, fraction in zip(nodes, fractions):
             branches.append((None, node, closest_edge, self.sNodes[node].feature.geometry().distance(point_on_line),))
 

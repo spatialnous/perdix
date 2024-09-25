@@ -70,7 +70,8 @@ class DepthmapEngine(AnalysisEngine):
                         map_data += str(f.geometry().vertexAt(1).x()) + sep + \
                                     str(f.geometry().vertexAt(1).y()) + "\n"
             return map_data
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             raise AnalysisEngine.AnalysisEngineError("Exporting axial map failed.")
 
     def prepare_segment_map(self, axial_layer, map_type, ref='', weight='', sep='\t', include_header=False):
@@ -357,7 +358,8 @@ class DepthmapEngine(AnalysisEngine):
                 try:
                     val = math.log(float(feat[j]) + 1.0) / math.log(float(feat[td[i]]) + 3.0)
                     calc_values.append(val)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     calc_values.append(NULL)
             for i, j in enumerate(td):
                 try:
@@ -366,7 +368,8 @@ class DepthmapEngine(AnalysisEngine):
                     else:
                         val = (float(feat[nc[i - len(nc)]]) ** 1.2) / (float(feat[j]) + 2.0)
                     calc_values.append(val)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     calc_values.append(NULL)
             feat.extend(calc_values)
             all_values.append(feat)

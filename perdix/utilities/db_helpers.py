@@ -90,7 +90,8 @@ def listSpatialiteConnections():
             last_db = last_db.split('@', 1)[1]
             # get last connexion index
             res['idx'] = res['name'].index(last_db)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             res['idx'] = 0
     # return the result even if empty
     return res
@@ -556,7 +557,8 @@ def getPostgisSelectedConnection():
     try:
         settings = QSettings()
         last_db = settings.value(u'/PostgreSQL/connections/selected')
-    except:
+    except Exception as e:
+        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         last_db = ''
     return last_db
 
@@ -841,7 +843,8 @@ def createPostgisSpatialIndex(connection, schema, table, geomname):
     query = """CREATE INDEX %s_gidx ON "%s"."%s" USING GIST ("%s")""" % (index, schema, table, geomname)
     try:
         executePostgisQuery(connection, query)
-    except:
+    except Exception as e:
+        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         pass
     return
 

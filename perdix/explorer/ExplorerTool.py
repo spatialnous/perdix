@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -125,7 +126,8 @@ class ExplorerTool(QObject):
     def updateLayers(self):
         try:
             layers = lfh.getLegendLayers(self.iface)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             layers = []
         has_numeric = []
         idx = 0
@@ -157,11 +159,13 @@ class ExplorerTool(QObject):
                 if self.current_layer:
                     try:
                         self.current_layer.selectionChanged.disconnect(self.updateStats)
-                    except:
+                    except Exception as e:
+                        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                         pass
                     try:
                         self.current_layer.selectionChanged.disconnect(self.changedMapSelection)
-                    except:
+                    except Exception as e:
+                        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                         pass
                 # fixme: throws NoneType error occasionally when adding/removing layers. trapping it for now.
                 try:
@@ -170,7 +174,8 @@ class ExplorerTool(QObject):
                         self.current_layer.selectionChanged.connect(self.updateStats)
                     elif self.dlg.getCurrentTab() == 2:
                         self.current_layer.selectionChanged.connect(self.changedMapSelection)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     self.current_layer = None
         # get layer attributes
         if self.current_layer and self.update_attributtes:
@@ -181,7 +186,8 @@ class ExplorerTool(QObject):
                 # fixme: throws NoneType error occasionally when adding/removing layers. trapping it for now.
                 try:
                     numeric_fields, numeric_field_indices = lfh.getNumericFieldNames(self.current_layer)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     numeric_fields = []
                     numeric_field_indices = []
                 if len(numeric_fields) > 0:
@@ -242,11 +248,13 @@ class ExplorerTool(QObject):
             if self.current_layer:
                 try:
                     self.current_layer.selectionChanged.disconnect(self.updateStats)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     pass
                 try:
                     self.current_layer.selectionChanged.disconnect(self.changedMapSelection)
-                except:
+                except Exception as e:
+                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                     pass
             self.current_layer = None  # QgsVectorLayer()
             self.dlg.setAttributesList([])
@@ -262,7 +270,8 @@ class ExplorerTool(QObject):
                 self.dlg.attributesList.currentRowChanged.disconnect(self.updateStats)
                 if self.current_layer is not None:
                     self.current_layer.selectionChanged.disconnect(self.updateStats)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
             try:
                 if self.current_layer is not None:
@@ -272,7 +281,8 @@ class ExplorerTool(QObject):
                 self.dlg.showLinesChanged.disconnect(self.showhideChartLines)
                 self.attributeCharts.histogramSelected.disconnect(self.setMapSelection)
                 self.attributeCharts.scatterplotSelected.disconnect(self.setMapSelection)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
         # do not disconnect symbology as it just retrieves info and updates the display: required
         # connect calculate stats
@@ -281,7 +291,8 @@ class ExplorerTool(QObject):
                 if self.current_layer is not None:
                     self.current_layer.selectionChanged.connect(self.updateStats)
                 self.dlg.attributesList.currentRowChanged.connect(self.updateStats)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
             try:
                 if self.current_layer is not None:
@@ -291,7 +302,8 @@ class ExplorerTool(QObject):
                 self.dlg.showLinesChanged.disconnect(self.showhideChartLines)
                 self.attributeCharts.histogramSelected.disconnect(self.setMapSelection)
                 self.attributeCharts.scatterplotSelected.disconnect(self.setMapSelection)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
             self.updateStats()
         # connect calculate charts
@@ -300,7 +312,8 @@ class ExplorerTool(QObject):
                 self.dlg.attributesList.currentRowChanged.disconnect(self.updateStats)
                 if self.current_layer is not None:
                     self.current_layer.selectionChanged.disconnect(self.updateStats)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
             try:
                 if self.current_layer is not None:
@@ -310,7 +323,8 @@ class ExplorerTool(QObject):
                 self.dlg.showLinesChanged.connect(self.showhideChartLines)
                 self.attributeCharts.histogramSelected.connect(self.setMapSelection)
                 self.attributeCharts.scatterplotSelected.connect(self.setMapSelection)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
             self.updateCharts()
 

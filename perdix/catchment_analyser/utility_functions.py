@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -51,7 +52,8 @@ def createTempLayer(name, geometry, srid, attributes, types):
         # add the fields to the layer
         try:
             provider.addAttributes(fields)
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             return None
         vlayer.commitChanges()
 

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 - 2018 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 - 2018 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -88,7 +89,7 @@ class NetworkSegmenterTool(QObject):
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        self.dlg.exec_()
 
     def unloadGUI(self):
         if self.dlg:

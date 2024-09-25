@@ -246,7 +246,7 @@ class ExplorerDialog(QtWidgets.QDockWidget, Ui_ExplorerDialog):
         self.lineWidthSpin.setDisabled(onoff)
         self.intervalSpin.setDisabled(onoff)
         self.intervalTypeCombo.setDisabled(onoff)
-        if onoff == True or self.current_symbology['interval_type'] == 3:
+        if onoff or self.current_symbology['interval_type'] == 3:
             self.__lockCustomIntervalControls(onoff)
         self.__lockApplyButton(onoff)
 

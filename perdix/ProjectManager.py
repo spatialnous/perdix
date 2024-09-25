@@ -157,7 +157,8 @@ class ProjectManager(QtCore.QObject):
                 self.proj.writeEntry('esst', position + str(key), val)
             self.settingsUpdated.emit()
             return True
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             return False
 
     def writeSetting(self, key, value, group):
@@ -168,7 +169,8 @@ class ProjectManager(QtCore.QObject):
             self.proj.writeEntry('esst', position + str(key), value)
             self.settingsUpdated.emit()
             return True
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             return False
 
     def __saveSettings(self):
@@ -241,7 +243,8 @@ class ProjectDialog(QDialog, Ui_ProjectDialog):
             try:
                 data_type = int(self.proj_settings["datastore/type"])
                 self.dataTypeCombo.setCurrentIndex(data_type)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.dataTypeCombo.setCurrentIndex(self.default_data_type)
         else:
             self.dataTypeCombo.setCurrentIndex(self.default_data_type)
@@ -291,7 +294,8 @@ class ProjectDialog(QDialog, Ui_ProjectDialog):
         # identify datastore from settings
         try:
             data_type = int(self.proj_settings["datastore/type"])
-        except:
+        except Exception as e:
+            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
             data_type = None
         if self.datastore_type and data_type and (self.datastore_type == data_type):
             # for shape files, append the folder if existing and not yet in the list
@@ -300,7 +304,8 @@ class ProjectDialog(QDialog, Ui_ProjectDialog):
             # select the datastore if in the list
             try:
                 self.datastores['idx'] = self.datastores['path'].index(self.proj_settings["datastore/path"])
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 pass
         # populate list and select default datastore
         if self.datastores and len(self.datastores['name']) > 0:
@@ -376,7 +381,8 @@ class ProjectDialog(QDialog, Ui_ProjectDialog):
             try:
                 idx = self.datastores['schema'].index(self.proj_settings['datastore/schema'])
                 self.schemaCombo.setCurrentIndex(idx)
-            except:
+            except Exception as e:
+                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
                 self.schemaCombo.setCurrentIndex(0)
             self.selectSchema()
 

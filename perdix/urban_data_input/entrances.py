@@ -200,10 +200,10 @@ class EntranceTool(QObject):
 
         QgsMessageLog.logMessage("feature added, id = " + str(fid))
 
-        mc = self.canvas
+        self.canvas
         v_layer = self.dockwidget.setEntranceLayer()
         feature_Count = v_layer.featureCount()
-        features = v_layer.getFeatures()
+        v_layer.getFeatures()
         inputid = 0
 
         if feature_Count == 1:
@@ -230,7 +230,7 @@ class EntranceTool(QObject):
 
     # Update Feature
     def updateSelectedEntranceAttribute(self):
-        mc = self.canvas
+        self.canvas
         layer = self.dockwidget.setEntranceLayer()
         features = layer.selectedFeatures()
 

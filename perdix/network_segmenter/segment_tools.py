@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -253,7 +254,7 @@ class segmentor(QObject):
     def get_no_inter_lines(self, point):
         point_geom = QgsGeometry.fromPointXY(point)
         lines = self.spIndex.intersects(point_geom.boundingBox())
-        filtered_lines = [l for l in lines if self.feats[l].geometry().intersects(point_geom)]
+        filtered_lines = [line for line in lines if self.feats[line].geometry().intersects(point_geom)]
         return len(set(filtered_lines))
 
     def copy_feat(self, f, geom, feat_id):
