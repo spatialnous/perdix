@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,10 +20,7 @@ from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
 from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
 from perdix.utilities.utility_functions import overrides
 from perdix.utilities.exceptions import BadInputError
-
-
-# Import the PyQt and QGIS libraries
-
+from perdix.analysis.engines.DepthmapCLI.DepthmapCLISettingsWidget import DepthmapCLISettingsWidget
 
 class DepthmapCLIEngine(QObject, DepthmapEngine):
     @overrides(DepthmapEngine)

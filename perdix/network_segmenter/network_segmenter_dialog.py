@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -17,11 +18,11 @@ from qgis.PyQt.QtWidgets import QDialog
 
 from .DbSettings_dialog import DbSettingsDialog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'network_segmenter_dialog_base.ui'))
+Ui_RoadNetworkCleanerDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'network_segmenter_dialog.ui'))
 
 
-class NetworkSegmenterDialog(QDialog, FORM_CLASS):
+class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
     closingPlugin = pyqtSignal()
 
     def __init__(self, available_dbs, parent=None):

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,11 +20,11 @@ from qgis.core import (QgsProject, QgsSnappingConfig, QgsTolerance, Qgis)
 
 from perdix.utilities import layer_field_helpers as lfh
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'DrawingTool_dockwidget_base.ui'))
+Ui_DrawingToolDockWidget, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'drawing_dock_widget.ui'))
 
 
-class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
     closingPlugin = pyqtSignal()
 
     def __init__(self, iface, parent=None):
@@ -35,9 +36,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        axial_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/axial_disabled.png")
-        segment_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/segment_disabled.png")
-        unlink_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/unlink_disabled.png")
+        axial_icon = QPixmap(os.path.dirname(__file__) + "/icons/axial_disabled.png")
+        segment_icon = QPixmap(os.path.dirname(__file__) + "/icons/segment_disabled.png")
+        unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")
         self.axialButton.setIcon(QIcon(axial_icon))
         self.axialButton.setIconSize(QSize(40, 40))
         self.segmentButton.setIcon(QIcon(segment_icon))
@@ -134,7 +135,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         # self.axialButton.setCheckable(True)
         self.resetIcons()
-        axial_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/axial.png")
+        axial_icon = QPixmap(os.path.dirname(__file__) + "/icons/axial.png")
         self.axialButton.setIcon(QIcon(axial_icon))
         self.axialButton.setIconSize(QSize(40, 40))
 
@@ -170,7 +171,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # disable previous snapping setting
         self.resetSnapping()
         self.resetIcons()
-        segment_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/segment.png")
+        segment_icon = QPixmap(os.path.dirname(__file__) + "/icons/segment.png")
         self.segmentButton.setIcon(QIcon(segment_icon))
         self.segmentButton.setIconSize(QSize(40, 40))
 
@@ -210,7 +211,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # snap to vertex
         if self.settings[1] != 'no unlinks':
             self.resetIcons()
-            unlink_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/unlink.png")
+            unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink.png")
             self.unlinksButton.setIcon(QIcon(unlink_icon))
             self.unlinksButton.setIconSize(QSize(40, 40))
             proj = QgsProject.instance()
@@ -269,13 +270,13 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         return
 
     def resetIcons(self):
-        axial_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/axial_disabled.png")
+        axial_icon = QPixmap(os.path.dirname(__file__) + "/icons/axial_disabled.png")
         self.axialButton.setIcon(QIcon(axial_icon))
         self.axialButton.setIconSize(QSize(40, 40))
-        segment_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/segment_disabled.png")
+        segment_icon = QPixmap(os.path.dirname(__file__) + "/icons/segment_disabled.png")
         self.segmentButton.setIcon(QIcon(segment_icon))
         self.segmentButton.setIconSize(QSize(40, 40))
-        unlink_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/unlink_disabled.png")
+        unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")
         self.unlinksButton.setIcon(QIcon(unlink_icon))
         self.unlinksButton.setIconSize(QSize(40, 40))
         return

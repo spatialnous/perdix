@@ -1,14 +1,18 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import os
+
 # Import the PyQt and QGIS libraries
 from qgis.PyQt.QtCore import (QObject, QSettings, QFileInfo)
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import (QDialog)
+from qgis.PyQt.uic import (loadUiType)
 
-# import toolkit settings dialog
-from .ui_Settings import Ui_SettingsDialog
+Ui_SettingsDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'settings_dialog.ui'))
 
 
 class SettingsManager(QObject):

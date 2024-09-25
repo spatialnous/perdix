@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -194,7 +195,7 @@ class NetworkCleanerTool(QObject):
                 if len(errors_features) > 0:
                     errors = utf.to_layer(errors_features, layer.crs(), layer.dataProvider().encoding(), 'Point',
                                           output_type, errors_path)
-                    errors.loadNamedStyle(os.path.dirname(__file__) + '/qgis_styles/errors.qml')
+                    errors.loadNamedStyle(os.path.dirname(__file__) + '/styles/errors.qml')
                     QgsProject.instance().addMapLayer(errors)
                     node = QgsProject.instance().layerTreeRoot().findLayer(errors.id())
                     self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
@@ -206,7 +207,7 @@ class NetworkCleanerTool(QObject):
                 if len(unlinks_features) > 0:
                     unlinks = utf.to_layer(unlinks_features, layer.crs(), layer.dataProvider().encoding(), 'Point',
                                            output_type, unlinks_path)
-                    unlinks.loadNamedStyle(os.path.dirname(__file__) + '/qgis_styles/unlinks.qml')
+                    unlinks.loadNamedStyle(os.path.dirname(__file__) + '/styles/unlinks.qml')
                     QgsProject.instance().addMapLayer(unlinks)
                     node = QgsProject.instance().layerTreeRoot().findLayer(unlinks.id())
                     self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
@@ -215,7 +216,7 @@ class NetworkCleanerTool(QObject):
 
             cleaned = utf.to_layer(cleaned_features, layer.crs(), layer.dataProvider().encoding(), 'Linestring',
                                    output_type, path)
-            cleaned.loadNamedStyle(os.path.dirname(__file__) + '/qgis_styles/cleaned.qml')
+            cleaned.loadNamedStyle(os.path.dirname(__file__) + '/styles/cleaned.qml')
             QgsProject.instance().addMapLayer(cleaned)
             node = QgsProject.instance().layerTreeRoot().findLayer(cleaned.id())
             self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)

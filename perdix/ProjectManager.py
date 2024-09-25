@@ -1,19 +1,22 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import os.path
+import os
 # Import the PyQt and QGIS libraries
 from builtins import str
 
-from qgis.PyQt import QtCore, QtWidgets
-from qgis.PyQt.QtWidgets import QDialog
-from qgis.core import QgsProject
+from qgis.PyQt import (QtCore, QtWidgets)
+from qgis.PyQt.QtWidgets import (QDialog)
+from qgis.core import (QgsProject)
+from qgis.PyQt.uic import (loadUiType)
 
 from perdix.utilities import db_helpers as dbh, shapefile_helpers as shph
-# import project settings dialog
-from .ui_Project import Ui_ProjectDialog
+
+Ui_ProjectDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'project_dialog.ui'))
 
 
 class ProjectManager(QtCore.QObject):

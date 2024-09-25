@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2017 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2017 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,11 +15,11 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from perdix.utilities import db_helpers as dbh
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'DbSettings_dialog_base.ui'))
+Ui_DbSettingsDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'db_settings_dialog.ui'))
 
 
-class DbSettingsDialog(QtWidgets.QDialog, FORM_CLASS):
+class DbSettingsDialog(QtWidgets.QDialog, Ui_DbSettingsDialog):
     closingPlugin = pyqtSignal()
     setDbOutput = pyqtSignal()
 

@@ -6,8 +6,8 @@ SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>DrawingToolDockWidgetBase</class>
- <widget class="QDockWidget" name="DrawingToolDockWidgetBase">
+ <class>DrawingToolDockWidget</class>
+ <widget class="QDockWidget" name="DrawingToolDockWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

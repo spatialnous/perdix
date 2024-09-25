@@ -1,14 +1,17 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import os
 from builtins import str
 
 from qgis.PyQt import QtWidgets
+from qgis.PyQt.uic import loadUiType
 
-from perdix.analysis.engines.DepthmapNet.ui_DepthmapAdvanced import Ui_DepthmapAdvancedDialog
-
+Ui_DepthmapAdvancedDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'more_settings_dialog.ui'))
 
 class DepthmapAdvancedDialog(QtWidgets.QDialog, Ui_DepthmapAdvancedDialog):
     def __init__(self):

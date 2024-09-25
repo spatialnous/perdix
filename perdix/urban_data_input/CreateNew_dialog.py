@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -13,11 +14,11 @@ from qgis.PyQt import QtCore, QtWidgets, uic
 from perdix.utilities import db_helpers as dbh
 from .DbSettings_dialog import DbSettingsDialog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'CreateNew_dialog_base.ui'))
+Ui_CreateNewDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'create_new_dialog.ui'))
 
 
-class CreatenewDialog(QtWidgets.QDialog, FORM_CLASS):
+class CreatenewDialog(QtWidgets.QDialog, Ui_CreateNewDialog):
     create_new_layer = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):

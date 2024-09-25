@@ -2,20 +2,24 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from perdix.analysis.engines.DepthmapNet.DepthmapAdvancedDialog import DepthmapAdvancedDialog
-from .ui_DepthmapNetSettingsWidget import Ui_DepthmapNetSettingsWidget
+import os
+from perdix.analysis.engines.DepthmapCLI.DepthmapAdvancedDialog import DepthmapAdvancedDialog
 from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph, db_helpers as dbh, \
     utility_functions as uf
 from perdix.utilities.utility_functions import overrides
 from perdix.analysis.engines.SettingsWidget import SettingsWidget
 from qgis.PyQt.QtCore import (pyqtSignal)
 from qgis.PyQt.QtWidgets import (QMessageBox)
+from qgis.PyQt.uic import loadUiType
 
+Ui_DepthmapCLISettingsWidget, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui_DepthmapCLISettingsWidget.ui'))
 
-class DepthmapNetSettingsWidget(SettingsWidget, Ui_DepthmapNetSettingsWidget):
+class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
     dialogClosed = pyqtSignal()
     updateDatastore = pyqtSignal(str)
 

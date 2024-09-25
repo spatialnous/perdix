@@ -6,8 +6,8 @@ SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>RoadNetworkCleanerDialogBase</class>
- <widget class="QDialog" name="RoadNetworkCleanerDialogBase">
+ <class>RoadNetworkCleanerDialog</class>
+ <widget class="QDialog" name="RoadNetworkCleanerDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

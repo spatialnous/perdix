@@ -8,8 +8,8 @@ SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>CreatenewDialogBase</class>
- <widget class="QDialog" name="CreatenewDialogBase">
+ <class>CreateNewLUDialog</class>
+ <widget class="QDialog" name="CreateNewLUDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

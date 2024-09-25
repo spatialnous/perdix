@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -15,11 +16,11 @@ from qgis.PyQt.uic import loadUiType
 
 from .DbSettings_dialog import DbSettingsDialog
 
-FORM_CLASS, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'catchment_analyser_dialog_base.ui'))
+Ui_CatchmentAnalyserDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'catchment_analyser_dialog.ui'))
 
 
-class CatchmentAnalyserDialog(QDialog, FORM_CLASS):
+class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
     def __init__(self, available_dbs, parent=None):
         """Constructor."""
         super(CatchmentAnalyserDialog, self).__init__(parent)

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
-SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
+SPDX-FileCopyrightText: 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
+SPDX-FileCopyrightText: 2017 UCL
 
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>DbSettingsDialogBase</class>
- <widget class="QDialog" name="DbSettingsDialogBase">
+ <class>DbSettingsDialog</class>
+ <widget class="QDialog" name="DbSettingsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
