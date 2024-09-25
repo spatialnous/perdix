@@ -1,17 +1,22 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import absolute_import
 
-from builtins import str
-
-from qgis.PyQt import QtCore, QtWidgets
+import os
 
 from .VerificationSettingsDialog import VerificationSettingsDialog
-from .ui_Analysis import Ui_AnalysisDialog
 
+from builtins import str
+
+from qgis.PyQt import QtCore, QtWidgets, uic
+
+
+Ui_AnalysisDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'analysis_dock_widget.ui'))
 
 class AnalysisDialog(QtWidgets.QDockWidget, Ui_AnalysisDialog):
     dialogClosed = QtCore.pyqtSignal()

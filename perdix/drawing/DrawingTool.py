@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,11 +15,11 @@ from builtins import object
 from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, QCoreApplication, Qt, QSize)
 from qgis.PyQt.QtGui import (QIcon, QPixmap)
 from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.uic import loadUiType
 from qgis.core import (Qgis, QgsProject, QgsMapLayer)
 
-# Import the code for the DockWidget
-from .DrawingTool_dockwidget import DrawingToolDockWidget
-
+Ui_DrawingToolDockWidget, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'drawing_dock_widget.ui'))
 
 class DrawingTool(object):
     """QGIS Plugin Implementation."""
@@ -283,7 +284,7 @@ class DrawingTool(object):
         if active_unlinks_idx == 0 and self.dockwidget.unlink_mode:
             self.iface.messageBar().pushMessage("Unlinks layer not specified!", Qgis.Critical, duration=5)
             self.dockwidget.unlink_mode = False
-            unlink_icon = QPixmap(os.path.dirname(__file__) + "/custom_icons/unlink_disabled.png")
+            unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")
             self.dockwidget.unlinksButton.setIcon(QIcon(unlink_icon))
             self.dockwidget.unlinksButton.setIconSize(QSize(40, 40))
 
@@ -327,7 +328,7 @@ class DrawingTool(object):
             #    removed on close (see self.onClosePlugin method)
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = DrawingToolDockWidget(self.iface)
+                self.dockwidget = Ui_DrawingToolDockWidget(self.iface)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2017 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -11,6 +12,7 @@ from builtins import object
 from qgis.PyQt.QtCore import (QSettings, QTranslator, QCoreApplication, qVersion, Qt)
 from qgis.PyQt.QtGui import (QIcon, QPixmap)
 from qgis.PyQt.QtWidgets import (QAction, QDialog)
+from qgis.PyQt.uic import (loadUiType)
 
 # Import the debug library
 is_debug = False
@@ -35,7 +37,9 @@ except ImportError:
         sys.path.insert(0, cmd_subfolder)
 
 # Import general modules
-from .ui_About import Ui_AboutDialog
+Ui_AboutDialog, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'about_dialog.ui'))
+
 from .SettingsManager import SettingsManager
 from .ProjectManager import ProjectManager
 

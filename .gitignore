@@ -4,4 +4,6 @@
 *.pyc
 perdix/help/
 perdix/.idea
-scripts/perdix.zip
+scripts/.generated/*
+*/style.editorconfig
+.ruff_cache

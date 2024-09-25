@@ -8,8 +8,8 @@ SPDX-FileCopyrightText: 2019 Space Syntax Ltd.
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>CatchmentAnalyserDialogBase</class>
- <widget class="QDialog" name="CatchmentAnalyserDialogBase">
+ <class>CatchmentAnalyserDialog</class>
+ <widget class="QDialog" name="CatchmentAnalyserDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

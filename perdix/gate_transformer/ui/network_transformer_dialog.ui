@@ -6,8 +6,8 @@ SPDX-FileCopyrightText: 2017 UCL
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
- <class>NetworkTransformerDialogBase</class>
- <widget class="QDialog" name="NetworkTransformerDialogBase">
+ <class>NetworkTransformerDialog</class>
+ <widget class="QDialog" name="NetworkTransformerDialog">
   <property name="enabled">
    <bool>true</bool>
   </property>

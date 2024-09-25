@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Stephen Law <s.law@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -11,11 +12,11 @@ import os.path
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'network_transformer_dialog_base.ui'))
+Ui_NetworkTransformerDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'network_transformer_dialog.ui'))
 
 
-class NetworkTransformerDialog(QDialog, FORM_CLASS):
+class NetworkTransformerDialog(QDialog, Ui_NetworkTransformerDialog):
 
     ############################ initialisation ############################
 

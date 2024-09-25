@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,11 +20,11 @@ from .CreateNew_dialog import CreatenewDialog
 from perdix.utilities import layer_field_helpers as lfh
 from .landuse import LanduseTool
 
-FORM_CLASS, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'urban_data_input_dockwidget_base.ui'))
+Ui_UrbanDataInputDockWidget, _ = loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'urban_data_input_dockwidget.ui'))
 
 
-class UrbanDataInputDockWidget(QDockWidget, FORM_CLASS):
+class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
     closingPlugin = pyqtSignal()
     loadFrontageLayer = pyqtSignal()
 

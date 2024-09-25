@@ -1,16 +1,18 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-
+import os
 from builtins import str
 
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import QtWidgets, uic
 
-from .ui_VerificationSettings import Ui_VerificationSettingsDialog
 from perdix.utilities import utility_functions as uf
 
+Ui_VerificationSettingsDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'verification_settings_dialog.ui'))
 
 class VerificationSettingsDialog(QtWidgets.QDialog, Ui_VerificationSettingsDialog):
     def __init__(self, settings):

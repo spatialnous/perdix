@@ -1,49 +1,21 @@
-<<<<<<< HEAD:esstoolkit/analysis/engines/DepthmapNet/DepthmapNetEngine.py
-# -*- coding: utf-8 -*-
-
-# Space Syntax Toolkit
-# Set of tools for essential space syntax network analysis and results exploration
-# -------------------
-# begin                : 2014-04-01
-# copyright            : (C) 2015 by Jorge Gil, UCL
-# copyright            : (C) 2021 by Space Syntax Ltd.
-# author               : Jorge Gil
-# email                : jorge.gil@ucl.ac.uk
-# contributor          : Petros Koutsolampros
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-=======
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
->>>>>>> a9f7ff0 (Rename project, fix licenses, add new depthmapXcli):perdix/analysis/engines/DepthmapNet/DepthmapNetEngine.py
 
 from builtins import str
 
 from qgis.PyQt.QtCore import (QObject, QThread, pyqtSignal)
 from qgis.core import (QgsVertexId)
 
-<<<<<<< HEAD:esstoolkit/analysis/engines/DepthmapNet/DepthmapNetEngine.py
-from esstoolkit.analysis.engines.AnalysisEngine import AnalysisEngine
-from esstoolkit.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
-from esstoolkit.analysis.engines.DepthmapNet.DepthmapNetSocket import DepthmapNetSocket
-from esstoolkit.utilities import layer_field_helpers as lfh
-from esstoolkit.utilities.utility_functions import overrides
-from esstoolkit.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import DepthmapNetSettingsWidget
-=======
 from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
 from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
 from perdix.analysis.engines.DepthmapNet.DepthmapNetSocket import DepthmapNetSocket
 from perdix.utilities import layer_field_helpers as lfh
 from perdix.utilities.utility_functions import overrides
 from perdix.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import DepthmapNetSettingsWidget
->>>>>>> a9f7ff0 (Rename project, fix licenses, add new depthmapXcli):perdix/analysis/engines/DepthmapNet/DepthmapNetEngine.py
 
 
 class DepthmapNetEngine(QObject, DepthmapEngine):

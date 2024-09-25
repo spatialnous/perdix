@@ -6,7 +6,7 @@ SPDX-FileCopyrightText: 2014 - 2015 UCL
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <ui version="4.0">
-    <class>DepthmapNetSettingsWidget</class>
+    <class>DepthmapCLISettingsWidget</class>
     <widget class="QWidget" name="axialDepthmapTab">
         <attribute name="title">
             <string>depthmapX remote</string>
@@ -149,24 +149,6 @@ SPDX-License-Identifier: GPL-2.0-or-later
                         </widget>
                     </item>
                 </layout>
-            </item>
-            <item>
-                <widget class="QLabel" name="axialDepthmapDownload">
-                    <property name="toolTip">
-                        <string>https://varoudis.github.io/depthmapX/</string>
-                    </property>
-                    <property name="text">
-                        <string>&lt;qt&gt;&lt;a href=&quot;http://archtech.gr/varoudis/depthmapX/?dir=depthmapXnet&quot;&gt;&lt;span
-                            style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Download depthmapXnet...&lt;/a&gt;&lt;/qt&gt;
-                        </string>
-                    </property>
-                    <property name="alignment">
-                        <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="openExternalLinks">
-                        <bool>true</bool>
-                    </property>
-                </widget>
             </item>
         </layout>
     </widget>

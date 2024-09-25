@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# 
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+#!/bin/bash
+
+set -e
+
+reuse lint
+
+for FILE in $(git diff --cached --name-only --diff-filter=M)
+do
+    echo "Checking file: $FILE"
+    python3 ./scripts/check-copyright-year.py ./$FILE
+done
+echo "Copyright year checker satisfied"

@@ -1,14 +1,14 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from builtins import range
-from builtins import str
+import os
 
-from qgis.PyQt import QtCore, QtWidgets
+from builtins import range, str
 
-from .ui_Explorer import Ui_ExplorerDialog
+from qgis.PyQt import QtCore, QtWidgets, uic
 
 # try to import installed pyqtgraph, if not
 # available use the one shipped with this package
@@ -26,6 +26,8 @@ except ImportError:
 
 from perdix.utilities import utility_functions as uf
 
+Ui_ExplorerDialog, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'ui', 'explorer_dock_widget.ui'))
 
 class ExplorerDialog(QtWidgets.QDockWidget, Ui_ExplorerDialog):
     layerChanged = QtCore.pyqtSignal()
