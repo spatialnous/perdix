@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2014 - 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
+# SPDX-FileCopyrightText: 2014 - 2017 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # This file contains metadata for your plugin. Beginning
 # with version 1.8 this is the preferred way to supply information about a
 # plugin. The current method of embedding metadata in __init__.py will
