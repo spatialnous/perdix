@@ -7,16 +7,16 @@
 import os
 
 # Import the PyQt and QGIS libraries
-from qgis.PyQt.QtCore import (QObject, QSettings, QFileInfo)
-from qgis.PyQt.QtWidgets import (QDialog)
-from qgis.PyQt.uic import (loadUiType)
+from qgis.PyQt.QtCore import QObject, QSettings, QFileInfo
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.uic import loadUiType
 
-Ui_SettingsDialog, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'settings_dialog.ui'))
+Ui_SettingsDialog, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "settings_dialog.ui")
+)
 
 
 class SettingsManager(QObject):
-
     def __init__(self, iface):
         QObject.__init__(self)
 

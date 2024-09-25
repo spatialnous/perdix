@@ -3,13 +3,13 @@
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from builtins import str
 
-from qgis.PyQt.QtCore import (QObject, QThread, pyqtSignal)
-from qgis.core import (QgsVertexId)
+from qgis.PyQt.QtCore import QObject, QThread, pyqtSignal
+from qgis.core import QgsVertexId
 
 from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
 from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
@@ -17,7 +17,9 @@ from perdix.analysis.engines.DepthmapNet.DepthmapNetSocket import DepthmapNetSoc
 from perdix.utilities import layer_field_helpers as lfh
 from perdix.utilities import utility_functions as uf
 from perdix.utilities.utility_functions import overrides
-from perdix.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import DepthmapNetSettingsWidget
+from perdix.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import (
+    DepthmapNetSettingsWidget,
+)
 
 
 class DepthmapNetEngine(QObject, DepthmapEngine):
@@ -29,9 +31,9 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
 
         # initialise global variables
         self.axial_layer = None
-        self.axial_id = ''
+        self.axial_id = ""
         self.socket = None
-        self.command = ''
+        self.command = ""
         self.analysis_nodes = 0
         self.analysis_results = None
 
@@ -49,17 +51,19 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
     def get_depthmap_connection():
         # newfeature: get these settings from settings manager.
         # no need for it now as it's hardcoded in depthmapXnet.
-        connection = {'host': 'localhost', 'port': 31337}
+        connection = {"host": "localhost", "port": 31337}
         return connection
 
     def connect_depthmap_net(self):
         connection = self.get_depthmap_connection()
         self.socket = DepthmapNetSocket()
         # connect socket
-        result = self.socket.connectSocket(connection['host'], connection['port'])
+        result = self.socket.connectSocket(connection["host"], connection["port"])
         # if connection fails give warning and stop analysis
-        if result != '':
-            self.iface.messageBar().pushMessage("Info", "Make sure depthmapXnet is running.", level=0, duration=4)
+        if result != "":
+            self.iface.messageBar().pushMessage(
+                "Info", "Make sure depthmapXnet is running.", level=0, duration=4
+            )
             connected = False
             self.socket.closeSocket()
         else:
@@ -79,12 +83,12 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
         # collect result in rows
         final_result = []
         for line in new_result:
-            if "--result" not in line and "--comm" not in line and line != '':
+            if "--result" not in line and "--comm" not in line and line != "":
                 final_result.append(line.split(","))
         if len(final_result) == 0:
             return None, None
         attributes = final_result[0]
-        values = final_result[1:len(final_result)]
+        values = final_result[1 : len(final_result)]
         return attributes, values
 
     def parse_progress(self, msg):
@@ -97,21 +101,22 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
         if "--comm: 2," in msg:
             pos1 = msg.find(": 2,")
             pos2 = msg.find(",0 --", pos1)
-            self.analysis_nodes = int(msg[(pos1 + 4):pos2])
+            self.analysis_nodes = int(msg[(pos1 + 4) : pos2])
             step = int(self.analysis_nodes) * 0.2
         # calculate progress
         elif "--comm: 3," in msg:
             if self.analysis_nodes > 0:
                 pos1 = progress[-2].find(": 3,")
                 pos2 = progress[-2].find(",0 ")
-                prog = progress[-2][(pos1 + 4):pos2]
+                prog = progress[-2][(pos1 + 4) : pos2]
                 relprog = int((float(prog) / float(self.analysis_nodes)) * 100)
-        return step, relprog, ''
+        return step, relprog, ""
 
     def get_progress(self, analysis_settings, datastore):
         if not self.socket.isReady():
-            raise AnalysisEngine.AnalysisEngineError("Socket connection failed, make sure"
-                                                     "depthmapXNet is running")
+            raise AnalysisEngine.AnalysisEngineError(
+                "Socket connection failed, make sure" "depthmapXNet is running"
+            )
         connected, msg = self.socket.checkData(4096)
         if "--r" in msg or "esult" in msg:
             # retrieve all the remaining data
@@ -121,171 +126,202 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
                     msg += result
             self.socket.closeSocket()
             attributes, values = self.parse_results(msg)
-            self.analysis_results = DepthmapEngine.process_analysis_result(analysis_settings, datastore, attributes,
-                                                                           values)
+            self.analysis_results = DepthmapEngine.process_analysis_result(
+                analysis_settings, datastore, attributes, values
+            )
             return 0, 100, None
         elif "--comm: 2," in msg:
             return self.parse_progress(msg)
         elif "--comm: 3," in msg:
             return self.parse_progress(msg)
         elif not connected:
-            raise AnalysisEngine.AnalysisEngineError("Socket connection failed, make sure"
-                                                     "depthmapXNet is running")
+            raise AnalysisEngine.AnalysisEngineError(
+                "Socket connection failed, make sure" "depthmapXNet is running"
+            )
         return None, None, None
 
     def cleanup(self):
         self.socket.closeSocket()
 
-    def showMessage(self, msg, type='Info', lev=1, dur=2):
+    def showMessage(self, msg, type="Info", lev=1, dur=2):
         self.iface.messageBar().pushMessage(type, msg, level=lev, duration=dur)
 
     def parse_radii(self, txt):
         radii = txt
         radii.lower()
-        radii = radii.replace(' ', '')
-        radii = radii.split(',')
+        radii = radii.replace(" ", "")
+        radii = radii.split(",")
         radii.sort()
         radii = list(set(radii))
-        radii = ['0' if x == 'n' else x for x in radii]
+        radii = ["0" if x == "n" else x for x in radii]
         for r in radii:
             if not uf.isNumeric(r):
-                return ''
-        radii = ','.join(radii)
+                return ""
+        radii = ",".join(radii)
         return radii
 
     def setup_analysis(self, layers, settings):
         self.settings = settings
         # get relevant QGIS layer objects
-        axial = layers['map']
-        if axial != '':
+        axial = layers["map"]
+        if axial != "":
             self.axial_layer = lfh.getLegendLayerByName(self.iface, axial)
         else:
-            return False, 'No layer selected'
-        if layers['unlinks'] != '':
-            self.unlinks_layer = lfh.getLegendLayerByName(self.iface, layers['unlinks'])
+            return False, "No layer selected"
+        if layers["unlinks"] != "":
+            self.unlinks_layer = lfh.getLegendLayerByName(self.iface, layers["unlinks"])
         else:
-            self.unlinks_layer = ''
+            self.unlinks_layer = ""
         #
         # prepare analysis layers
-        if self.settings['weight']:
-            weight_by = self.settings['weightBy']
+        if self.settings["weight"]:
+            weight_by = self.settings["weightBy"]
         else:
-            weight_by = ''
+            weight_by = ""
         # look for user defined ID
-        if self.settings['id']:
-            self.axial_id = self.settings['id']
+        if self.settings["id"]:
+            self.axial_id = self.settings["id"]
         else:
             self.axial_id = lfh.getIdField(self.axial_layer)
         # prepare map and unlinks layers
-        if self.settings['type'] in (0, 1):
-            axial_data = self.prepare_axial_map(self.axial_layer, self.settings['type'],
-                                                self.axial_id, weight_by, '\t', False)
-            if axial_data == '':
-                return False, "The axial layer is not ready for analysis: verify it first."
+        if self.settings["type"] in (0, 1):
+            axial_data = self.prepare_axial_map(
+                self.axial_layer,
+                self.settings["type"],
+                self.axial_id,
+                weight_by,
+                "\t",
+                False,
+            )
+            if axial_data == "":
+                return (
+                    False,
+                    "The axial layer is not ready for analysis: verify it first.",
+                )
             if self.unlinks_layer:
-                unlinks_data = self.prepare_unlinks(self.axial_layer, self.unlinks_layer, self.axial_id)
+                unlinks_data = self.prepare_unlinks(
+                    self.axial_layer, self.unlinks_layer, self.axial_id
+                )
             else:
-                unlinks_data = ''
+                unlinks_data = ""
         else:
-            axial_data = self.prepare_segment_map(self.axial_layer, settings['type'],
-                                                  self.axial_id, weight_by, '\t', False)
-            unlinks_data = ''
+            axial_data = self.prepare_segment_map(
+                self.axial_layer,
+                settings["type"],
+                self.axial_id,
+                weight_by,
+                "\t",
+                False,
+            )
+            unlinks_data = ""
         # get radius values
-        radii = self.settings['rvalues']
+        radii = self.settings["rvalues"]
         #
         # prepare analysis user settings
-        command = ''
+        command = ""
         header = "--layer100:nameL\n--input100:Name01\nId\tx1\ty1\tx2\ty2"
-        if weight_by != '':
+        if weight_by != "":
             header += "\t" + weight_by
-        header += '\n'
+        header += "\n"
         # axial analysis settings
-        if self.settings['type'] == 0:
+        if self.settings["type"] == 0:
             footer = "--layer--\ntype:2\n"
             footer += "segment.radii:R," + str(radii) + "\n"
-            footer += "acp.betweenness:" + str(self.settings['betweenness']) + "\n"
-            footer += "acp.measures:" + str(self.settings['fullset']) + "\n"
-            footer += "acp.rra:" + str(self.settings['fullset']) + "\n"
-            if weight_by != '':
-                footer += "acp.weightBy:" + str(self.getWeightPosition(self.settings['weightBy'])) + "\n"
+            footer += "acp.betweenness:" + str(self.settings["betweenness"]) + "\n"
+            footer += "acp.measures:" + str(self.settings["fullset"]) + "\n"
+            footer += "acp.rra:" + str(self.settings["fullset"]) + "\n"
+            if weight_by != "":
+                footer += (
+                    "acp.weightBy:"
+                    + str(self.getWeightPosition(self.settings["weightBy"]))
+                    + "\n"
+                )
             else:
                 footer += "acp.weightBy:-1\n"
-            if unlinks_data != '':
+            if unlinks_data != "":
                 footer += "acp.unlinkid:-1\n"
                 footer += "acp.unlinks:" + str(unlinks_data) + "\n"
             footer += "--end--\n"
             command = header + axial_data + footer
         # segment analysis settings with segmentation and unlinks
-        elif self.settings['type'] == 1:
+        elif self.settings["type"] == 1:
             footer = "--layer--\ntype:3\n"
-            footer += "segment.stubs:" + str(self.settings['stubs']) + "\n"
-            footer += "segment.betweenness:" + str(self.settings['betweenness']) + "\n"
+            footer += "segment.stubs:" + str(self.settings["stubs"]) + "\n"
+            footer += "segment.betweenness:" + str(self.settings["betweenness"]) + "\n"
             footer += "segment.fullAngular:" + "0" + "\n"
             footer += "segment.tulip:" + "1" + "\n"
             footer += "segment.tulipCnt:" + "1024" + "\n"
-            if self.settings['radius'] == 0:
+            if self.settings["radius"] == 0:
                 footer += "segment.segmentSteps:" + "1" + "\n"
             else:
                 footer += "segment.segmentSteps:" + "0" + "\n"
-            if self.settings['radius'] == 1:
+            if self.settings["radius"] == 1:
                 footer += "segment.angular:" + "1" + "\n"
             else:
                 footer += "segment.angular:" + "0" + "\n"
-            if self.settings['radius'] == 2:
+            if self.settings["radius"] == 2:
                 footer += "segment.metric:" + "1" + "\n"
             else:
                 footer += "segment.metric:" + "0" + "\n"
             footer += "segment.radii:R," + str(radii) + "\n"
-            if weight_by != '':
-                footer += "segment.weightBy:" + str(self.getWeightPosition(self.settings['weightBy'])) + "\n"
+            if weight_by != "":
+                footer += (
+                    "segment.weightBy:"
+                    + str(self.getWeightPosition(self.settings["weightBy"]))
+                    + "\n"
+                )
             else:
                 footer += "segment.weightBy:-1\n"
-            if unlinks_data != '':
+            if unlinks_data != "":
                 footer += "acp.unlinkid:-1\n"
                 footer += "acp.unlinks:" + str(unlinks_data) + "\n"
             footer += "--end--\n"
             command = header + axial_data + footer
         # segment analysis settings, data only
-        elif self.settings['type'] == 2:
+        elif self.settings["type"] == 2:
             footer = "--layer--\ntype:4\n"
-            footer += "segment.stubs:" + str(self.settings['stubs']) + "\n"
-            footer += "segment.betweenness:" + str(self.settings['betweenness']) + "\n"
+            footer += "segment.stubs:" + str(self.settings["stubs"]) + "\n"
+            footer += "segment.betweenness:" + str(self.settings["betweenness"]) + "\n"
             footer += "segment.fullAngular:" + "0" + "\n"
             footer += "segment.tulip:" + "1" + "\n"
             footer += "segment.tulipCnt:" + "1024" + "\n"
-            if self.settings['radius'] == 0:
+            if self.settings["radius"] == 0:
                 footer += "segment.segmentSteps:" + "1" + "\n"
             else:
                 footer += "segment.segmentSteps:" + "0" + "\n"
-            if self.settings['radius'] == 1:
+            if self.settings["radius"] == 1:
                 footer += "segment.angular:" + "1" + "\n"
             else:
                 footer += "segment.angular:" + "0" + "\n"
-            if self.settings['radius'] == 2:
+            if self.settings["radius"] == 2:
                 footer += "segment.metric:" + "1" + "\n"
             else:
                 footer += "segment.metric:" + "0" + "\n"
             footer += "segment.radii:R," + str(radii) + "\n"
-            if weight_by != '':
-                footer += "segment.weightBy:" + str(self.getWeightPosition(self.settings['weightBy'])) + "\n"
+            if weight_by != "":
+                footer += (
+                    "segment.weightBy:"
+                    + str(self.getWeightPosition(self.settings["weightBy"]))
+                    + "\n"
+                )
             else:
                 footer += "segment.weightBy:-1\n"
             footer += "--end--\n"
             command = header + axial_data + footer
         self.command = command
-        return command and command != '', ''
+        return command and command != "", ""
 
     def getWeightPosition(self, name):
         pos = -1
         names = []
         weight_name = name.title()
-        if self.settings['type'] == 0:
+        if self.settings["type"] == 0:
             names.extend(self.axial_default)
-        elif self.settings['type'] == 1:
+        elif self.settings["type"] == 1:
             names.extend(self.segment_default)
             # depthmapX creates a weight column as an axial property. to remove later
             weight_name = "Axial %s" % weight_name
-        elif self.settings['type'] == 2:
+        elif self.settings["type"] == 2:
             names.extend(self.rcl_default)
         if weight_name not in names:
             names.append(weight_name)
@@ -302,12 +338,14 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
     # newfeature: unused, not sure this is working properly. look at threads in verification
     def threadAxialMap(self, action):
         # create thread to export map geometry and extra attributes
-        if action == 'export':
-            if self.settings['weight']:
-                weight_by = self.settings['weightBy']
+        if action == "export":
+            if self.settings["weight"]:
+                weight_by = self.settings["weightBy"]
             else:
-                weight_by = ''
-            self.axial_thread = ExportMap(self.iface.mainWindow(), self, self.axial_layer, self.user_id, weight_by)
+                weight_by = ""
+            self.axial_thread = ExportMap(
+                self.iface.mainWindow(), self, self.axial_layer, self.user_id, weight_by
+            )
         # else:
         #    self.axial_thread = ImportAxialMap(self.iface.mainWindow(), self, result)
         # put it in separate thread
@@ -321,7 +359,7 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
 # class to extract the model geometry for input in Depthmap.
 # can be slow with large models and need to run it in separate thread
 class ExportMap(QThread):
-    def __init__(self, parent_thread, parent_object, layer, ref='', weight=''):
+    def __init__(self, parent_thread, parent_object, layer, ref="", weight=""):
         QThread.__init__(self, parent_thread)
         self.parent = parent_object
         self.layer = layer
@@ -330,21 +368,29 @@ class ExportMap(QThread):
         self.weight = weight
 
     def run(self):
-        segment_data = ''
+        segment_data = ""
         try:
             features = self.axial_layer.getFeatures()
             # I leave all the if clauses outside the for loop to gain some speed
             vid = QgsVertexId()
-            if self.id != '':
-                if self.weight != '':
+            if self.id != "":
+                if self.weight != "":
                     for f in features:
                         nr = 0
                         while f.geometry().vertexIdFromVertexNr(nr + 1, vid):
                             segment_data += str(f.attribute(self.id)) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr).y()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr + 1).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr + 1).y()) + "\t"
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr).y())
+                                + "\t"
+                            )
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr + 1).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr + 1).y())
+                                + "\t"
+                            )
                             segment_data += str(f.attribute(self.weight)) + "\n"
                             nr += 1
                 else:
@@ -352,21 +398,37 @@ class ExportMap(QThread):
                         nr = 0
                         while f.geometry().vertexIdFromVertexNr(nr + 1, vid):
                             segment_data += str(f.attribute(self.id)) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr).y()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr + 1).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr + 1).y()) + "\n"
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr).y())
+                                + "\t"
+                            )
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr + 1).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr + 1).y())
+                                + "\n"
+                            )
                             nr += 1
             else:
-                if self.weight != '':
+                if self.weight != "":
                     for f in features:
                         nr = 0
                         while f.geometry().vertexIdFromVertexNr(nr + 1, vid):
                             segment_data += str(f.id()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr).y()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr + 1).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr + 1).y()) + "\t"
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr).y())
+                                + "\t"
+                            )
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr + 1).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr + 1).y())
+                                + "\t"
+                            )
                             segment_data += str(f.attribute(self.weight)) + "\n"
                             nr += 1
                 else:
@@ -374,16 +436,26 @@ class ExportMap(QThread):
                         nr = 0
                         while f.geometry().vertexIdFromVertexNr(nr + 1, vid):
                             segment_data += str(f.id()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr).y()) + "\t"
-                            segment_data += str(f.geometry().vertexAt(nr + 1).x()) + "\t" + \
-                                            str(f.geometry().vertexAt(nr + 1).y()) + "\n"
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr).y())
+                                + "\t"
+                            )
+                            segment_data += (
+                                str(f.geometry().vertexAt(nr + 1).x())
+                                + "\t"
+                                + str(f.geometry().vertexAt(nr + 1).y())
+                                + "\n"
+                            )
                             nr += 1
-            self.status.emit('Model exported for analysis.')
+            self.status.emit("Model exported for analysis.")
             self.result.emit(segment_data)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
-            self.error.emit('Exporting segment map failed.')
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
+            self.error.emit("Exporting segment map failed.")
 
     def stop(self):
         self.abort = True

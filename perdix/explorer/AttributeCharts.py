@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from math import atan
 
 # Import the PyQt and QGIS libraries, essential libraries
-from qgis.PyQt.QtCore import (QObject, pyqtSignal)
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 # try to import installed pyqtgraph, if not
 # available use the one shipped with this package
@@ -64,7 +65,14 @@ class AttributeCharts(QObject):
         if has_pyqtgraph:
             curve = pg.PlotCurveItem()
             self.plot.clear()
-            curve.setData(x, y, stepMode=True, fillLevel=0, brush=(230, 230, 230), pen=pg.mkPen(None))
+            curve.setData(
+                x,
+                y,
+                stepMode=True,
+                fillLevel=0,
+                brush=(230, 230, 230),
+                pen=pg.mkPen(None),
+            )
             self.plot.addItem(curve)
             # add the selection tool
             self.region = pg.LinearRegionItem([xmax, xmax], bounds=[xmin, xmax])
@@ -95,7 +103,14 @@ class AttributeCharts(QObject):
                 y, x = np.histogram(values, bins=np.linspace(xmin, xmax, num=bin))
                 # plot the selection chart
                 self.hist_selection = pg.PlotCurveItem()
-                self.hist_selection.setData(x, y, stepMode=True, fillLevel=0, brush=(230, 0, 0), pen=pg.mkPen(None))
+                self.hist_selection.setData(
+                    x,
+                    y,
+                    stepMode=True,
+                    fillLevel=0,
+                    brush=(230, 0, 0),
+                    pen=pg.mkPen(None),
+                )
                 self.plot.addItem(self.hist_selection)
                 if self.just_selected:
                     # if the selection comes from the chart leave the selection region in place
@@ -125,7 +140,19 @@ class AttributeCharts(QObject):
 
     # ----
     # Scatterplot functions
-    def drawScatterplot(self, xvalues, xmin, xmax, yvalues, ymin, ymax, slope, intercept, ids, symbols=None):
+    def drawScatterplot(
+        self,
+        xvalues,
+        xmin,
+        xmax,
+        yvalues,
+        ymin,
+        ymax,
+        slope,
+        intercept,
+        ids,
+        symbols=None,
+    ):
         # plot the chart
         if has_pyqtgraph:
             self.scatter = pg.ScatterPlotItem()
@@ -137,11 +164,25 @@ class AttributeCharts(QObject):
                     x = xvalues[i]
                     y = yvalues[i]
                     symb = symbols[i]
-                    points.append({'pos': (x, y), 'data': id, 'size': 3, 'pen': pg.mkPen(None), 'brush': symb})
+                    points.append(
+                        {
+                            "pos": (x, y),
+                            "data": id,
+                            "size": 3,
+                            "pen": pg.mkPen(None),
+                            "brush": symb,
+                        }
+                    )
                 self.scatter.addPoints(points)
             else:
-                self.scatter.addPoints(x=xvalues, y=yvalues, data=ids, size=3, pen=pg.mkPen(None),
-                                       brush=pg.mkBrush(235, 235, 235, 255))
+                self.scatter.addPoints(
+                    x=xvalues,
+                    y=yvalues,
+                    data=ids,
+                    size=3,
+                    pen=pg.mkPen(None),
+                    brush=pg.mkBrush(235, 235, 235, 255),
+                )
             # selection by direct click
             self.scatter.sigClicked.connect(self.changedScatterplotSelection)
             self.plot.addItem(self.scatter)
@@ -149,7 +190,7 @@ class AttributeCharts(QObject):
             self.regress_line = pg.InfiniteLine()
             self.regress_line.setAngle(atan(slope / 1) * 180 / 3.1459)
             self.regress_line.setValue((0, intercept))
-            self.regress_line.setPen(color='b', width=1)
+            self.regress_line.setPen(color="b", width=1)
             if self.show_lines:
                 self.plot.addItem(self.regress_line)
             # newfeature: add the selection tool
@@ -185,8 +226,14 @@ class AttributeCharts(QObject):
             if len(ids) > 0:
                 self.scatter_selection = [fid for fid in ids]
                 self.selected_points = pg.ScatterPlotItem()
-                self.selected_points.addPoints(x=xvalues, y=yvalues, data=ids, size=3, pen=pg.mkPen('r', width=1),
-                                               brush=pg.mkBrush(235, 0, 0, 255))
+                self.selected_points.addPoints(
+                    x=xvalues,
+                    y=yvalues,
+                    data=ids,
+                    size=3,
+                    pen=pg.mkPen("r", width=1),
+                    brush=pg.mkBrush(235, 0, 0, 255),
+                )
                 self.plot.addItem(self.selected_points)
             self.just_selected = False
 

@@ -10,8 +10,10 @@ from builtins import str
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.uic import loadUiType
 
-Ui_DepthmapAdvancedDialog, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'more_settings_dialog.ui'))
+Ui_DepthmapAdvancedDialog, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "more_settings_dialog.ui")
+)
+
 
 class DepthmapAdvancedDialog(QtWidgets.QDialog, Ui_DepthmapAdvancedDialog):
     def __init__(self):
@@ -69,8 +71,9 @@ class DepthmapAdvancedDialog(QtWidgets.QDialog, Ui_DepthmapAdvancedDialog):
         try:
             int(self.axialStubsEdit.text())
             self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setDisabled(False)
-            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setToolTip('')
+            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setToolTip("")
         except ValueError:
             self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setDisabled(True)
             self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setToolTip(
-                'Please enter a valid stubs removal % (integer).')
+                "Please enter a valid stubs removal % (integer)."
+            )

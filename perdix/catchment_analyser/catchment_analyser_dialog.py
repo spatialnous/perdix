@@ -1,23 +1,23 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Network based catchment analysis
-"""
+"""Network based catchment analysis"""
 
 from __future__ import absolute_import
 
 import os
 
-from qgis.PyQt.QtWidgets import (QDialog, QFileDialog)
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog
 from qgis.PyQt.uic import loadUiType
 
 from .DbSettings_dialog import DbSettingsDialog
 
-Ui_CatchmentAnalyserDialog, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'catchment_analyser_dialog.ui'))
+Ui_CatchmentAnalyserDialog, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "catchment_analyser_dialog.ui")
+)
 
 
 class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
@@ -66,8 +66,9 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
 
     def setOutput(self):
         if self.shpRadioButton.isChecked():
-            self.file_name, _ = QFileDialog.getSaveFileName(self, "Save output file ", self.getNetwork() + "_catchment",
-                                                            '*.shp')
+            self.file_name, _ = QFileDialog.getSaveFileName(
+                self, "Save output file ", self.getNetwork() + "_catchment", "*.shp"
+            )
             if self.file_name:
                 self.networkText.setText(self.file_name)
             else:
@@ -90,10 +91,15 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
             try:
                 self.dbsettings = self.dbsettings_dlg.getDbSettings()
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
                 self.networkText.setText(db_layer_name)
             except Exception as e:
-                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+                print(
+                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                )
                 self.networkText.clear()
 
     def setShpOutput(self):
@@ -101,7 +107,9 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         try:
             self.networkText.setText(self.file_name)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             self.networkText.clear()
         self.networkText.setDisabled(True)
 
@@ -118,7 +126,7 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         self.networkText.setDisabled(False)
 
     def setNetworkLayers(self, names):
-        layers = ['-----']
+        layers = ["-----"]
         if names:
             layers = []
             layers.extend(names)
@@ -136,21 +144,21 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         self.costCombo.clear()
         if names:
             # self.costCheck.setEnabled(True)
-            self.costCombo.addItems(['length'] + names)
+            self.costCombo.addItems(["length"] + names)
         else:
-            fields = ['-----']
-            self.costCombo.addItem(['length'])
+            fields = ["-----"]
+            self.costCombo.addItem(["length"])
             self.costCombo.addItems(fields)
 
     def getCostField(self):
-        if self.costCombo.currentText() == '':
+        if self.costCombo.currentText() == "":
             cost_field = None
         else:
             cost_field = self.costCombo.currentText()
         return cost_field
 
     def setOriginLayers(self, names):
-        layers = ['-----']
+        layers = ["-----"]
         if names:
             layers = []
             layers.extend(names)
@@ -180,7 +188,7 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         else:
             self.nameCheck.setEnabled(False)
             # self.nameCombo.setEnabled(False)
-            fields = ['-----']
+            fields = ["-----"]
             self.nameCombo.addItems(fields)
 
     def getName(self):
@@ -191,7 +199,7 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
 
     def getDistances(self):
         if self.distancesText.text():
-            distances = self.distancesText.text().split(',')
+            distances = self.distancesText.text().split(",")
             return distances
 
     def getNetworkTolerance(self):
@@ -201,7 +209,9 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         return self.polygonTolSpin.value()
 
     def setNetworkOutput(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save output file ", "catchment_network", '*.shp')
+        file_name, _ = QFileDialog.getSaveFileName(
+            self, "Save output file ", "catchment_network", "*.shp"
+        )
         if file_name:
             self.networkText.setText(file_name)
 
@@ -218,7 +228,6 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
             self.closeDialog()
 
     def lockGUI(self, onoff):
-
         self.networkCombo.setDisabled(onoff)
         self.costCombo.setDisabled(onoff)
         self.originsCombo.setDisabled(onoff)
@@ -247,24 +256,24 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
             return shp_path, shp_path[:-4] + "_plg.shp"
         elif self.postgisRadioButton.isChecked():
             try:
-                database, schema, table_name = self.networkText.text().split(':')
+                database, schema, table_name = self.networkText.text().split(":")
                 db_path = self.dbsettings_dlg.connstring, schema, table_name
                 db_path_u = list(db_path)
-                db_path_u[2] = db_path_u[2] + '_plg'
+                db_path_u[2] = db_path_u[2] + "_plg"
                 return db_path, tuple(db_path_u)
             except ValueError:
-                return '', ''
+                return "", ""
         else:
             temp_name = self.networkText.text()
-            return temp_name, temp_name + '_plg'
+            return temp_name, temp_name + "_plg"
 
     def get_output_type(self):
         if self.shpRadioButton.isChecked():
-            return 'shapefile'
+            return "shapefile"
         elif self.postgisRadioButton.isChecked():
-            return 'postgis'
+            return "postgis"
         else:
-            return 'memory'
+            return "memory"
 
     def closeEvent(self, QCloseEvent):
         self.closeDialog()

@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import absolute_import
@@ -13,10 +13,15 @@ import os.path
 
 # Import the PyQt and QGIS libraries
 
-from qgis.PyQt.QtCore import (QObject, QTimer, pyqtSignal, QVariant)
-from qgis.core import (QgsProject, QgsVectorDataProvider, Qgis, QgsWkbTypes)
+from qgis.PyQt.QtCore import QObject, QTimer, pyqtSignal, QVariant
+from qgis.core import QgsProject, QgsVectorDataProvider, Qgis, QgsWkbTypes
 
-from perdix.utilities import shapefile_helpers as shph, layer_field_helpers as lfh, db_helpers as dbh
+from perdix.utilities import (
+    shapefile_helpers as shph,
+    layer_field_helpers as lfh,
+    db_helpers as dbh,
+)
+
 # Import required modules
 from .AnalysisDialog import AnalysisDialog
 from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
@@ -42,7 +47,9 @@ class AnalysisTool(QObject):
     def engineChanged(self, index):
         new_engine = self.dlg.engineSelectionCombo.currentText()
         self.analysis_engine = self.engine_registry.get_engine(new_engine, self.iface)
-        self.dlg.set_analysis_settings_widget(self.analysis_engine.create_settings_widget(self.dlg))
+        self.dlg.set_analysis_settings_widget(
+            self.analysis_engine.create_settings_widget(self.dlg)
+        )
         self.dlg.update_analysis_tabs()
 
     def load(self):
@@ -50,8 +57,12 @@ class AnalysisTool(QObject):
         self.dlg = AnalysisDialog(self.iface.mainWindow())
         available_engines = self.engine_registry.get_available_engines()
         self.dlg.set_available_engines(available_engines)
-        self.analysis_engine = self.engine_registry.get_engine(next(iter(available_engines)), self.iface)
-        self.dlg.set_analysis_settings_widget(self.analysis_engine.create_settings_widget(self.dlg))
+        self.analysis_engine = self.engine_registry.get_engine(
+            next(iter(available_engines)), self.iface
+        )
+        self.dlg.set_analysis_settings_widget(
+            self.analysis_engine.create_settings_widget(self.dlg)
+        )
         self.dlg.engineSelectionCombo.currentIndexChanged.connect(self.engineChanged)
 
         # initialise axial analysis classes
@@ -87,9 +98,9 @@ class AnalysisTool(QObject):
         self.timer.timeout.connect(self.check_analysis_progress)
 
         # define analysis data structures
-        self.analysis_layers = {'map': "", 'unlinks': "", 'map_type': 0}
+        self.analysis_layers = {"map": "", "unlinks": "", "map_type": 0}
 
-        self.user_ids = {'map': "", 'unlinks': ""}
+        self.user_ids = {"map": "", "unlinks": ""}
         self.analysis_output = ""
         self.getProjectSettings()
 
@@ -146,41 +157,43 @@ class AnalysisTool(QObject):
         self.editDatastoreSettings.emit()
 
     def updateDatastore(self, name):
-        new_datastore = {'name': '', 'path': '', 'type': -1, 'schema': '', 'crs': ''}
+        new_datastore = {"name": "", "path": "", "type": -1, "schema": "", "crs": ""}
         layer = lfh.getLegendLayerByName(self.iface, name)
         if layer:
-            new_datastore['crs'] = layer.crs().postgisSrid()
-            if 'SpatiaLite' in layer.storageType():
-                new_datastore['type'] = 1
+            new_datastore["crs"] = layer.crs().postgisSrid()
+            if "SpatiaLite" in layer.storageType():
+                new_datastore["type"] = 1
                 path = lfh.getLayerPath(layer)
                 dbname = os.path.basename(path)
-                new_datastore['path'] = path
-                new_datastore['name'] = dbname
+                new_datastore["path"] = path
+                new_datastore["name"] = dbname
                 # create a new connection if not exists
                 conn = dbh.listSpatialiteConnections()
-                if path not in conn['path']:
+                if path not in conn["path"]:
                     dbh.createSpatialiteConnection(dbname, path)
-            elif 'PostGIS' in layer.storageType():
-                new_datastore['type'] = 2
+            elif "PostGIS" in layer.storageType():
+                new_datastore["type"] = 2
                 layerinfo = dbh.getPostgisLayerInfo(layer)
-                if layerinfo['service']:
-                    path = layerinfo['service']
+                if layerinfo["service"]:
+                    path = layerinfo["service"]
                 else:
-                    path = layerinfo['database']
-                new_datastore['path'] = path
-                new_datastore['schema'] = layerinfo['schema']
-                if 'connection' in layerinfo:
-                    new_datastore['name'] = layerinfo['connection']
+                    path = layerinfo["database"]
+                new_datastore["path"] = path
+                new_datastore["schema"] = layerinfo["schema"]
+                if "connection" in layerinfo:
+                    new_datastore["name"] = layerinfo["connection"]
                 else:
                     # create a new connection if not exists
-                    dbh.createPostgisConnectionSetting(path, dbh.getPostgisConnectionInfo(layer))
-                    new_datastore['name'] = path
-            elif 'memory?' not in layer.storageType():  # 'Shapefile'
-                new_datastore['type'] = 0
-                new_datastore['path'] = lfh.getLayerPath(layer)
-                new_datastore['name'] = os.path.basename(new_datastore['path'])
-            if new_datastore['type'] in (0, 1, 2):
-                self.project.writeSettings(new_datastore, 'datastore')
+                    dbh.createPostgisConnectionSetting(
+                        path, dbh.getPostgisConnectionInfo(layer)
+                    )
+                    new_datastore["name"] = path
+            elif "memory?" not in layer.storageType():  # 'Shapefile'
+                new_datastore["type"] = 0
+                new_datastore["path"] = lfh.getLayerPath(layer)
+                new_datastore["name"] = os.path.basename(new_datastore["path"])
+            if new_datastore["type"] in (0, 1, 2):
+                self.project.writeSettings(new_datastore, "datastore")
                 self.setDatastore()
             else:
                 return
@@ -188,74 +201,105 @@ class AnalysisTool(QObject):
             return
 
     def clearDatastore(self):
-        new_datastore = {'name': '', 'path': '', 'type': -1, 'schema': '', 'crs': ''}
-        self.project.writeSettings(new_datastore, 'datastore')
+        new_datastore = {"name": "", "path": "", "type": -1, "schema": "", "crs": ""}
+        self.project.writeSettings(new_datastore, "datastore")
         self.setDatastore()
 
     def setDatastore(self):
-        self.datastore = self.project.getGroupSettings('datastore')
-        if 'type' in self.datastore:
-            self.datastore['type'] = int(self.datastore['type'])
+        self.datastore = self.project.getGroupSettings("datastore")
+        if "type" in self.datastore:
+            self.datastore["type"] = int(self.datastore["type"])
         else:
-            self.datastore['type'] = -1
+            self.datastore["type"] = -1
         # update UI
         txt = ""
         path = ""
-        if 'name' in self.datastore and self.datastore['name'] != "":
+        if "name" in self.datastore and self.datastore["name"] != "":
             # get elements for string to identify data store for user
             # shape file data store
-            if self.datastore['type'] == 0 and os.path.exists(self.datastore['path']):
-                txt = 'SF: %s' % self.datastore['name']
-                path = self.datastore['path']
+            if self.datastore["type"] == 0 and os.path.exists(self.datastore["path"]):
+                txt = "SF: %s" % self.datastore["name"]
+                path = self.datastore["path"]
             # spatialite data store
-            elif self.datastore['type'] == 1 and os.path.exists(self.datastore['path']):
+            elif self.datastore["type"] == 1 and os.path.exists(self.datastore["path"]):
                 sl_connections = dbh.listSpatialiteConnections()
                 if len(sl_connections) > 0:
-                    if self.datastore['name'] in sl_connections['name'] and self.datastore['path'] == \
-                            sl_connections['path'][sl_connections['name'].index(self.datastore['name'])]:
-                        txt = 'SL: %s' % self.datastore['name']
-                        path = self.datastore['path']
+                    if (
+                        self.datastore["name"] in sl_connections["name"]
+                        and self.datastore["path"]
+                        == sl_connections["path"][
+                            sl_connections["name"].index(self.datastore["name"])
+                        ]
+                    ):
+                        txt = "SL: %s" % self.datastore["name"]
+                        path = self.datastore["path"]
                 else:
-                    dbh.createSpatialiteConnection(self.datastore['name'], self.datastore['path'])
-                    txt = 'SL: %s' % self.datastore['name']
-                    path = self.datastore['path']
+                    dbh.createSpatialiteConnection(
+                        self.datastore["name"], self.datastore["path"]
+                    )
+                    txt = "SL: %s" % self.datastore["name"]
+                    path = self.datastore["path"]
             # postgis data store
-            elif self.datastore['type'] == 2 and len(dbh.listPostgisConnectionNames()) > 0:
-                if self.datastore['name'] in dbh.listPostgisConnectionNames():
-                    txt = 'PG: %s (%s)' % (self.datastore['name'], self.datastore['schema'])
-                    path = """dbname='%s' schema='%s'""" % (self.datastore['path'], self.datastore['schema'])
+            elif (
+                self.datastore["type"] == 2
+                and len(dbh.listPostgisConnectionNames()) > 0
+            ):
+                if self.datastore["name"] in dbh.listPostgisConnectionNames():
+                    txt = "PG: %s (%s)" % (
+                        self.datastore["name"],
+                        self.datastore["schema"],
+                    )
+                    path = """dbname='%s' schema='%s'""" % (
+                        self.datastore["path"],
+                        self.datastore["schema"],
+                    )
         self.dlg.setDatastore(txt, path)
 
     def isDatastoreSet(self):
         is_set = False
         if self.datastore:
-            name = self.datastore['name']
-            path = self.datastore['path']
-            schema = self.datastore['schema']
+            name = self.datastore["name"]
+            path = self.datastore["path"]
+            schema = self.datastore["schema"]
             if name == "":
                 self.clearDatastore()
-                self.iface.messageBar().pushMessage("Info", "Select a 'Data store' to save analysis results.", level=0,
-                                                    duration=5)
-            elif self.datastore['type'] == 0 and not os.path.exists(path):
+                self.iface.messageBar().pushMessage(
+                    "Info",
+                    "Select a 'Data store' to save analysis results.",
+                    level=0,
+                    duration=5,
+                )
+            elif self.datastore["type"] == 0 and not os.path.exists(path):
                 is_set = False
-            elif self.datastore['type'] == 1 and (
-                    name not in dbh.listSpatialiteConnections()['name'] or not os.path.exists(path)):
+            elif self.datastore["type"] == 1 and (
+                name not in dbh.listSpatialiteConnections()["name"]
+                or not os.path.exists(path)
+            ):
                 is_set = False
-            elif self.datastore['type'] == 2 and (
-                    name not in dbh.listPostgisConnectionNames() or schema not in dbh.listPostgisSchemas(
-                dbh.getPostgisConnection(name))):
+            elif self.datastore["type"] == 2 and (
+                name not in dbh.listPostgisConnectionNames()
+                or schema not in dbh.listPostgisSchemas(dbh.getPostgisConnection(name))
+            ):
                 is_set = False
             else:
                 is_set = True
             # clear whatever data store settings are saved
             if not is_set:
                 self.clearDatastore()
-                self.iface.messageBar().pushMessage("Info", "The selected data store cannot be found.", level=0,
-                                                    duration=5)
+                self.iface.messageBar().pushMessage(
+                    "Info",
+                    "The selected data store cannot be found.",
+                    level=0,
+                    duration=5,
+                )
         else:
             self.clearDatastore()
-            self.iface.messageBar().pushMessage("Info", "Select a 'Data store' to save analysis results.", level=0,
-                                                duration=5)
+            self.iface.messageBar().pushMessage(
+                "Info",
+                "Select a 'Data store' to save analysis results.",
+                level=0,
+                duration=5,
+            )
         return is_set
 
     ##
@@ -271,7 +315,7 @@ class AnalysisTool(QObject):
         analysis_map = -1
         analysis_unlinks = -1
         map_type = 0
-        layers = lfh.getLegendLayers(self.iface, 'all', 'all')
+        layers = lfh.getLegendLayers(self.iface, "all", "all")
         if layers:
             for layer in layers:
                 # checks if the layer is projected. Geographic coordinates are not supported
@@ -280,18 +324,21 @@ class AnalysisTool(QObject):
                     if layer.geometryType() == 1:  # line geometry
                         map_list.append(layer.name())
             # settings preference
-            if self.analysis_layers['map'] in map_list:
-                analysis_map = map_list.index(self.analysis_layers['map'])
-                map_type = self.analysis_layers['map_type']
-            if self.analysis_layers['unlinks'] in unlinks_list:
-                analysis_unlinks = unlinks_list.index(self.analysis_layers['unlinks'])
+            if self.analysis_layers["map"] in map_list:
+                analysis_map = map_list.index(self.analysis_layers["map"])
+                map_type = self.analysis_layers["map_type"]
+            if self.analysis_layers["unlinks"] in unlinks_list:
+                analysis_unlinks = unlinks_list.index(self.analysis_layers["unlinks"])
             # current selection
             selected_layers = self.dlg.getAnalysisLayers()
-            if selected_layers['map'] != '' and selected_layers['map'] in map_list:
-                analysis_map = map_list.index(selected_layers['map'])
-                map_type = selected_layers['map_type']
-            if selected_layers['unlinks'] != '' and selected_layers['unlinks'] in unlinks_list:
-                analysis_unlinks = unlinks_list.index(selected_layers['unlinks'])
+            if selected_layers["map"] != "" and selected_layers["map"] in map_list:
+                analysis_map = map_list.index(selected_layers["map"])
+                map_type = selected_layers["map_type"]
+            if (
+                selected_layers["unlinks"] != ""
+                and selected_layers["unlinks"] in unlinks_list
+            ):
+                analysis_unlinks = unlinks_list.index(selected_layers["unlinks"])
         else:
             self.dlg.clear_analysis_tab()
 
@@ -306,50 +353,84 @@ class AnalysisTool(QObject):
     def runAxialVerification(self):
         self.edit_mode = self.dlg.getLayerTab()
         self.analysis_layers = self.dlg.getAnalysisLayers()
-        axial = lfh.getLegendLayerByName(self.iface, self.analysis_layers['map'])
-        unlinks = lfh.getLegendLayerByName(self.iface, self.analysis_layers['unlinks'])
+        axial = lfh.getLegendLayerByName(self.iface, self.analysis_layers["map"])
+        unlinks = lfh.getLegendLayerByName(self.iface, self.analysis_layers["unlinks"])
         settings = self.dlg.getAxialEditSettings()
         caps = None
         self.axial_id = lfh.getIdField(axial)
-        if self.axial_id == '':
-            self.iface.messageBar().pushMessage("Info",
-                                                "The axial layer has invalid values in the ID column. Using feature ids.",
-                                                level=0, duration=3)
+        if self.axial_id == "":
+            self.iface.messageBar().pushMessage(
+                "Info",
+                "The axial layer has invalid values in the ID column. Using feature ids.",
+                level=0,
+                duration=3,
+            )
         # verify axial map
         if self.edit_mode == 0:
             # get ids (to match the object ids in the map)
-            self.user_ids['map'] = "%s" % self.axial_id
+            self.user_ids["map"] = "%s" % self.axial_id
             if axial.geometryType() == QgsWkbTypes.LineGeometry:
                 caps = axial.dataProvider().capabilities()
-                self.verificationThread = AxialVerification(self.iface.mainWindow(), self, settings, axial,
-                                                            self.user_ids['map'], unlinks)
+                self.verificationThread = AxialVerification(
+                    self.iface.mainWindow(),
+                    self,
+                    settings,
+                    axial,
+                    self.user_ids["map"],
+                    unlinks,
+                )
             else:
-                self.iface.messageBar().pushMessage("Info", "Select an axial lines map layer.", level=0, duration=3)
+                self.iface.messageBar().pushMessage(
+                    "Info", "Select an axial lines map layer.", level=0, duration=3
+                )
                 return False
         # verify unlinks
         elif self.edit_mode == 1:
             if unlinks and (axial.storageType() != unlinks.storageType()):
-                self.iface.messageBar().pushMessage("Warning", "All layers must be in the same file format.", level=1,
-                                                    duration=3)
+                self.iface.messageBar().pushMessage(
+                    "Warning",
+                    "All layers must be in the same file format.",
+                    level=1,
+                    duration=3,
+                )
                 return False
             caps = unlinks.dataProvider().capabilities()
-            self.user_ids['unlinks'] = lfh.getIdField(unlinks)
-            if self.user_ids['unlinks'] == '':
-                self.iface.messageBar().pushMessage("Info",
-                                                    "The unlinks layer has invalid values in the ID column. Using feature ids.",
-                                                    level=0, duration=3)
-            if unlinks.dataProvider().fieldNameIndex("line1") == -1 or \
-                    unlinks.dataProvider().fieldNameIndex("line2") == -1:
-                self.iface.messageBar().pushMessage("Warning",
-                                                    "Line ID columns missing in unlinks layer, please 'Update IDs'.",
-                                                    level=1, duration=3)
+            self.user_ids["unlinks"] = lfh.getIdField(unlinks)
+            if self.user_ids["unlinks"] == "":
+                self.iface.messageBar().pushMessage(
+                    "Info",
+                    "The unlinks layer has invalid values in the ID column. Using feature ids.",
+                    level=0,
+                    duration=3,
+                )
+            if (
+                unlinks.dataProvider().fieldNameIndex("line1") == -1
+                or unlinks.dataProvider().fieldNameIndex("line2") == -1
+            ):
+                self.iface.messageBar().pushMessage(
+                    "Warning",
+                    "Line ID columns missing in unlinks layer, please 'Update IDs'.",
+                    level=1,
+                    duration=3,
+                )
                 return False
             else:
-                self.verificationThread = UnlinksVerification(self.iface.mainWindow(), self, settings, axial,
-                                                              self.axial_id, unlinks, self.user_ids['unlinks'])
+                self.verificationThread = UnlinksVerification(
+                    self.iface.mainWindow(),
+                    self,
+                    settings,
+                    axial,
+                    self.axial_id,
+                    unlinks,
+                    self.user_ids["unlinks"],
+                )
         if not caps & QgsVectorDataProvider.AddFeatures:
-            self.iface.messageBar().pushMessage("Info", "To edit the selected layer, change to another file format.",
-                                                level=0, duration=3)
+            self.iface.messageBar().pushMessage(
+                "Info",
+                "To edit the selected layer, change to another file format.",
+                level=0,
+                duration=3,
+            )
         # prepare dialog
         self.dlg.lockLayerTab(True)
         self.dlg.setAxialVerifyProgressbar(0, 100)
@@ -357,32 +438,45 @@ class AnalysisTool(QObject):
         self.dlg.clear_verification_report()
         self.dlg.clearAxialProblems()
         if self.verificationThread:
-            self.verificationThread.verificationFinished.connect(self.processAxialVerificationResults)
-            self.verificationThread.verificationProgress.connect(self.dlg.updateAxialVerifyProgressbar)
-            self.verificationThread.verificationError.connect(self.cancelAxialVerification)
+            self.verificationThread.verificationFinished.connect(
+                self.processAxialVerificationResults
+            )
+            self.verificationThread.verificationProgress.connect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
+            self.verificationThread.verificationError.connect(
+                self.cancelAxialVerification
+            )
             self.verificationThread.start()
         return
 
     def runAxialUpdate(self):
         self.edit_mode = self.dlg.getLayerTab()
         self.analysis_layers = self.dlg.getAnalysisLayers()
-        axial = lfh.getLegendLayerByName(self.iface, self.analysis_layers['map'])
-        unlinks = lfh.getLegendLayerByName(self.iface, self.analysis_layers['unlinks'])
+        axial = lfh.getLegendLayerByName(self.iface, self.analysis_layers["map"])
+        unlinks = lfh.getLegendLayerByName(self.iface, self.analysis_layers["unlinks"])
         settings = self.dlg.getAxialEditSettings()
         self.axial_id = lfh.getIdField(axial)
-        if self.axial_id == '':
-            self.iface.messageBar().pushMessage("Info",
-                                                "The axial layer has invalid or duplicate values in the id column. Using feature ids instead.",
-                                                level=0, duration=5)
+        if self.axial_id == "":
+            self.iface.messageBar().pushMessage(
+                "Info",
+                "The axial layer has invalid or duplicate values in the id column. Using feature ids instead.",
+                level=0,
+                duration=5,
+            )
         # update axial id
         if self.edit_mode == 0:
-            self.user_ids['map'] = "%s" % self.axial_id
+            self.user_ids["map"] = "%s" % self.axial_id
             # todo: update axial ids when layer is shapefile
         # update unlink line ids
         elif self.edit_mode == 1:
             if unlinks and (axial.storageType() != unlinks.storageType()):
-                self.iface.messageBar().pushMessage("Error", "The selected layers must be in the same file format.",
-                                                    level=1, duration=5)
+                self.iface.messageBar().pushMessage(
+                    "Error",
+                    "The selected layers must be in the same file format.",
+                    level=1,
+                    duration=5,
+                )
                 return False
             caps = unlinks.dataProvider().capabilities()
             if caps & QgsVectorDataProvider.ChangeAttributeValues:
@@ -390,10 +484,16 @@ class AnalysisTool(QObject):
                 self.dlg.clearAxialProblems()
                 ids = lfh.getIdFieldNames(unlinks)
                 if ids:
-                    self.user_ids['unlinks'] = ids[0]
-                self.verificationThread = UnlinksIdUpdate(self.iface.mainWindow(), self, unlinks,
-                                                          self.user_ids['unlinks'], axial, self.axial_id,
-                                                          settings['unlink_dist'])
+                    self.user_ids["unlinks"] = ids[0]
+                self.verificationThread = UnlinksIdUpdate(
+                    self.iface.mainWindow(),
+                    self,
+                    unlinks,
+                    self.user_ids["unlinks"],
+                    axial,
+                    self.axial_id,
+                    settings["unlink_dist"],
+                )
         # prepare dialog
         self.dlg.lockLayerTab(True)
         self.dlg.setAxialVerifyProgressbar(0, 100)
@@ -401,8 +501,12 @@ class AnalysisTool(QObject):
         self.dlg.clear_verification_report()
         self.dlg.clearAxialProblems()
         if self.verificationThread:
-            self.verificationThread.verificationFinished.connect(self.processAxialIdUpdateResults)
-            self.verificationThread.verificationProgress.connect(self.dlg.updateAxialVerifyProgressbar)
+            self.verificationThread.verificationFinished.connect(
+                self.processAxialIdUpdateResults
+            )
+            self.verificationThread.verificationProgress.connect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
             self.verificationThread.verificationError.connect(self.cancelAxialIdUpdate)
             self.verificationThread.start()
         return
@@ -412,11 +516,19 @@ class AnalysisTool(QObject):
         if txt:
             self.iface.messageBar().pushMessage("Error", txt, level=1, duration=5)
         try:
-            self.verificationThread.verificationFinished.disconnect(self.processAxialIdUpdateResults)
-            self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
-            self.verificationThread.verificationError.disconnect(self.cancelAxialIdUpdate)
+            self.verificationThread.verificationFinished.disconnect(
+                self.processAxialIdUpdateResults
+            )
+            self.verificationThread.verificationProgress.disconnect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
+            self.verificationThread.verificationError.disconnect(
+                self.cancelAxialIdUpdate
+            )
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         # self.verificationThread = None
         self.dlg.updateAxialVerifyProgressbar(0)
@@ -427,25 +539,35 @@ class AnalysisTool(QObject):
         # stop thread
         self.verificationThread.stop()
         try:
-            self.verificationThread.verificationFinished.disconnect(self.processAxialIdUpdateResults)
-            self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
+            self.verificationThread.verificationFinished.disconnect(
+                self.processAxialIdUpdateResults
+            )
+            self.verificationThread.verificationProgress.disconnect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         self.verificationThread = None
         # reload the layer if columns were added with the ID update
-        if self.datastore['type'] in (1, 2):
+        if self.datastore["type"] in (1, 2):
             if self.edit_mode == 0:
-                layer = lfh.getLegendLayerByName(self.iface, self.analysis_layers['map'])
+                layer = lfh.getLegendLayerByName(
+                    self.iface, self.analysis_layers["map"]
+                )
             elif self.edit_mode == 1:
-                layer = lfh.getLegendLayerByName(self.iface, self.analysis_layers['unlinks'])
+                layer = lfh.getLegendLayerByName(
+                    self.iface, self.analysis_layers["unlinks"]
+                )
             connection = dbh.getDBLayerConnection(layer)
-            if self.datastore['type'] == 1:
+            if self.datastore["type"] == 1:
                 cols = dbh.listSpatialiteColumns(connection, layer.name())
             else:
                 info = dbh.getPostgisLayerInfo(layer)
-                schema = info['schema']
-                name = info['table']
+                schema = info["schema"]
+                name = info["table"]
                 cols = dbh.listPostgisColumns(connection, schema, name)
             connection.close()
             # columns-1 to account for the geometry column that is not a field in QGIS
@@ -463,11 +585,19 @@ class AnalysisTool(QObject):
         if txt:
             self.iface.messageBar().pushMessage("Error", txt, level=1, duration=5)
         try:
-            self.verificationThread.verificationFinished.disconnect(self.processAxialVerificationResults)
-            self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
-            self.verificationThread.verificationError.disconnect(self.cancelAxialVerification)
+            self.verificationThread.verificationFinished.disconnect(
+                self.processAxialVerificationResults
+            )
+            self.verificationThread.verificationProgress.disconnect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
+            self.verificationThread.verificationError.disconnect(
+                self.cancelAxialVerification
+            )
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         # self.verificationThread = None
         self.dlg.updateAxialVerifyProgressbar(0)
@@ -478,10 +608,16 @@ class AnalysisTool(QObject):
         # stop thread
         self.verificationThread.stop()
         try:
-            self.verificationThread.verificationFinished.disconnect(self.processAxialVerificationResults)
-            self.verificationThread.verificationProgress.disconnect(self.dlg.updateAxialVerifyProgressbar)
+            self.verificationThread.verificationFinished.disconnect(
+                self.processAxialVerificationResults
+            )
+            self.verificationThread.verificationProgress.disconnect(
+                self.dlg.updateAxialVerifyProgressbar
+            )
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         self.verificationThread = None
         self.dlg.setAxialProblems(results, nodes)
@@ -505,27 +641,29 @@ class AnalysisTool(QObject):
         layers = self.dlg.getAnalysisLayers()
         layer = None
         name = None
-        user_id = ''
+        user_id = ""
         if idx == 0:
-            name = layers['map']
-            user_id = self.user_ids['map']
+            name = layers["map"]
+            user_id = self.user_ids["map"]
         elif idx == 1:
-            name = layers['unlinks']
-            user_id = self.user_ids['unlinks']
+            name = layers["unlinks"]
+            user_id = self.user_ids["unlinks"]
         if name:
             layer = lfh.getLegendLayerByName(self.iface, name)
         if layer:
             # get layer ids
-            if user_id == '':
+            if user_id == "":
                 self.all_ids = layer.allFeatureIds()
             else:
                 self.all_ids, ids = lfh.getFieldValues(layer, user_id)
                 layer.setDisplayExpression('"field_name" = {0}'.format(user_id))
             # set display field for axial map (always)
             if idx != 0:
-                axial_layer = lfh.getLegendLayerByName(self.iface, layers['map'])
-                if self.axial_id != '':
-                    axial_layer.setDisplayExpression('"field_name" = {0}'.format(self.axial_id))
+                axial_layer = lfh.getLegendLayerByName(self.iface, layers["map"])
+                if self.axial_id != "":
+                    axial_layer.setDisplayExpression(
+                        '"field_name" = {0}'.format(self.axial_id)
+                    )
             if not self.iface.actionMapTips().isChecked():
                 self.iface.actionMapTips().trigger()
             # prepare features to check
@@ -541,7 +679,7 @@ class AnalysisTool(QObject):
                         features.append(int(id))
             # select features and zoom
             if features:
-                if user_id == '':
+                if user_id == "":
                     layer.selectByIds(features)
                 else:
                     ids = lfh.getFeaturesListValues(layer, user_id, features)
@@ -567,36 +705,40 @@ class AnalysisTool(QObject):
             self.dlg.clear_analysis_report()
             # get selected layers
             self.analysis_layers = self.dlg.getAnalysisLayers()
-            analysis_layer = lfh.getLegendLayerByName(self.iface, self.analysis_layers['map'])
-# <<<<<<< HEAD
-#             self.axial_analysis_settings['id'] = lfh.getIdField(analysis_layer)
-#             self.axial_analysis_settings['weight'] = self.dlg.get_analysis_weighted()
-#             self.axial_analysis_settings['weightBy'] = self.dlg.get_analysis_weight_attribute()
-#             txt = self.analysis_engine.parse_radii(self.dlg.get_analysis_radius_text())
-#             if txt == '':
-#                 self.dlg.write_analysis_report("Please verify the radius values.")
-#                 return
-#             else:
-#                 self.axial_analysis_settings['rvalues'] = txt
-#             self.axial_analysis_settings['output'] = self.dlg.get_analysis_output_table()
-#             self.analysis_output = self.axial_analysis_settings['output']
-#             # get the advanced analysis settings
-#             self.axial_analysis_settings['distance'] = self.dlg.get_analysis_distance_type()
-#             self.axial_analysis_settings['radius'] = self.dlg.get_analysis_radius_type()
-#             self.axial_analysis_settings['fullset'] = self.dlg.get_analysis_fullset()
-#             self.axial_analysis_settings['betweenness'] = self.dlg.get_analysis_choice()
-#             self.axial_analysis_settings['newnorm'] = self.dlg.get_analysis_normalised()
-#             self.axial_analysis_settings['stubs'] = self.dlg.get_analysis_stubs()
-# =======
+            analysis_layer = lfh.getLegendLayerByName(
+                self.iface, self.analysis_layers["map"]
+            )
+            # <<<<<<< HEAD
+            #             self.axial_analysis_settings['id'] = lfh.getIdField(analysis_layer)
+            #             self.axial_analysis_settings['weight'] = self.dlg.get_analysis_weighted()
+            #             self.axial_analysis_settings['weightBy'] = self.dlg.get_analysis_weight_attribute()
+            #             txt = self.analysis_engine.parse_radii(self.dlg.get_analysis_radius_text())
+            #             if txt == '':
+            #                 self.dlg.write_analysis_report("Please verify the radius values.")
+            #                 return
+            #             else:
+            #                 self.axial_analysis_settings['rvalues'] = txt
+            #             self.axial_analysis_settings['output'] = self.dlg.get_analysis_output_table()
+            #             self.analysis_output = self.axial_analysis_settings['output']
+            #             # get the advanced analysis settings
+            #             self.axial_analysis_settings['distance'] = self.dlg.get_analysis_distance_type()
+            #             self.axial_analysis_settings['radius'] = self.dlg.get_analysis_radius_type()
+            #             self.axial_analysis_settings['fullset'] = self.dlg.get_analysis_fullset()
+            #             self.axial_analysis_settings['betweenness'] = self.dlg.get_analysis_choice()
+            #             self.axial_analysis_settings['newnorm'] = self.dlg.get_analysis_normalised()
+            #             self.axial_analysis_settings['stubs'] = self.dlg.get_analysis_stubs()
+            # =======
             self.dlg.prepare_analysis_settings(analysis_layer, self.datastore)
             analysis_settings = self.dlg.get_analysis_settings()
-            if not analysis_settings['valid']:
+            if not analysis_settings["valid"]:
                 raise AnalysisEngine.AnalysisEngineError("Analysis settings invalid")
-# >>>>>>> master
+            # >>>>>>> master
 
-            self.analysis_output = analysis_settings['output']
+            self.analysis_output = analysis_settings["output"]
 
-            analysis_ready = self.analysis_engine.setup_analysis(self.analysis_layers, analysis_settings)
+            analysis_ready = self.analysis_engine.setup_analysis(
+                self.analysis_layers, analysis_settings
+            )
             if analysis_ready[0]:
                 self.updateProjectSettings()
                 self.start_time = datetime.datetime.now()
@@ -605,29 +747,33 @@ class AnalysisTool(QObject):
                 # print message in results window
                 self.dlg.write_analysis_report(message)
                 self.dlg.lock_analysis_tab(True)
-                self.iface.messageBar().pushMessage("Info",
-                                                    "Do not close QGIS or depthmapXnet while the analysis is running!",
-                                                    level=0, duration=5)
+                self.iface.messageBar().pushMessage(
+                    "Info",
+                    "Do not close QGIS or depthmapXnet while the analysis is running!",
+                    level=0,
+                    duration=5,
+                )
                 self.analysis_engine.start_analysis()
                 # timer to check if results are ready, in milliseconds
                 self.timer.start(1000)
                 self.analysis_running = True
             else:
                 self.dlg.write_analysis_report(
-                    "Unable to run this analysis. Please check the input layer and analysis settings.")
-                if analysis_ready[1] != '':
-                    self.showMessage(analysis_ready[1], 'Info', lev=1, dur=5)
+                    "Unable to run this analysis. Please check the input layer and analysis settings."
+                )
+                if analysis_ready[1] != "":
+                    self.showMessage(analysis_ready[1], "Info", lev=1, dur=5)
         else:
             self.dlg.write_analysis_report("Analysis engine not ready")
 
     def compile_analysis_summary(self):
-        message = u"Running analysis for map layer '%s':" % self.analysis_layers['map']
-        if self.analysis_layers['unlinks']:
-            message += u"\n   unlinks layer - '%s'" % self.analysis_layers['unlinks']
+        message = "Running analysis for map layer '%s':" % self.analysis_layers["map"]
+        if self.analysis_layers["unlinks"]:
+            message += "\n   unlinks layer - '%s'" % self.analysis_layers["unlinks"]
 
         message += self.dlg.get_analysis_summary()
 
-        message += u"\n\nStart: %s\n..." % self.start_time.strftime("%d/%m/%Y %H:%M:%S")
+        message += "\n\nStart: %s\n..." % self.start_time.strftime("%d/%m/%Y %H:%M:%S")
         return message
 
     def cancel_analysis(self):
@@ -642,7 +788,9 @@ class AnalysisTool(QObject):
     def check_analysis_progress(self):
         analysis_settings = self.dlg.get_analysis_settings()
         try:
-            step, progress, logmsg = self.analysis_engine.get_progress(analysis_settings, self.datastore)
+            step, progress, logmsg = self.analysis_engine.get_progress(
+                analysis_settings, self.datastore
+            )
             if not progress:
                 # no progress, just wait...
                 return
@@ -650,7 +798,7 @@ class AnalysisTool(QObject):
                 self.timer.stop()
                 # update calculation time
                 dt = datetime.datetime.now()
-                feedback = u"Finish: %s" % dt.strftime("%d/%m/%Y %H:%M:%S")
+                feedback = "Finish: %s" % dt.strftime("%d/%m/%Y %H:%M:%S")
                 self.dlg.write_analysis_report(feedback)
                 # process the output in the analysis
                 self.process_analysis_results(self.analysis_engine.analysis_results)
@@ -669,27 +817,41 @@ class AnalysisTool(QObject):
             self.analysis_engine.cleanup()
             self.analysis_running = False
 
-    def process_analysis_results(self, analysis_results: AnalysisEngine.AnalysisResults):
+    def process_analysis_results(
+        self, analysis_results: AnalysisEngine.AnalysisResults
+    ):
         new_layer = None
         if self.analysis_running:
             self.dlg.set_analysis_progressbar(100, 100)
             if analysis_results.attributes:
                 dt = datetime.datetime.now()
-                message = u"Post-processing start: %s\n..." % dt.strftime("%d/%m/%Y %H:%M:%S")
+                message = "Post-processing start: %s\n..." % dt.strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                )
                 self.dlg.write_analysis_report(message)
-                new_layer = self.save_analysis_results(analysis_results.attributes, analysis_results.types,
-                                                       analysis_results.values, analysis_results.coords)
+                new_layer = self.save_analysis_results(
+                    analysis_results.attributes,
+                    analysis_results.types,
+                    analysis_results.values,
+                    analysis_results.coords,
+                )
                 # update processing time
                 dt = datetime.datetime.now()
-                message = u"Post-processing finish: %s" % dt.strftime("%d/%m/%Y %H:%M:%S")
+                message = "Post-processing finish: %s" % dt.strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                )
                 self.dlg.write_analysis_report(message)
             else:
-                self.iface.messageBar().pushMessage("Info", "Failed to import the analysis results.", level=1,
-                                                    duration=5)
-                self.dlg.write_analysis_report(u"Post-processing: Failed!")
+                self.iface.messageBar().pushMessage(
+                    "Info",
+                    "Failed to import the analysis results.",
+                    level=1,
+                    duration=5,
+                )
+                self.dlg.write_analysis_report("Post-processing: Failed!")
             self.end_time = datetime.datetime.now()
             elapsed = self.end_time - self.start_time
-            message = u"Total running time: %s" % elapsed
+            message = "Total running time: %s" % elapsed
             self.dlg.write_analysis_report(message)
             self.dlg.lock_analysis_tab(False)
             self.dlg.set_analysis_progressbar(0, 100)
@@ -705,34 +867,48 @@ class AnalysisTool(QObject):
     def save_analysis_results(self, attributes, types, values, coords):
         # Save results to output
         res = False
-        analysis_layer = lfh.getLegendLayerByName(self.iface, self.analysis_layers['map'])
+        analysis_layer = lfh.getLegendLayerByName(
+            self.iface, self.analysis_layers["map"]
+        )
         srid = analysis_layer.crs()
-        path = self.datastore['path']
+        path = self.datastore["path"]
         table = self.analysis_output
         analysis_settings = self.dlg.get_analysis_settings()
-        id = analysis_settings['id']
+        id = analysis_settings["id"]
         # if it's an axial analysis try to update the existing layer
         new_layer = None
         # must check if data store is still there
         if not self.isDatastoreSet():
-            self.iface.messageBar().pushMessage("Warning", "The analysis results will be saved in a memory layer.",
-                                                level=0, duration=5)
+            self.iface.messageBar().pushMessage(
+                "Warning",
+                "The analysis results will be saved in a memory layer.",
+                level=0,
+                duration=5,
+            )
         # save output based on data store format and type of analysis
         provider = analysis_layer.storageType()
         create_table = False
         # if it's a segment analysis always create a new layer
         # also if one of these is different: output table name, file type, data store location, number of records
         # this last one is a weak check for changes to the table. making a match of results by id would take ages.
-        if analysis_layer.name() != table or analysis_settings['type'] == 1 or len(
-                values) != analysis_layer.featureCount():
+        if (
+            analysis_layer.name() != table
+            or analysis_settings["type"] == 1
+            or len(values) != analysis_layer.featureCount()
+        ):
             create_table = True
         # shapefile data store
-        if self.datastore['type'] == 0:
-            existing_layer_path = lfh.getLayerPath(analysis_layer) + "/" + analysis_layer.name() + ".shp"
+        if self.datastore["type"] == 0:
+            existing_layer_path = (
+                lfh.getLayerPath(analysis_layer) + "/" + analysis_layer.name() + ".shp"
+            )
             new_layer_path = path + "/" + table + ".shp"
             original_table_name = table
 
-            if len(values) != analysis_layer.featureCount() and existing_layer_path == new_layer_path:
+            if (
+                len(values) != analysis_layer.featureCount()
+                and existing_layer_path == new_layer_path
+            ):
                 # we can't overwrite the file anymore because the number of lines is not the same,
                 # force a new file, by appending a number at the end
                 overwrite_counter = 1
@@ -742,47 +918,69 @@ class AnalysisTool(QObject):
                     new_layer_path = path + "/" + table + ".shp"
                     overwrite_counter = overwrite_counter + 1
                     if overwrite_counter > 1000:
-                        self.iface.messageBar().pushMessage("Error",
-                                                            "Existing file and newly suggested file have different "
-                                                            "number of lines, but can not create new file as too many "
-                                                            "existing duplicates",
-                                                            level=Qgis.Critical, duration=5)
+                        self.iface.messageBar().pushMessage(
+                            "Error",
+                            "Existing file and newly suggested file have different "
+                            "number of lines, but can not create new file as too many "
+                            "existing duplicates",
+                            level=Qgis.Critical,
+                            duration=5,
+                        )
 
             if original_table_name != table:
-                self.iface.messageBar().pushMessage("Warning",
-                                                    "Existing file and newly suggested file have different "
-                                                    "number of lines, new file created with different name",
-                                                    level=Qgis.Warning, duration=5)
-            if original_table_name == table and \
-                    (lfh.getLayerPath(analysis_layer) != path or analysis_layer.name() != table):
+                self.iface.messageBar().pushMessage(
+                    "Warning",
+                    "Existing file and newly suggested file have different "
+                    "number of lines, new file created with different name",
+                    level=Qgis.Warning,
+                    duration=5,
+                )
+            if original_table_name == table and (
+                lfh.getLayerPath(analysis_layer) != path
+                or analysis_layer.name() != table
+            ):
                 create_table = True
 
             # convert type of choice columns to float
             for attr in attributes:
-                if 'CH' in attr:
+                if "CH" in attr:
                     idx = attributes.index(attr)
                     types[idx] = QVariant.Double
             # write a new file
-            if 'shapefile' not in provider.lower() or create_table:
-                new_layer = shph.create_shapefile_full_layer_data_provider(path, table, srid, attributes,
-                                                                           types, values, coords)
+            if "shapefile" not in provider.lower() or create_table:
+                new_layer = shph.create_shapefile_full_layer_data_provider(
+                    path, table, srid, attributes, types, values, coords
+                )
                 if new_layer:
                     res = True
                 else:
                     res = False
             # or append to an existing file
             else:
-                res = shph.addShapeFileAttributes(analysis_layer, attributes, types, values)
+                res = shph.addShapeFileAttributes(
+                    analysis_layer, attributes, types, values
+                )
         # spatialite data store
-        elif self.datastore['type'] == 1:
+        elif self.datastore["type"] == 1:
             connection = dbh.getSpatialiteConnection(path)
-            if not dbh.testSpatialiteTableExists(connection, analysis_settings['output']):
+            if not dbh.testSpatialiteTableExists(
+                connection, analysis_settings["output"]
+            ):
                 create_table = True
-            if 'spatialite' not in provider.lower() or create_table:
-                res = dbh.createSpatialiteTable(connection, path, table, srid.postgisSrid(), attributes, types,
-                                                'MULTILINESTRING')
+            if "spatialite" not in provider.lower() or create_table:
+                res = dbh.createSpatialiteTable(
+                    connection,
+                    path,
+                    table,
+                    srid.postgisSrid(),
+                    attributes,
+                    types,
+                    "MULTILINESTRING",
+                )
                 if res:
-                    res = dbh.insertSpatialiteValues(connection, table, attributes, values, coords)
+                    res = dbh.insertSpatialiteValues(
+                        connection, table, attributes, values, coords
+                    )
                     if res:
                         new_layer = dbh.getSpatialiteLayer(connection, path, table)
                         if new_layer:
@@ -790,7 +988,9 @@ class AnalysisTool(QObject):
                         else:
                             res = False
             else:
-                res = dbh.addSpatialiteAttributes(connection, table, id, attributes, types, values)
+                res = dbh.addSpatialiteAttributes(
+                    connection, table, id, attributes, types, values
+                )
                 # the spatialite layer needs to be removed and re-inserted to display changes
                 if res:
                     QgsProject.instance().removeMapLayer(analysis_layer.id())
@@ -801,38 +1001,56 @@ class AnalysisTool(QObject):
                         res = False
             connection.close()
         # postgis data store
-        elif self.datastore['type'] == 2:
-            schema = self.datastore['schema']
-            connection = dbh.getPostgisConnection(self.datastore['name'])
-            if not dbh.testPostgisTableExists(connection, self.datastore['schema'],
-                                              analysis_settings['output']):
+        elif self.datastore["type"] == 2:
+            schema = self.datastore["schema"]
+            connection = dbh.getPostgisConnection(self.datastore["name"])
+            if not dbh.testPostgisTableExists(
+                connection, self.datastore["schema"], analysis_settings["output"]
+            ):
                 create_table = True
-            if 'postgresql' not in provider.lower() or create_table:
-                res = dbh.createPostgisTable(connection, schema, table, srid.postgisSrid(), attributes, types,
-                                             'MULTILINESTRING')
+            if "postgresql" not in provider.lower() or create_table:
+                res = dbh.createPostgisTable(
+                    connection,
+                    schema,
+                    table,
+                    srid.postgisSrid(),
+                    attributes,
+                    types,
+                    "MULTILINESTRING",
+                )
                 if res:
-                    res = dbh.insertPostgisValues(connection, schema, table, attributes, values, coords)
+                    res = dbh.insertPostgisValues(
+                        connection, schema, table, attributes, values, coords
+                    )
                     if res:
-                        new_layer = dbh.getPostgisLayer(connection, self.datastore['name'], schema, table)
+                        new_layer = dbh.getPostgisLayer(
+                            connection, self.datastore["name"], schema, table
+                        )
                         if new_layer:
                             res = True
                         else:
                             res = False
             else:
-                res = dbh.addPostgisAttributes(connection, schema, table, id, attributes, types, values)
+                res = dbh.addPostgisAttributes(
+                    connection, schema, table, id, attributes, types, values
+                )
                 # the postgis layer needs to be removed and re-inserted to display changes
                 if res:
                     QgsProject.instance().removeMapLayer(analysis_layer.id())
-                    new_layer = dbh.getPostgisLayer(connection, self.datastore['name'], schema, table)
+                    new_layer = dbh.getPostgisLayer(
+                        connection, self.datastore["name"], schema, table
+                    )
                     if new_layer:
                         res = True
                     else:
                         res = False
             connection.close()
         # memory layer data store
-        if self.datastore['type'] == -1 or not res:
+        if self.datastore["type"] == -1 or not res:
             # create a memory layer with the results
             # the coords indicates the results columns with x1, y1, x2, y2
-            new_layer = lfh.createTempLayer(table, srid.postgisSrid(), attributes, types, values, coords)
+            new_layer = lfh.createTempLayer(
+                table, srid.postgisSrid(), attributes, types, values, coords
+            )
 
         return new_layer

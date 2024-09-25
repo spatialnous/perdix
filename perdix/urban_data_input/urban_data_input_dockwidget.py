@@ -10,7 +10,7 @@ import os
 from builtins import str
 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import (QDockWidget, QTableWidgetItem, QHeaderView)
+from qgis.PyQt.QtWidgets import QDockWidget, QTableWidgetItem, QHeaderView
 from qgis.PyQt.uic import loadUiType
 from qgis.core import QgsProject
 
@@ -20,8 +20,9 @@ from .CreateNew_dialog import CreatenewDialog
 from perdix.utilities import layer_field_helpers as lfh
 from .landuse import LanduseTool
 
-Ui_UrbanDataInputDockWidget, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'urban_data_input_dockwidget.ui'))
+Ui_UrbanDataInputDockWidget, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "urban_data_input_dockwidget.ui")
+)
 
 
 class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
@@ -83,14 +84,18 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
         # setup dockwidget signals
         # frontages
-        self.frontagescatlistWidget.currentRowChanged.connect(self.updateFrontageSubTypes)
+        self.frontagescatlistWidget.currentRowChanged.connect(
+            self.updateFrontageSubTypes
+        )
         self.useExistingcomboBox.currentIndexChanged.connect(self.clearDataFields)
         self.useExistingcomboBox.currentIndexChanged.connect(self.loadFrontageLayer)
         self.pushButtonNewFile.clicked.connect(self.newFileDialog)
         # entrances
         self.ecategorylistWidget.currentRowChanged.connect(self.updateSubCategory)
         self.pushButtonNewEntrancesFile.clicked.connect(self.newFileDialogEntrance)
-        self.useExistingEntrancescomboBox.currentIndexChanged.connect(self.clearEntranceDataFields)
+        self.useExistingEntrancescomboBox.currentIndexChanged.connect(
+            self.clearEntranceDataFields
+        )
         # landuse
         self.useExistingLUcomboBox.currentIndexChanged.connect(self.clearLUDataFields)
         self.lucategorylistWidget.currentRowChanged.connect(self.updateLUsubcat)
@@ -145,12 +150,20 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
     # Update frontage types
     def updateFrontageTypes(self):
         self.frontagescatlistWidget.clear()
-        frontage_list_cat = ['Building', 'Fences']
+        frontage_list_cat = ["Building", "Fences"]
         self.frontagescatlistWidget.addItems(frontage_list_cat)
 
     def updateFrontageSubTypes(self):
-        frontage_sub_category_list_Building = ['Transparent', 'Semi Transparent', 'Blank']
-        frontage_sub_category_list_Fences = ['High Opaque Fence', 'High See Through Fence', 'Low Fence']
+        frontage_sub_category_list_Building = [
+            "Transparent",
+            "Semi Transparent",
+            "Blank",
+        ]
+        frontage_sub_category_list_Fences = [
+            "High Opaque Fence",
+            "High See Through Fence",
+            "Low Fence",
+        ]
         self.frontagessubcatlistWidget.clear()
         self.frontagessubcatlistWidget.addItems(frontage_sub_category_list_Building)
         self.frontagessubcatlistWidget.setCurrentRow(0)
@@ -216,7 +229,9 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
             self.tableWidgetFrontage.resizeRowsToContents()
             self.tableWidgetFrontage.resizeColumnsToContents()
-            self.tableWidgetFrontage.horizontalHeader().setResizeMode(3, QHeaderView.Stretch)
+            self.tableWidgetFrontage.horizontalHeader().setResizeMode(
+                3, QHeaderView.Stretch
+            )
 
     def tableClear(self):
         self.tableWidgetFrontage.clear()
@@ -227,7 +242,7 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
     def updateEntranceTypes(self):
         self.ecategorylistWidget.clear()
-        entrance_category_list = ['Controlled', 'Uncontrolled']
+        entrance_category_list = ["Controlled", "Uncontrolled"]
 
         entrance_access_level_list = ["Lower Floor", "Ground Floor", "Upper Floor"]
 
@@ -235,8 +250,13 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
         self.eaccesscategorylistWidget.addItems(entrance_access_level_list)
 
     def updateSubCategory(self):
-        entrance_sub_category_list_Controlled = ['Default', 'Fire Exit', 'Service Entrance', 'Unused']
-        entrance_sub_category_list_Uncontrolled = ['Default']
+        entrance_sub_category_list_Controlled = [
+            "Default",
+            "Fire Exit",
+            "Service Entrance",
+            "Unused",
+        ]
+        entrance_sub_category_list_Uncontrolled = ["Default"]
         self.esubcategorylistWidget.addItems(entrance_sub_category_list_Controlled)
 
         if self.ecategorylistWidget.currentRow() == 0:
@@ -246,7 +266,9 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
         elif self.ecategorylistWidget.currentRow() == 1:
             self.esubcategorylistWidget.clear()
-            self.esubcategorylistWidget.addItems(entrance_sub_category_list_Uncontrolled)
+            self.esubcategorylistWidget.addItems(
+                entrance_sub_category_list_Uncontrolled
+            )
             self.esubcategorylistWidget.setCurrentRow(0)
 
     # Set universal Entrance layer if conditions are satisfied
@@ -294,7 +316,9 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
             self.tableWidgetEntrance.resizeRowsToContents()
             self.tableWidgetEntrance.resizeColumnsToContents()
-            self.tableWidgetEntrance.horizontalHeader().setResizeMode(3, QHeaderView.Stretch)
+            self.tableWidgetEntrance.horizontalHeader().setResizeMode(
+                3, QHeaderView.Stretch
+            )
 
     def entrancetableClear(self):
         self.tableWidgetEntrance.clear()
@@ -305,22 +329,40 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
     def updateLUTypes(self):
         self.lucategorylistWidget.clear()
-        lu_category_list = ["Agriculture", "Community", "Catering",
-                            "Education", "Government", "Hotels",
-                            "Industry", "Leisure", "Medical",
-                            "Offices", "Parking", "Retail",
-                            "Residential", "Services", "Storage",
-                            "Transport", "Utilities", "Under Construction",
-                            "Under Developed", "Unknown/Undefined", "Vacant Building"]
+        lu_category_list = [
+            "Agriculture",
+            "Community",
+            "Catering",
+            "Education",
+            "Government",
+            "Hotels",
+            "Industry",
+            "Leisure",
+            "Medical",
+            "Offices",
+            "Parking",
+            "Retail",
+            "Residential",
+            "Services",
+            "Storage",
+            "Transport",
+            "Utilities",
+            "Under Construction",
+            "Under Developed",
+            "Unknown/Undefined",
+            "Vacant Building",
+        ]
         lu_sub_category_list_empty = ["-"]
 
         self.lucategorylistWidget.addItems(lu_category_list)
         self.lusubcategorylistWidget.addItems(lu_sub_category_list_empty)
 
     def updateLUsubcat(self):
-
-        lu_sub_category_list_catering = ["Restaurant and Cafes", "Drinking Establishments",
-                                         "Hot Food Takeaways"]
+        lu_sub_category_list_catering = [
+            "Restaurant and Cafes",
+            "Drinking Establishments",
+            "Hot Food Takeaways",
+        ]
         lu_sub_category_list_leisure = ["Art and Culture", "Amusement or Sports"]
         lu_sub_category_list_medical = ["Hospitals", "Health centres"]
         lu_sub_category_list_parking = ["Car Parks", "Other Vehicles"]
@@ -486,44 +528,73 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.tableWidgetlanduse.setColumnCount(5)
             self.tableWidgetlanduse.setRowCount(len(attrs))
             if self.LUGroundfloorradioButton.isChecked():
-
                 headers = ["LU-ID", "Floors", "Area", "GF Category", "GF Sub Category"]
                 self.tableWidgetlanduse.setHorizontalHeaderLabels(headers)
 
                 for i, item in enumerate(attrs):
-                    self.tableWidgetlanduse.setItem(i, 0, QTableWidgetItem(str(item[idfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 1, QTableWidgetItem(str(item[floorfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 2, QTableWidgetItem(str(item[areafieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 3, QTableWidgetItem(str(item[gfcatfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 4, QTableWidgetItem(str(item[gfsubcatfieldindex])))
+                    self.tableWidgetlanduse.setItem(
+                        i, 0, QTableWidgetItem(str(item[idfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 1, QTableWidgetItem(str(item[floorfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 2, QTableWidgetItem(str(item[areafieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 3, QTableWidgetItem(str(item[gfcatfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 4, QTableWidgetItem(str(item[gfsubcatfieldindex]))
+                    )
 
             elif self.LULowerfloorradioButton.isChecked():
-
                 headers = ["LU-ID", "Floors", "Area", "LF Category", "LF Sub Category"]
                 self.tableWidgetlanduse.setHorizontalHeaderLabels(headers)
 
                 for i, item in enumerate(attrs):
-                    self.tableWidgetlanduse.setItem(i, 0, QTableWidgetItem(str(item[idfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 1, QTableWidgetItem(str(item[floorfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 2, QTableWidgetItem(str(item[areafieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 3, QTableWidgetItem(str(item[lfcatfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 4, QTableWidgetItem(str(item[lfsubcatfieldindex])))
+                    self.tableWidgetlanduse.setItem(
+                        i, 0, QTableWidgetItem(str(item[idfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 1, QTableWidgetItem(str(item[floorfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 2, QTableWidgetItem(str(item[areafieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 3, QTableWidgetItem(str(item[lfcatfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 4, QTableWidgetItem(str(item[lfsubcatfieldindex]))
+                    )
 
             elif self.LUUpperfloorradioButton.isChecked():
-
                 headers = ["LU-ID", "Floors", "Area", "UF Category", "UF Sub Category"]
                 self.tableWidgetlanduse.setHorizontalHeaderLabels(headers)
 
                 for i, item in enumerate(attrs):
-                    self.tableWidgetlanduse.setItem(i, 0, QTableWidgetItem(str(item[idfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 1, QTableWidgetItem(str(item[floorfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 2, QTableWidgetItem(str(item[areafieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 3, QTableWidgetItem(str(item[ufcatfieldindex])))
-                    self.tableWidgetlanduse.setItem(i, 4, QTableWidgetItem(str(item[ufsubcatfieldindex])))
+                    self.tableWidgetlanduse.setItem(
+                        i, 0, QTableWidgetItem(str(item[idfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 1, QTableWidgetItem(str(item[floorfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 2, QTableWidgetItem(str(item[areafieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 3, QTableWidgetItem(str(item[ufcatfieldindex]))
+                    )
+                    self.tableWidgetlanduse.setItem(
+                        i, 4, QTableWidgetItem(str(item[ufsubcatfieldindex]))
+                    )
 
             self.tableWidgetlanduse.resizeRowsToContents()
             self.tableWidgetlanduse.resizeColumnsToContents()
-            self.tableWidgetlanduse.horizontalHeader().setResizeMode(4, QHeaderView.Stretch)
+            self.tableWidgetlanduse.horizontalHeader().setResizeMode(
+                4, QHeaderView.Stretch
+            )
 
     def LUtableClear(self):
         self.tableWidgetlanduse.clear()
@@ -546,12 +617,18 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U082")
             self.lineEdit_luTCPA.setText("D1")
 
-        if self.lucategorylistWidget.currentRow() == 2 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 2
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("CA")
             self.lineEdit_luNLUD.setText("U093")
             self.lineEdit_luTCPA.setText("A3")
 
-        elif self.lucategorylistWidget.currentRow() == 2 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 2
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.clear()
             self.lineEdit_luNLUD.clear()
             self.lineEdit_luTCPA.clear()
@@ -560,7 +637,10 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U094")
             self.lineEdit_luTCPA.setText("A4")
 
-        elif self.lucategorylistWidget.currentRow() == 2 and self.lusubcategorylistWidget.currentRow() == 2:
+        elif (
+            self.lucategorylistWidget.currentRow() == 2
+            and self.lusubcategorylistWidget.currentRow() == 2
+        ):
             self.lineEdit_luSSx.clear()
             self.lineEdit_luNLUD.clear()
             self.lineEdit_luTCPA.clear()
@@ -589,22 +669,34 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U101")
             self.lineEdit_luTCPA.setText("B2")
 
-        if self.lucategorylistWidget.currentRow() == 7 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 7
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("LE")
             self.lineEdit_luNLUD.setText("U040")
             self.lineEdit_luTCPA.setText("D1")
 
-        elif self.lucategorylistWidget.currentRow() == 7 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 7
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("LE")
             self.lineEdit_luNLUD.setText("")
             self.lineEdit_luTCPA.setText("D2")
 
-        if self.lucategorylistWidget.currentRow() == 8 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 8
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("M")
             self.lineEdit_luNLUD.setText("U081")
             self.lineEdit_luTCPA.setText("C2")
 
-        elif self.lucategorylistWidget.currentRow() == 8 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 8
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("M")
             self.lineEdit_luNLUD.setText("")
             self.lineEdit_luTCPA.setText("D1")
@@ -614,12 +706,18 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U102")
             self.lineEdit_luTCPA.setText("B1")
 
-        if self.lucategorylistWidget.currentRow() == 10 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 10
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("P")
             self.lineEdit_luNLUD.setText("U053")
             self.lineEdit_luTCPA.setText("")
 
-        elif self.lucategorylistWidget.currentRow() == 10 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 10
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("P")
             self.lineEdit_luNLUD.setText("U053")
             self.lineEdit_luTCPA.setText("")
@@ -629,22 +727,34 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U091")
             self.lineEdit_luTCPA.setText("A1")
 
-        if self.lucategorylistWidget.currentRow() == 12 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 12
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("RE")
             self.lineEdit_luNLUD.setText("U071")
             self.lineEdit_luTCPA.setText("C2")
 
-        elif self.lucategorylistWidget.currentRow() == 12 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 12
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("RE")
             self.lineEdit_luNLUD.setText("U073")
             self.lineEdit_luTCPA.setText("C2")
 
-        if self.lucategorylistWidget.currentRow() == 13 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 13
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("S")
             self.lineEdit_luNLUD.setText("U092")
             self.lineEdit_luTCPA.setText("A1")
 
-        elif self.lucategorylistWidget.currentRow() == 13 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 13
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("S")
             self.lineEdit_luNLUD.setText("")
             self.lineEdit_luTCPA.setText("A2")
@@ -654,12 +764,18 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
             self.lineEdit_luNLUD.setText("U103")
             self.lineEdit_luTCPA.setText("B8")
 
-        if self.lucategorylistWidget.currentRow() == 15 and self.lusubcategorylistWidget.currentRow() == 0:
+        if (
+            self.lucategorylistWidget.currentRow() == 15
+            and self.lusubcategorylistWidget.currentRow() == 0
+        ):
             self.lineEdit_luSSx.setText("TR")
             self.lineEdit_luNLUD.setText("U052")
             self.lineEdit_luTCPA.setText("")
 
-        elif self.lucategorylistWidget.currentRow() == 15 and self.lusubcategorylistWidget.currentRow() == 1:
+        elif (
+            self.lucategorylistWidget.currentRow() == 15
+            and self.lusubcategorylistWidget.currentRow() == 1
+        ):
             self.lineEdit_luSSx.setText("TR")
             self.lineEdit_luNLUD.setText("U055")
             self.lineEdit_luTCPA.setText("")

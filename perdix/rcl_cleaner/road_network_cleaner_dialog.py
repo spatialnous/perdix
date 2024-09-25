@@ -1,11 +1,10 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" This module helps clean a road centre line map.
-"""
+"""This module helps clean a road centre line map."""
 
 from __future__ import absolute_import
 
@@ -17,8 +16,9 @@ from qgis.PyQt.QtWidgets import QDialog
 
 from .DbSettings_dialog import DbSettingsDialog
 
-Ui_RoadNetworkCleanerDialog, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'road_network_cleaner_dialog.ui'))
+Ui_RoadNetworkCleanerDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "road_network_cleaner_dialog.ui")
+)
 
 
 class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
@@ -68,13 +68,15 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         # add GUI signals§
         self.browseCleaned.clicked.connect(self.setOutput)
         self.mergeCheckBox.stateChanged.connect(self.toggleMergeSettings)
-        self.mergeCollinearCheckBox.stateChanged.connect(self.toggleMergeCollinearSettings)
+        self.mergeCollinearCheckBox.stateChanged.connect(
+            self.toggleMergeCollinearSettings
+        )
 
         self.memoryRadioButton.clicked.connect(self.setTempOutput)
         self.setTempOutput()
         self.shpRadioButton.clicked.connect(self.setShpOutput)
 
-        self.dataSourceCombo.addItems(['OpenStreetMap', 'OrdnanceSurvey', 'other'])
+        self.dataSourceCombo.addItems(["OpenStreetMap", "OrdnanceSurvey", "other"])
         self.lockSettingsGUI(True)
         self.dataSourceCombo.currentIndexChanged.connect(self.setClSettings)
 
@@ -102,7 +104,7 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         return
 
     def setClSettings(self):
-        if self.dataSourceCombo.currentText() == 'OpenStreetMap':
+        if self.dataSourceCombo.currentText() == "OpenStreetMap":
             self.snapCheckBox.setCheckState(2)
             self.simplifyCheckBox.setCheckState(2)
             self.snapSpinBox.setValue(10)
@@ -113,7 +115,7 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
             self.lockSettingsGUI(True)
 
-        elif self.dataSourceCombo.currentText() == 'OrdnanceSurvey':
+        elif self.dataSourceCombo.currentText() == "OrdnanceSurvey":
             self.snapCheckBox.setCheckState(2)
             self.simplifyCheckBox.setCheckState(2)
             self.snapSpinBox.setValue(10)
@@ -137,18 +139,18 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
             return shp_path, shp_path[:-4] + "_u.shp", shp_path[:-4] + "_errors.shp"
         elif self.postgisRadioButton.isChecked():
             try:
-                database, schema, table_name = self.outputCleaned.text().split(':')
+                database, schema, table_name = self.outputCleaned.text().split(":")
                 db_path = self.dbsettings_dlg.connstring, schema, table_name
                 db_path_u = list(db_path)
-                db_path_u[2] = db_path_u[2] + '_u'
+                db_path_u[2] = db_path_u[2] + "_u"
                 db_path_errors = list(db_path)
-                db_path_errors[2] = db_path_u[2] + '_errors'
+                db_path_errors[2] = db_path_u[2] + "_errors"
                 return db_path, tuple(db_path_u), tuple(db_path_errors)
             except ValueError:
-                return '', '', ''
+                return "", "", ""
         else:
             temp_name = self.outputCleaned.text()
-            return temp_name, temp_name + '_u', temp_name + '_errors'
+            return temp_name, temp_name + "_u", temp_name + "_errors"
 
     def popActiveLayers(self, layers_list):
         self.inputCombo.clear()
@@ -203,9 +205,9 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def getMerge(self):
         if self.mergeCheckBox.isChecked():
-            return 'intersections'
+            return "intersections"
         elif self.mergeCollinearCheckBox.isChecked():
-            return 'collinear'
+            return "collinear"
         else:
             return None
 
@@ -232,70 +234,106 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def get_output_type(self):
         if self.shpRadioButton.isChecked():
-            return 'shapefile'
+            return "shapefile"
         elif self.postgisRadioButton.isChecked():
-            return 'postgis'
+            return "postgis"
         else:
-            return 'memory'
+            return "memory"
 
     def fix_unlinks(self):
-        if self.dataSourceCombo.currentText() == 'OrdnanceSurvey':
+        if self.dataSourceCombo.currentText() == "OrdnanceSurvey":
             return True
         else:
             return None
 
     def get_settings(self):
-        break_at_vertices, merge_type, snap_threshold, orphans, fix_unlinks = self.getBreakages(), self.getMerge(), self.getTolerance(), self.getOrphans(), self.fix_unlinks()
+        break_at_vertices, merge_type, snap_threshold, orphans, fix_unlinks = (
+            self.getBreakages(),
+            self.getMerge(),
+            self.getTolerance(),
+            self.getOrphans(),
+            self.fix_unlinks(),
+        )
         getUnlinks = self.get_unlinks()
-        settings = {'input': self.getNetwork(), 'output': self.getOutput(), 'snap': snap_threshold,
-                    'break': break_at_vertices, 'merge': merge_type, 'orphans': orphans,
-                    'errors': self.get_errors(), 'unlinks': getUnlinks, 'collinear_angle': self.getCollinearThreshold(),
-                    'simplification_threshold': self.getSimplificationTolerance(),
-                    'fix_unlinks': fix_unlinks, 'output_type': self.get_output_type(),
-                    'progress_ranges': self.get_progress_ranges(break_at_vertices, merge_type, snap_threshold,
-                                                                getUnlinks, fix_unlinks)}
+        settings = {
+            "input": self.getNetwork(),
+            "output": self.getOutput(),
+            "snap": snap_threshold,
+            "break": break_at_vertices,
+            "merge": merge_type,
+            "orphans": orphans,
+            "errors": self.get_errors(),
+            "unlinks": getUnlinks,
+            "collinear_angle": self.getCollinearThreshold(),
+            "simplification_threshold": self.getSimplificationTolerance(),
+            "fix_unlinks": fix_unlinks,
+            "output_type": self.get_output_type(),
+            "progress_ranges": self.get_progress_ranges(
+                break_at_vertices, merge_type, snap_threshold, getUnlinks, fix_unlinks
+            ),
+        }
         return settings
 
     @staticmethod
-    def get_progress_ranges(break_at_vertices, merge_type, snap_threshold, getUnlinks, fix_unlinks):
-
+    def get_progress_ranges(
+        break_at_vertices, merge_type, snap_threshold, getUnlinks, fix_unlinks
+    ):
         # hard-coded ranges
-        weights = {'break': 4, 'load': 2, 'snap': 2, 'merge': 1, 'unlinks': 1, 'clean': 1, 'fix': 1}
+        weights = {
+            "break": 4,
+            "load": 2,
+            "snap": 2,
+            "merge": 1,
+            "unlinks": 1,
+            "clean": 1,
+            "fix": 1,
+        }
         total_range = 95
-        total_pr_w = weights['load']
-        total_pr_w += (float(2) * weights['clean'])  # 2 cleanings are happening by default
+        total_pr_w = weights["load"]
+        total_pr_w += (
+            float(2) * weights["clean"]
+        )  # 2 cleanings are happening by default
         if break_at_vertices:
-            total_pr_w += weights['break']
-        if merge_type in ('intersections', 'collinear'):
-            total_pr_w += weights['merge']
+            total_pr_w += weights["break"]
+        if merge_type in ("intersections", "collinear"):
+            total_pr_w += weights["merge"]
         if snap_threshold != 0:
-            total_pr_w += weights['snap']
-            total_pr_w += weights['clean']
+            total_pr_w += weights["snap"]
+            total_pr_w += weights["clean"]
         if getUnlinks:
-            total_pr_w += weights['unlinks']
+            total_pr_w += weights["unlinks"]
         if fix_unlinks:
-            total_pr_w += weights['fix']
+            total_pr_w += weights["fix"]
 
         factor = total_range / float(total_pr_w)
-        load_range = weights['load'] * float(factor)
-        cl1_range = weights['clean'] * float(factor)
+        load_range = weights["load"] * float(factor)
+        cl1_range = weights["clean"] * float(factor)
         cl2_range = 0
         cl3_range = cl1_range
         break_range, merge_range, snap_range, unlinks_range, fix_range = 0, 0, 0, 0, 0
         if break_at_vertices:
-            break_range = weights['break'] * float(factor)
-        if merge_type in ('intersections', 'collinear'):
-            merge_range = weights['merge'] * float(factor)
+            break_range = weights["break"] * float(factor)
+        if merge_type in ("intersections", "collinear"):
+            merge_range = weights["merge"] * float(factor)
         if snap_threshold != 0:
-            snap_range = weights['snap'] * float(factor)
+            snap_range = weights["snap"] * float(factor)
             cl2_range = cl1_range
         if fix_unlinks:
-            fix_range = weights['fix'] * float(factor)
+            fix_range = weights["fix"] * float(factor)
         if getUnlinks:
-            unlinks_range = weights['unlinks'] * float(factor)
+            unlinks_range = weights["unlinks"] * float(factor)
 
-        return [load_range, cl1_range, cl2_range, cl3_range, break_range, merge_range, snap_range, unlinks_range,
-                fix_range]
+        return [
+            load_range,
+            cl1_range,
+            cl2_range,
+            cl3_range,
+            break_range,
+            merge_range,
+            snap_range,
+            unlinks_range,
+            fix_range,
+        ]
 
     def get_dbsettings(self):
         settings = self.dbsettings_dlg.getDbSettings()
@@ -303,8 +341,9 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def setOutput(self):
         if self.shpRadioButton.isChecked():
-            self.file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save output file ", self.getNetwork() + "_cl",
-                                                                      '*.shp')
+            self.file_name, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, "Save output file ", self.getNetwork() + "_cl", "*.shp"
+            )
             if self.file_name:
                 self.outputCleaned.setText(self.file_name)
             else:
@@ -328,10 +367,15 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
             try:
                 self.dbsettings = self.dbsettings_dlg.getDbSettings()
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
                 self.outputCleaned.setText(db_layer_name)
             except Exception as e:
-                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+                print(
+                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                )
                 self.outputCleaned.clear()
         return
 
@@ -346,6 +390,8 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         try:
             self.outputCleaned.setText(self.file_name)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             self.outputCleaned.clear()
         self.outputCleaned.setDisabled(True)

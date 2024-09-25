@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import
 
-from qgis.PyQt.QtCore import (QObject, QSettings, Qt)
+from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.core import QgsProject
 
 from .entrances import EntranceTool
@@ -34,16 +34,19 @@ class UrbanDataInputTool(QObject):
 
         # get current user settings
         self.user_settings = {}
-        self.user_settings['crs'] = QSettings().value('/qgis/crs/use_project_crs')
-        self.user_settings['attrib_dialog'] = QSettings().value(
-            '/qgis/digitizing/disable_enter_attribute_values_dialog')
+        self.user_settings["crs"] = QSettings().value("/qgis/crs/use_project_crs")
+        self.user_settings["attrib_dialog"] = QSettings().value(
+            "/qgis/digitizing/disable_enter_attribute_values_dialog"
+        )
 
     def load_gui(self):
         # Overide existing QGIS settings
-        if not self.user_settings['attrib_dialog']:
-            QSettings().setValue('/qgis/digitizing/disable_enter_attribute_values_dialog', True)
-        if not self.user_settings['crs']:
-            QSettings().setValue('/qgis/crs/use_project_crs', True)
+        if not self.user_settings["attrib_dialog"]:
+            QSettings().setValue(
+                "/qgis/digitizing/disable_enter_attribute_values_dialog", True
+            )
+        if not self.user_settings["crs"]:
+            QSettings().setValue("/qgis/crs/use_project_crs", True)
 
         # show the dockwidget
         # TODO: fix to allow choice of dock location
@@ -59,7 +62,9 @@ class UrbanDataInputTool(QObject):
         # Frontages
         self.iface.mapCanvas().selectionChanged.connect(self.dockwidget.addDataFields)
         # Entrances
-        self.iface.mapCanvas().selectionChanged.connect(self.dockwidget.addEntranceDataFields)
+        self.iface.mapCanvas().selectionChanged.connect(
+            self.dockwidget.addEntranceDataFields
+        )
         # Landuse
         self.iface.mapCanvas().selectionChanged.connect(self.dockwidget.addLUDataFields)
         # Initialisation
@@ -70,9 +75,11 @@ class UrbanDataInputTool(QObject):
         # disconnect interface signals
         try:
             # restore user settings
-            QSettings().setValue('/qgis/digitizing/disable_enter_attribute_values_dialog',
-                                 self.user_settings['attrib_dialog'])
-            QSettings().setValue('/qgis/crs/use_project_crs', self.user_settings['crs'])
+            QSettings().setValue(
+                "/qgis/digitizing/disable_enter_attribute_values_dialog",
+                self.user_settings["attrib_dialog"],
+            )
+            QSettings().setValue("/qgis/crs/use_project_crs", self.user_settings["crs"])
 
             # legend change connections
             self.iface.projectRead.disconnect(self.updateLayers)
@@ -80,16 +87,24 @@ class UrbanDataInputTool(QObject):
             QgsProject.instance().layersRemoved.disconnect(self.updateLayers)
             QgsProject.instance().layersAdded.disconnect(self.updateLayers)
             # Frontages
-            self.iface.mapCanvas().selectionChanged.disconnect(self.dockwidget.addDataFields)
+            self.iface.mapCanvas().selectionChanged.disconnect(
+                self.dockwidget.addDataFields
+            )
             self.dockwidget.disconnectFrontageLayer()
             # Entrances
-            self.iface.mapCanvas().selectionChanged.disconnect(self.dockwidget.addEntranceDataFields)
+            self.iface.mapCanvas().selectionChanged.disconnect(
+                self.dockwidget.addEntranceDataFields
+            )
             self.dockwidget.disconnectEnranceLayer()
             # Landuse
-            self.iface.mapCanvas().selectionChanged.disconnect(self.dockwidget.addLUDataFields)
+            self.iface.mapCanvas().selectionChanged.disconnect(
+                self.dockwidget.addLUDataFields
+            )
             self.dockwidget.disconnectLULayer()
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
 
     def updateLayers(self):

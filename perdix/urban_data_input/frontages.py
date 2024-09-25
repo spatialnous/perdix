@@ -7,23 +7,37 @@
 from __future__ import print_function
 
 import os
+
 # Import the PyQt and QGIS libraries
 from builtins import str
 from builtins import zip
 
-from qgis.PyQt.QtCore import (QObject, QVariant)
-from qgis.core import (QgsProject, QgsMapLayer, QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsDataSourceUri, QgsVectorLayerExporter, QgsMessageLog, QgsFeatureRequest,
-                       QgsVectorDataProvider, NULL, QgsWkbTypes, Qgis)
+from qgis.PyQt.QtCore import QObject, QVariant
+from qgis.core import (
+    QgsProject,
+    QgsMapLayer,
+    QgsVectorLayer,
+    QgsField,
+    QgsFeature,
+    QgsGeometry,
+    QgsDataSourceUri,
+    QgsVectorLayerExporter,
+    QgsMessageLog,
+    QgsFeatureRequest,
+    QgsVectorDataProvider,
+    NULL,
+    QgsWkbTypes,
+    Qgis,
+)
 
 from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
 
 
 class FrontageTool(QObject):
-
-    id_attribute = 'F_ID'
-    group_attribute = 'F_Group'
-    type_attribute = 'F_Type'
-    length_attribute = 'F_Length'
+    id_attribute = "F_ID"
+    group_attribute = "F_Group"
+    type_attribute = "F_Type"
+    length_attribute = "F_Length"
 
     def __init__(self, iface, dockwidget):
         QObject.__init__(self)
@@ -39,9 +53,13 @@ class FrontageTool(QObject):
         self.dockwidget.loadFrontageLayer.connect(self.loadFrontageLayer)
         self.dockwidget.updateIDButton.clicked.connect(self.updateID)
         self.dockwidget.updateLengthButton.clicked.connect(self.updateLength)
-        self.dockwidget.updateFacadeButton.clicked.connect(self.updateSelectedFrontageAttribute)
+        self.dockwidget.updateFacadeButton.clicked.connect(
+            self.updateSelectedFrontageAttribute
+        )
         self.dockwidget.updateIDPushButton.clicked.connect(self.pushID)
-        self.dockwidget.pushIDcomboBox.currentIndexChanged.connect(self.updatepushWidgetList)
+        self.dockwidget.pushIDcomboBox.currentIndexChanged.connect(
+            self.updatepushWidgetList
+        )
         self.dockwidget.hideshowButton.clicked.connect(self.hideFeatures)
         self.dockwidget.pushButtonNewFile.clicked.connect(self.updateLayers)
 
@@ -67,9 +85,10 @@ class FrontageTool(QObject):
         layer.startEditing()
 
     def isRequiredLayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer \
-                and layer.geometryType() == type:
-            if lfh.layerHasFields(layer, [FrontageTool.group_attribute, FrontageTool.type_attribute]):
+        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+            if lfh.layerHasFields(
+                layer, [FrontageTool.group_attribute, FrontageTool.type_attribute]
+            ):
                 return True
 
         return False
@@ -151,12 +170,16 @@ class FrontageTool(QObject):
     def disconnectFrontageLayer(self):
         try:
             if self.frontage_layer:
-                self.frontage_layer.selectionChanged.disconnect(self.dockwidget.addDataFields)
+                self.frontage_layer.selectionChanged.disconnect(
+                    self.dockwidget.addDataFields
+                )
                 self.frontage_layer.featureAdded.disconnect(self.logFeatureAdded)
-                self.frontage_layer.featureDeleted.disconnect(self.dockwidget.clearDataFields)
+                self.frontage_layer.featureDeleted.disconnect(
+                    self.dockwidget.clearDataFields
+                )
                 self.frontage_layer = None
         except RuntimeError as e:
-            if str(e) == 'wrapped C/C++ object of type QgsVectorLayer has been deleted':
+            if str(e) == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
                 # QT object has already been deleted
                 return
             else:
@@ -164,33 +187,38 @@ class FrontageTool(QObject):
 
     # Create New Layer
     def newFrontageLayer(self):
-
         # always create a memory layer first
 
         if self.frontagedlg.createNewFileCheckBox.isChecked():
             building_layer = self.getSelectedLayer()
             crs = building_layer.crs()
-            vl = QgsVectorLayer("LineString?crs=" + crs.authid(), "memory:frontages", "memory")
+            vl = QgsVectorLayer(
+                "LineString?crs=" + crs.authid(), "memory:frontages", "memory"
+            )
 
         else:
             vl = QgsVectorLayer("LineString?crs=", "memory:frontages", "memory")
         if vl.crs().toWkt() == "":
             vl.setCrs(QgsProject.instance().crs())
         provider = vl.dataProvider()
-        provider.addAttributes([QgsField(FrontageTool.id_attribute, QVariant.Int),
-                                QgsField(FrontageTool.group_attribute, QVariant.String),
-                                QgsField(FrontageTool.type_attribute, QVariant.String),
-                                QgsField(FrontageTool.length_attribute, QVariant.Double)])
+        provider.addAttributes(
+            [
+                QgsField(FrontageTool.id_attribute, QVariant.Int),
+                QgsField(FrontageTool.group_attribute, QVariant.String),
+                QgsField(FrontageTool.type_attribute, QVariant.String),
+                QgsField(FrontageTool.length_attribute, QVariant.Double),
+            ]
+        )
         vl.updateFields()
 
         # use building layer - explode
         if self.frontagedlg.createNewFileCheckBox.isChecked():
-            print('building layer')
+            print("building layer")
             exploded_features = []
             i = 1
             for f in building_layer.getFeatures():
                 points = f.geometry().asPolygon()[0]  # get list of points
-                for (p1, p2) in zip(points[:-1], points[1:]):
+                for p1, p2 in zip(points[:-1], points[1:]):
                     i += 1
                     feat = QgsFeature()
                     line_geom = QgsGeometry.fromPolyline([p1, p2])
@@ -198,71 +226,80 @@ class FrontageTool(QObject):
                     feat.setId(i)
                     feat.setGeometry(line_geom)
                     exploded_features.append(feat)
-            print('building layer2')
+            print("building layer2")
             vl.updateFields()
             vl.startEditing()
             provider.addFeatures(exploded_features)
             vl.commitChanges()
-            print('building layer3')
+            print("building layer3")
 
         if self.frontagedlg.f_shp_radioButton.isChecked():  # layer_type == 'shapefile':
-
             path = self.frontagedlg.lineEditFrontages.text()
 
-            if path and path != '':
+            if path and path != "":
                 filename = os.path.basename(path)
                 location = os.path.abspath(path)
 
                 shph.createShapeFile(vl, path, vl.crs())
                 vl = self.iface.addVectorLayer(location, filename[:-4], "ogr")
             else:
-                vl = 'invalid data source'
+                vl = "invalid data source"
 
         elif self.frontagedlg.f_postgis_radioButton.isChecked():
-
             db_path = self.frontagedlg.lineEditFrontages.text()
-            if db_path and db_path != '':
-
-                (database, schema, table_name) = (self.frontagedlg.lineEditFrontages.text()).split(':')
+            if db_path and db_path != "":
+                (database, schema, table_name) = (
+                    self.frontagedlg.lineEditFrontages.text()
+                ).split(":")
                 db_con_info = self.frontagedlg.dbsettings_dlg.available_dbs[database]
                 uri = QgsDataSourceUri()
                 # passwords, usernames need to be empty if not provided or else connection will fail
-                if 'service' in list(db_con_info.keys()):
-                    uri.setConnection(db_con_info['service'], '', '', '')  # db_con_info['dbname']
-                elif 'password' in list(db_con_info.keys()):
-                    uri.setConnection(db_con_info['host'], db_con_info['port'], db_con_info['dbname'],
-                                      db_con_info['user'], db_con_info['password'])
+                if "service" in list(db_con_info.keys()):
+                    uri.setConnection(
+                        db_con_info["service"], "", "", ""
+                    )  # db_con_info['dbname']
+                elif "password" in list(db_con_info.keys()):
+                    uri.setConnection(
+                        db_con_info["host"],
+                        db_con_info["port"],
+                        db_con_info["dbname"],
+                        db_con_info["user"],
+                        db_con_info["password"],
+                    )
                 else:
                     print(db_con_info)  # db_con_info['host']
-                    uri.setConnection('', db_con_info['port'], db_con_info['dbname'], '',
-                                      '')  # , db_con_info['user'], '')
+                    uri.setConnection(
+                        "", db_con_info["port"], db_con_info["dbname"], "", ""
+                    )  # , db_con_info['user'], '')
                 uri.setDataSource(schema, table_name, "geom")
-                error = QgsVectorLayerExporter.exportLayer(vl, uri.uri(), "postgres", QgsProject.instance().crs())
+                error = QgsVectorLayerExporter.exportLayer(
+                    vl, uri.uri(), "postgres", QgsProject.instance().crs()
+                )
                 if error[0] != QgsVectorLayerExporter.NoError:
                     print("Error when creating postgis layer: ", error[1])
-                    vl = 'duplicate'
+                    vl = "duplicate"
                 else:
                     vl = QgsVectorLayer(uri.uri(), table_name, "postgres")
 
             else:
-                vl = 'invalid data source'
+                vl = "invalid data source"
 
-        if vl == 'invalid data source':
+        if vl == "invalid data source":
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Specify  output path!')
+            msg = msgBar.createMessage("Specify  output path!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
-        elif vl == 'duplicate':
+        elif vl == "duplicate":
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Fronatges layer already exists!')
+            msg = msgBar.createMessage("Fronatges layer already exists!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
         elif not vl:
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Frontages layer failed to load!')
+            msg = msgBar.createMessage("Frontages layer failed to load!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
         else:
             QgsProject.instance().addMapLayer(vl)
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Frontages layer created!')
+            msg = msgBar.createMessage("Frontages layer created!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
             vl.startEditing()
             if self.isRequiredLayer(vl, type):
@@ -275,7 +312,6 @@ class FrontageTool(QObject):
 
     # Draw New Feature
     def logFeatureAdded(self, fid):
-
         QgsMessageLog.logMessage("feature added, id = " + str(fid))
 
         self.canvas
@@ -298,7 +334,9 @@ class FrontageTool(QObject):
         v_layer.changeAttributeValue(fid, update3, inputid, True)
 
         # length can be obtained after the layer is added
-        request = QgsFeatureRequest().setFilterExpression(u'"' + FrontageTool.id_attribute + '" = %s' % inputid)
+        request = QgsFeatureRequest().setFilterExpression(
+            '"' + FrontageTool.id_attribute + '" = %s' % inputid
+        )
         features = v_layer.getFeatures(request)
         for feat in features:
             geom = feat.geometry()

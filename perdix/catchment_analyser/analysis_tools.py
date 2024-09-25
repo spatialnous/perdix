@@ -1,11 +1,10 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Network based catchment analysis
-"""
+"""Network based catchment analysis"""
 
 from __future__ import print_function
 
@@ -17,7 +16,8 @@ from builtins import str
 
 from qgis.PyQt.QtCore import QSettings
 from qgis.analysis import QgsNetworkSpeedStrategy
-from qgis.core import (QgsGeometry, QgsPoint)
+from qgis.core import QgsGeometry, QgsPoint
+
 
 class CustomCost(QgsNetworkSpeedStrategy):
     def __init__(self, costColumIndex, defaultValue):
@@ -57,7 +57,9 @@ class ConcaveHull(object):
         """
         min_y_pt = list_of_points[0]
         for point in list_of_points[1:]:
-            if point[1] < min_y_pt[1] or (point[1] == min_y_pt[1] and point[0] < min_y_pt[0]):
+            if point[1] < min_y_pt[1] or (
+                point[1] == min_y_pt[1] and point[0] < min_y_pt[0]
+            ):
                 min_y_pt = point
         return min_y_pt
 
@@ -82,14 +84,18 @@ class ConcaveHull(object):
         :param point2: tuple (x, y)
         :return: float
         """
-        return math.sqrt(math.pow(point1[0] - point2[0], 2) + math.pow(point1[1] - point2[1], 2))
+        return math.sqrt(
+            math.pow(point1[0] - point2[0], 2) + math.pow(point1[1] - point2[1], 2)
+        )
 
     def nearest_points(self, list_of_points, point, k):
         # build a list of tuples of distances between point *point* and every point in *list_of_points*, and
         # their respective index of list *list_of_distances*
         list_of_distances = []
         for index in range(len(list_of_points)):
-            list_of_distances.append((self.euclidian_distance(list_of_points[index], point), index))
+            list_of_distances.append(
+                (self.euclidian_distance(list_of_points[index], point), index)
+            )
 
         # sort distances in ascending order
         list_of_distances.sort()
@@ -134,8 +140,10 @@ class ConcaveHull(object):
             else:
                 return 0
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
-            print(('fail %s, %s', angle1, angle2))
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
+            print(("fail %s, %s", angle1, angle2))
             return 0
 
     def intersect(self, line1, line2):
@@ -151,16 +159,24 @@ class ConcaveHull(object):
         a2 = line2[1][1] - line2[0][1]
         b2 = line2[0][0] - line2[1][0]
         c2 = a2 * line2[0][0] + b2 * line2[0][1]
-        tmp = (a1 * b2 - a2 * b1)
+        tmp = a1 * b2 - a2 * b1
         if tmp == 0:
             return False
         sx = (c1 * b2 - c2 * b1) / tmp
-        if (sx > line1[0][0] and sx > line1[1][0]) or (sx > line2[0][0] and sx > line2[1][0]) or \
-                (sx < line1[0][0] and sx < line1[1][0]) or (sx < line2[0][0] and sx < line2[1][0]):
+        if (
+            (sx > line1[0][0] and sx > line1[1][0])
+            or (sx > line2[0][0] and sx > line2[1][0])
+            or (sx < line1[0][0] and sx < line1[1][0])
+            or (sx < line2[0][0] and sx < line2[1][0])
+        ):
             return False
         sy = (a1 * c2 - a2 * c1) / tmp
-        if (sy > line1[0][1] and sy > line1[1][1]) or (sy > line2[0][1] and sy > line2[1][1]) or \
-                (sy < line1[0][1] and sy < line1[1][1]) or (sy < line2[0][1] and sy < line2[1][1]):
+        if (
+            (sy > line1[0][1] and sy > line1[1][1])
+            or (sy > line2[0][1] and sy > line2[1][1])
+            or (sy < line1[0][1] and sy < line1[1][1])
+            or (sy < line2[0][1] and sy < line2[1][1])
+        ):
             return False
         return True
 
@@ -199,17 +215,17 @@ class ConcaveHull(object):
         :return: None
         """
         if file_name is None:
-            file_name = 'hull2.wkt'
+            file_name = "hull2.wkt"
         if os.path.isfile(file_name):
-            outfile = open(file_name, 'a')
+            outfile = open(file_name, "a")
         else:
-            outfile = open(file_name, 'w')
-            outfile.write('%s\n' % 'WKT')
-        wkt = 'POLYGON((' + str(point_list[0][0]) + ' ' + str(point_list[0][1])
+            outfile = open(file_name, "w")
+            outfile.write("%s\n" % "WKT")
+        wkt = "POLYGON((" + str(point_list[0][0]) + " " + str(point_list[0][1])
         for p in point_list[1:]:
-            wkt += ', ' + str(p[0]) + ' ' + str(p[1])
-        wkt += '))'
-        outfile.write('%s\n' % wkt)
+            wkt += ", " + str(p[0]) + " " + str(p[1])
+        wkt += "))"
+        outfile.write("%s\n" % wkt)
         outfile.close()
         return None
 
@@ -232,10 +248,10 @@ class ConcaveHull(object):
 
         """
 
-        wkt = 'POLYGON((' + str(point_list[0][0]) + ' ' + str(point_list[0][1])
+        wkt = "POLYGON((" + str(point_list[0][0]) + " " + str(point_list[0][1])
         for p in point_list[1:]:
-            wkt += ', ' + str(p[0]) + ' ' + str(p[1])
-        wkt += '))'
+            wkt += ", " + str(p[0]) + " " + str(p[1])
+        wkt += "))"
         return wkt
 
     def as_polygon(self, point_list):
@@ -270,11 +286,11 @@ class ConcaveHull(object):
         :return: string
         """
         settings = QSettings()
-        old_behaviour = settings.value('/Projections/defaultBehaviour')
-        settings.setValue('/Projections/defaultBehaviour', 'useProject')
+        old_behaviour = settings.value("/Projections/defaultBehaviour")
+        settings.setValue("/Projections/defaultBehaviour", "useProject")
         return old_behaviour
 
-    def disable_use_of_global_CRS(self, default_behaviour='prompt'):
+    def disable_use_of_global_CRS(self, default_behaviour="prompt"):
         """
         Enables old settings again. If argument is missing then set behaviour to prompt.
         Example: disable_use_of_global_CRS(old_behaviour)
@@ -282,7 +298,7 @@ class ConcaveHull(object):
         :return: None
         """
         settings = QSettings()
-        settings.setValue('/Projections/defaultBehaviour', default_behaviour)
+        settings.setValue("/Projections/defaultBehaviour", default_behaviour)
         return None
 
     def extract_points(self, geom):
@@ -385,7 +401,6 @@ class ConcaveHull(object):
 
         # as long as point_set is not empty or search is returning to the starting point # use of step is unclear!
         while ((current_point != first_point) or (step == 2)) and (len(point_set) > 0):
-
             # after 3 iterations add the first point to point_set again, otherwise a hull cannot be closed
             if step == 5:
                 point_set = self.add_point(point_set, first_point)
@@ -395,7 +410,9 @@ class ConcaveHull(object):
 
             # sort the candidates (neighbors) in descending order of right-hand turn. This way the algorithm progresses
             # in clockwise direction through as many points as possible
-            c_points = self.sort_by_angle(k_nearest_points, current_point, previous_angle)
+            c_points = self.sort_by_angle(
+                k_nearest_points, current_point, previous_angle
+            )
 
             its = True
             i = -1
@@ -411,7 +428,10 @@ class ConcaveHull(object):
                 its = False
 
                 while its is False and (j < len(hull) - last_point):
-                    its = self.intersect((hull[step - 2], c_points[i]), (hull[step - 2 - j], hull[step - 1 - j]))
+                    its = self.intersect(
+                        (hull[step - 2], c_points[i]),
+                        (hull[step - 2 - j], hull[step - 1 - j]),
+                    )
                     j += 1
 
             # there is no candidate to which the connecting line does not intersect any existing segment, so the

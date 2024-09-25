@@ -9,10 +9,10 @@ from __future__ import absolute_import
 # Import the PyQt and QGIS libraries
 from builtins import object
 
-from qgis.PyQt.QtCore import (QSettings, QTranslator, QCoreApplication, qVersion, Qt)
-from qgis.PyQt.QtGui import (QIcon, QPixmap)
-from qgis.PyQt.QtWidgets import (QAction, QDialog)
-from qgis.PyQt.uic import (loadUiType)
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, qVersion, Qt
+from qgis.PyQt.QtGui import QIcon, QPixmap
+from qgis.PyQt.QtWidgets import QAction, QDialog
+from qgis.PyQt.uic import loadUiType
 
 # Import the debug library
 try:
@@ -42,8 +42,9 @@ from perdix.drawing import DrawingTool
 is_debug = False
 
 # Import general modules
-Ui_AboutDialog, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'about_dialog.ui'))
+Ui_AboutDialog, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "about_dialog.ui")
+)
 
 # import additional modules here
 ###########
@@ -53,26 +54,27 @@ Ui_AboutDialog, _ = loadUiType(os.path.join(
 
 
 class Perdix(object):
-
     def __init__(self, iface):
         # initialise plugin directory
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
         locale = QSettings().value("locale/userLocale")[0:2]
-        locale_path = os.path.join(self.plugin_dir, 'i18n', 'essTools_{}.qm'.format(locale))
+        locale_path = os.path.join(
+            self.plugin_dir, "i18n", "essTools_{}.qm".format(locale)
+        )
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
         # Save reference to the QGIS interface
         self.iface = iface
-        self.toolbar = self.iface.addToolBar(u"Perdix")
-        self.menu = self.tr(u"&Perdix")
+        self.toolbar = self.iface.addToolBar("Perdix")
+        self.menu = self.tr("&Perdix")
         self.actions = []
 
         # Create toolkit components
@@ -85,13 +87,23 @@ class Perdix(object):
 
         # for remote debugging
         if has_pydevd and is_debug:
-            pydevd.settrace('localhost', port=53100, stdoutToServer=True, stderrToServer=True, suspend=False)
+            pydevd.settrace(
+                "localhost",
+                port=53100,
+                stdoutToServer=True,
+                stderrToServer=True,
+                suspend=False,
+            )
 
         ###########
         ###########
         # initialise the different modules
-        self.analysis = AnalysisTool.AnalysisTool(self.iface, self.settings, self.project)
-        self.explorer = ExplorerTool.ExplorerTool(self.iface, self.settings, self.project)
+        self.analysis = AnalysisTool.AnalysisTool(
+            self.iface, self.settings, self.project
+        )
+        self.explorer = ExplorerTool.ExplorerTool(
+            self.iface, self.settings, self.project
+        )
         self.gate_transformer = TransformerAnalysis.GateTransformer(self.iface)
         self.rcl_cleaner = road_network_cleaner_tool.NetworkCleanerTool(self.iface)
         self.catchment_tool = CatchmentAnalyser.CatchmentTool(self.iface)
@@ -114,10 +126,10 @@ class Perdix(object):
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('Perdix', message)
+        return QCoreApplication.translate("Perdix", message)
 
     def initGui(self):
-        icon_path = os.path.join(os.path.dirname(__file__), 'icons')
+        icon_path = os.path.join(os.path.dirname(__file__), "icons")
 
         ###########
         ###########
@@ -125,11 +137,11 @@ class Perdix(object):
         # graph analysis module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'esst_graph.png'),
-                text=self.tr(u'Graph Analysis'),
+                os.path.join(icon_path, "esst_graph.png"),
+                text=self.tr("Graph Analysis"),
                 callback=self.showAnalysis,
                 parent=self.iface.mainWindow(),
-                status_tip='Graph Analysis'
+                status_tip="Graph Analysis",
             )
         )
         # pre-load setting of dockwidget
@@ -138,11 +150,11 @@ class Perdix(object):
         # attribute explorer module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'esst_explorer.png'),
-                text=self.tr(u'Attributes Explorer'),
+                os.path.join(icon_path, "esst_explorer.png"),
+                text=self.tr("Attributes Explorer"),
                 callback=self.showExplorer,
                 parent=self.iface.mainWindow(),
-                status_tip='Attributes Explorer'
+                status_tip="Attributes Explorer",
             )
         )
         # pre-load setting of dockwidget
@@ -151,61 +163,61 @@ class Perdix(object):
         # drawing module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'drawing.png'),
-                text=self.tr(u'Drawing Tool'),
+                os.path.join(icon_path, "drawing.png"),
+                text=self.tr("Drawing Tool"),
                 callback=self.showDrawingTool,
                 parent=self.iface.mainWindow(),
-                status_tip='Drawing Tool'
+                status_tip="Drawing Tool",
             )
         )
         # rcl cleaner module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'rcl_cleaner.png'),
-                text=self.tr(u'Road Network Cleaner'),
+                os.path.join(icon_path, "rcl_cleaner.png"),
+                text=self.tr("Road Network Cleaner"),
                 callback=self.showRCLCleaner,
                 parent=self.iface.mainWindow(),
-                status_tip='Road Network Cleaner'
+                status_tip="Road Network Cleaner",
             )
         )
         # network segmenter module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'network_segmenter.png'),
-                text=self.tr(u'Network Segmenter'),
+                os.path.join(icon_path, "network_segmenter.png"),
+                text=self.tr("Network Segmenter"),
                 callback=self.showNetworkSegmenter,
                 parent=self.iface.mainWindow(),
-                status_tip='Network Segmenter'
+                status_tip="Network Segmenter",
             )
         )
         # catchment analyser module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'catchment_analyser.png'),
-                text=self.tr(u'Catchment Analyser'),
+                os.path.join(icon_path, "catchment_analyser.png"),
+                text=self.tr("Catchment Analyser"),
                 callback=self.showCatchmentAnalyser,
                 parent=self.iface.mainWindow(),
-                status_tip='Catchment Analyser'
+                status_tip="Catchment Analyser",
             )
         )
         # urban data input module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'urban_data_input.png'),
-                text=self.tr(u'Urban Data Input'),
+                os.path.join(icon_path, "urban_data_input.png"),
+                text=self.tr("Urban Data Input"),
                 callback=self.showUrbanDataInput,
                 parent=self.iface.mainWindow(),
-                status_tip='Urban Data Input'
+                status_tip="Urban Data Input",
             )
         )
         # gate transformer module
         self.actions.append(
             self.add_action(
-                os.path.join(icon_path, 'gate_transformer.png'),
-                text=self.tr(u'Gate Transformer'),
+                os.path.join(icon_path, "gate_transformer.png"),
+                text=self.tr("Gate Transformer"),
                 callback=self.showGateTransformer,
                 parent=self.iface.mainWindow(),
-                status_tip='Gate Transformer'
+                status_tip="Gate Transformer",
             )
         )
 
@@ -215,28 +227,28 @@ class Perdix(object):
 
         # Create menu only toolkit components actions
         self.project_action = self.add_action(
-            os.path.join(icon_path, 'project.png'),
-            text=self.tr(u'Project'),
+            os.path.join(icon_path, "project.png"),
+            text=self.tr("Project"),
             callback=self.project.showDialog,
             parent=self.iface.mainWindow(),
-            status_tip='Project',
-            add_to_toolbar=False
+            status_tip="Project",
+            add_to_toolbar=False,
         )
         self.settings_action = self.add_action(
-            os.path.join(icon_path, 'settings.png'),
-            text=self.tr(u'Settings'),
+            os.path.join(icon_path, "settings.png"),
+            text=self.tr("Settings"),
             callback=self.settings.showDialog,
             parent=self.iface.mainWindow(),
-            status_tip='Settings',
-            add_to_toolbar=False
+            status_tip="Settings",
+            add_to_toolbar=False,
         )
         self.about_action = self.add_action(
-            os.path.join(icon_path, 'about.png'),
-            text=self.tr(u'About'),
+            os.path.join(icon_path, "about.png"),
+            text=self.tr("About"),
             callback=self.about.show,
             parent=self.iface.mainWindow(),
-            status_tip='About',
-            add_to_toolbar=False
+            status_tip="About",
+            add_to_toolbar=False,
         )
 
     ###########
@@ -279,15 +291,15 @@ class Perdix(object):
         self.iface.removePluginVectorMenu(self.menu, self.about_action)
         # remove the actions on the toolbar
         for action in self.actions:
-            self.iface.removePluginVectorMenu(
-                self.menu,
-                action)
+            self.iface.removePluginVectorMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         try:
             del self.toolbar
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
 
         ###########
@@ -311,9 +323,18 @@ class Perdix(object):
     def showMessage(self, msg, lev, dur, type):
         self.iface.messageBar().pushMessage("Info", msg, level=lev, duration=dur)
 
-    def add_action(self, icon_path, text, callback, enabled_flag=True, add_to_menu=True, add_to_toolbar=True,
-                   status_tip=None, whats_this=None, parent=None):
-
+    def add_action(
+        self,
+        icon_path,
+        text,
+        callback,
+        enabled_flag=True,
+        add_to_menu=True,
+        add_to_toolbar=True,
+        status_tip=None,
+        whats_this=None,
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -368,9 +389,7 @@ class Perdix(object):
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToVectorMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToVectorMenu(self.menu, action)
 
         return action
 
@@ -386,16 +405,21 @@ class AboutDialog(QDialog, Ui_AboutDialog):
 
         # load text
         about_msg = (
-            'Perdix is a collection of tools for space syntax analysis workflows in the QGIS environment.\n'
+            "Perdix is a collection of tools for space syntax analysis workflows in the QGIS environment.\n"
             'It was originally developed at the Space Syntax Laboratory, the Bartlett, University College London (UCL) as "Space Syntax Toolkit".\n\n'
-            'Mailing list: spacesyntax-toolkit@jiscmail.ac.uk\n\n'
-            'Author: Jorge Gil\n\n'
-            'It includes contributions from:\n\n'
-            '- Space Syntax Limited:\n'
-            'Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis\n\n'
-            '\nReleased under GNU Licence version 3')
+            "Mailing list: spacesyntax-toolkit@jiscmail.ac.uk\n\n"
+            "Author: Jorge Gil\n\n"
+            "It includes contributions from:\n\n"
+            "- Space Syntax Limited:\n"
+            "Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis\n\n"
+            "\nReleased under GNU Licence version 3"
+        )
 
         self.messageText.setText(about_msg)
 
         # load logos
-        self.logoLabel.setPixmap(QPixmap(os.path.join(os.path.dirname(__file__), 'icons', 'contrib_logos.png')))
+        self.logoLabel.setPixmap(
+            QPixmap(
+                os.path.join(os.path.dirname(__file__), "icons", "contrib_logos.png")
+            )
+        )

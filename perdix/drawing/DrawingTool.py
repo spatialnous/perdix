@@ -1,25 +1,34 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Drawing tool for axial lines, segment lines and unlinks.
-"""
+"""Drawing tool for axial lines, segment lines and unlinks."""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
 import os.path
 from builtins import object
 
-from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, QCoreApplication, Qt, QSize)
-from qgis.PyQt.QtGui import (QIcon, QPixmap)
+from qgis.PyQt.QtCore import (
+    QSettings,
+    QTranslator,
+    qVersion,
+    QCoreApplication,
+    Qt,
+    QSize,
+)
+from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.uic import loadUiType
-from qgis.core import (Qgis, QgsProject, QgsMapLayer)
+from qgis.core import Qgis, QgsProject, QgsMapLayer
 
-Ui_DrawingToolDockWidget, _ = loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'drawing_dock_widget.ui'))
+Ui_DrawingToolDockWidget, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "drawing_dock_widget.ui")
+)
+
 
 class DrawingTool(object):
     """QGIS Plugin Implementation."""
@@ -39,25 +48,24 @@ class DrawingTool(object):
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'DrawingTool_{}.qm'.format(locale))
+            self.plugin_dir, "i18n", "DrawingTool_{}.qm".format(locale)
+        )
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Drawing Tool')
+        self.menu = self.tr("&Drawing Tool")
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'DrawingTool')
-        self.toolbar.setObjectName(u'DrawingTool')
+        self.toolbar = self.iface.addToolBar("DrawingTool")
+        self.toolbar.setObjectName("DrawingTool")
 
         # print "** INITIALIZING DrawingTool"
 
@@ -77,19 +85,20 @@ class DrawingTool(object):
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('DrawingTool', message)
+        return QCoreApplication.translate("DrawingTool", message)
 
     def add_action(
-            self,
-            icon_path,
-            text,
-            callback,
-            enabled_flag=True,
-            add_to_menu=True,
-            add_to_toolbar=True,
-            status_tip=None,
-            whats_this=None,
-            parent=None):
+        self,
+        icon_path,
+        text,
+        callback,
+        enabled_flag=True,
+        add_to_menu=True,
+        add_to_toolbar=True,
+        status_tip=None,
+        whats_this=None,
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -144,9 +153,7 @@ class DrawingTool(object):
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToVectorMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToVectorMenu(self.menu, action)
 
         self.actions.append(action)
 
@@ -155,12 +162,13 @@ class DrawingTool(object):
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/DrawingTool/icon.png'
+        icon_path = ":/plugins/DrawingTool/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr(u'Draw'),
+            text=self.tr("Draw"),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+        )
 
     # --------------------------------------------------------------------------
 
@@ -179,15 +187,21 @@ class DrawingTool(object):
         except TypeError:
             pass
         try:
-            self.dockwidget.networkCombo.currentIndexChanged.disconnect(self.dockwidget.update_network)
+            self.dockwidget.networkCombo.currentIndexChanged.disconnect(
+                self.dockwidget.update_network
+            )
         except TypeError:
             pass
         try:
-            self.dockwidget.unlinksCombo.currentIndexChanged.disconnect(self.dockwidget.update_unlinks)
+            self.dockwidget.unlinksCombo.currentIndexChanged.disconnect(
+                self.dockwidget.update_unlinks
+            )
         except TypeError:
             pass
         try:
-            self.dockwidget.toleranceSpin.valueChanged.disconnect(self.dockwidget.update_tolerance)
+            self.dockwidget.toleranceSpin.valueChanged.disconnect(
+                self.dockwidget.update_tolerance
+            )
         except TypeError:
             pass
 
@@ -205,9 +219,7 @@ class DrawingTool(object):
         # print "** UNLOAD DrawingTool"
 
         for action in self.actions:
-            self.iface.removePluginVectorMenu(
-                self.tr(u'&Drawing Tool'),
-                action)
+            self.iface.removePluginVectorMenu(self.tr("&Drawing Tool"), action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
@@ -218,7 +230,7 @@ class DrawingTool(object):
         layers = []
 
         for layer in QgsProject.instance().mapLayers().values():
-            print('l')
+            print("l")
             if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
                 if layer.isSpatial() and (layer.geometryType() == geom_type):
                     layers.append(layer.name())
@@ -232,13 +244,12 @@ class DrawingTool(object):
             self.lockGUI(False)
         else:
             self.lockGUI(True)
-        print('done')
+        print("done")
         for lyr in list(QgsProject.instance().mapLayers().values()):
-            print(lyr, 'lyr', layers_list)
+            print(lyr, "lyr", layers_list)
         return
 
     def pop_layer(self):
-
         # get all layers
 
         self.iface.mapCanvas().refreshAllLayers()
@@ -251,10 +262,11 @@ class DrawingTool(object):
         self.dockwidget.networkCombo.addItems(networks)
 
         active_network_idx = self.dockwidget.networkCombo.findText(
-            self.dockwidget.activatedNetwork)  # TODOD test if multiple
+            self.dockwidget.activatedNetwork
+        )  # TODOD test if multiple
         if active_network_idx == -1:
             active_network_idx = 0
-        print('active_network_idx', self.dockwidget.activatedNetwork, networks)
+        print("active_network_idx", self.dockwidget.activatedNetwork, networks)
 
         # TODO: if the network changes - do not block signals - setup snapping
         # if self.dockwidget.activatedNetwork =
@@ -266,25 +278,31 @@ class DrawingTool(object):
                 "Drawing Tool: ",
                 "Rename network layers in the layers panel that have the same names!",
                 level=Qgis.Warning,
-                duration=5)
+                duration=5,
+            )
 
         self.dockwidget.settings[0] = self.dockwidget.networkCombo.currentText()
         self.dockwidget.networkCombo.blockSignals(False)
 
         self.dockwidget.unlinksCombo.blockSignals(True)
         self.dockwidget.unlinksCombo.clear()
-        self.dockwidget.unlinksCombo.addItems(['no unlinks'] + unlinks)
+        self.dockwidget.unlinksCombo.addItems(["no unlinks"] + unlinks)
         active_unlinks_idx = self.dockwidget.unlinksCombo.findText(
-            self.dockwidget.activatedUnlinks)  # TODOD test if multiple
+            self.dockwidget.activatedUnlinks
+        )  # TODOD test if multiple
         if active_unlinks_idx == -1:
             active_unlinks_idx = 0
 
         # print 'active_unlinks_idx', active_unlinks_idx, unlinks
 
         if active_unlinks_idx == 0 and self.dockwidget.unlink_mode:
-            self.iface.messageBar().pushMessage("Unlinks layer not specified!", Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                "Unlinks layer not specified!", Qgis.Critical, duration=5
+            )
             self.dockwidget.unlink_mode = False
-            unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")
+            unlink_icon = QPixmap(
+                os.path.dirname(__file__) + "/icons/unlink_disabled.png"
+            )
             self.dockwidget.unlinksButton.setIcon(QIcon(unlink_icon))
             self.dockwidget.unlinksButton.setIconSize(QSize(40, 40))
 
@@ -296,11 +314,12 @@ class DrawingTool(object):
                 "Drawing Tool: ",
                 "Rename point layers in the layers panel that have the same names!",
                 level=Qgis.Warning,
-                duration=5)
+                duration=5,
+            )
 
         self.dockwidget.settings[1] = self.dockwidget.networkCombo.currentText()
         self.dockwidget.unlinksCombo.blockSignals(False)
-        if len(networks) == 0 or self.dockwidget.networkCombo.currentText() == '':
+        if len(networks) == 0 or self.dockwidget.networkCombo.currentText() == "":
             self.lockGUI(True)
         else:
             self.lockGUI(False)
@@ -349,6 +368,12 @@ class DrawingTool(object):
             QgsProject.instance().layersAdded.connect(self.pop_layer)
             QgsProject.instance().layersRemoved.connect(self.pop_layer)
             # QgsProject.instance().variablesChanged.connect(self.pop_layer)
-            self.dockwidget.networkCombo.currentIndexChanged.connect(self.dockwidget.update_network)
-            self.dockwidget.unlinksCombo.currentIndexChanged.connect(self.dockwidget.update_unlinks)
-            self.dockwidget.toleranceSpin.valueChanged.connect(self.dockwidget.update_tolerance)
+            self.dockwidget.networkCombo.currentIndexChanged.connect(
+                self.dockwidget.update_network
+            )
+            self.dockwidget.unlinksCombo.currentIndexChanged.connect(
+                self.dockwidget.update_unlinks
+            )
+            self.dockwidget.toleranceSpin.valueChanged.connect(
+                self.dockwidget.update_tolerance
+            )

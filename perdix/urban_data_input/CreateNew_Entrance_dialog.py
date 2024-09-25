@@ -14,8 +14,9 @@ from qgis.PyQt import QtCore, QtWidgets, uic
 from .DbSettings_dialog import DbSettingsDialog
 from perdix.utilities import db_helpers as dbh
 
-Ui_CreateNewEntranceDialog, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'create_new_entrance_dialog.ui'))
+Ui_CreateNewEntranceDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "create_new_entrance_dialog.ui")
+)
 
 
 class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
@@ -32,16 +33,18 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
         self.setupUi(self)
 
         # setup signals
-        self.pushButtonSelectLocationEntrance.clicked.connect(self.selectSaveLocationEntrance)
+        self.pushButtonSelectLocationEntrance.clicked.connect(
+            self.selectSaveLocationEntrance
+        )
         self.pushButtonEntrancesNewFileDLG.clicked.connect(self.newEntranceLayer)
         self.closePopUpEntrancesButton.clicked.connect(self.closePopUpEntrances)
 
         available_dbs = dbh.getQGISDbs()
         self.dbsettings_dlg = DbSettingsDialog(available_dbs)
-        self.dbsettings_dlg.nameLineEdit.setText('entrances')
+        self.dbsettings_dlg.nameLineEdit.setText("entrances")
 
         self.e_memory_radioButton.setChecked(True)
-        self.lineEditEntrances.setPlaceholderText('Specify temporary layer name')
+        self.lineEditEntrances.setPlaceholderText("Specify temporary layer name")
         self.lineEditEntrances.setDisabled(False)
         self.e_shp_radioButton.setChecked(False)
         self.e_postgis_radioButton.setChecked(False)
@@ -62,7 +65,9 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
     # Open Save file dialogue and set location in text edit
     def selectSaveLocationEntrance(self):
         if self.e_shp_radioButton.isChecked():
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Specify Output Location ", "", '*.shp')
+            filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+                None, "Specify Output Location ", "", "*.shp"
+            )
             self.lineEditEntrances.clear()
             self.lineEditEntrances.setText(filename)
         elif self.e_postgis_radioButton.isChecked():
@@ -72,8 +77,11 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
             self.dbsettings = self.dbsettings_dlg.getDbSettings()
             if self.dbsettings:
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
-                print('db_layer_name')
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
+                print("db_layer_name")
                 self.lineEditEntrances.setText(db_layer_name)
         elif self.e_memory_radioButton.isChecked():
             self.lineEditEntrances.clear()
@@ -84,10 +92,15 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
             try:
                 self.dbsettings = self.dbsettings_dlg.getDbSettings()
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
                 self.lineEditEntrances.setText(db_layer_name)
             except Exception as e:
-                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+                print(
+                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                )
                 self.lineEditEntrances.clear()
         return
 
@@ -97,24 +110,29 @@ class CreateNew_EntranceDialog(QtWidgets.QDialog, Ui_CreateNewEntranceDialog):
     def setOutput(self):
         if self.e_shp_radioButton.isChecked():
             self.lineEditEntrances.clear()
-            self.lineEditEntrances.setPlaceholderText('Specify output location')
+            self.lineEditEntrances.setPlaceholderText("Specify output location")
             self.lineEditEntrances.setDisabled(True)
             self.pushButtonSelectLocationEntrance.setDisabled(False)
         elif self.e_postgis_radioButton.isChecked():
             self.lineEditEntrances.clear()
             self.dbsettings = self.dbsettings_dlg.getDbSettings()
             self.pushButtonSelectLocationEntrance.setDisabled(False)
-            print('dbs1', self.dbsettings)
+            print("dbs1", self.dbsettings)
             if self.dbsettings != {}:
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
                 self.lineEditEntrances.setText(db_layer_name)
                 self.lineEditEntrances.setDisabled(False)
             else:
-                self.lineEditEntrances.setPlaceholderText('Specify as database:schema:table name')
+                self.lineEditEntrances.setPlaceholderText(
+                    "Specify as database:schema:table name"
+                )
                 self.lineEditEntrances.setDisabled(True)
         elif self.e_memory_radioButton.isChecked():
             self.lineEditEntrances.clear()
             self.lineEditEntrances.setDisabled(False)
-            self.lineEditEntrances.setPlaceholderText('Specify temporary layer name')
+            self.lineEditEntrances.setPlaceholderText("Specify temporary layer name")
             self.pushButtonSelectLocationEntrance.setDisabled(True)

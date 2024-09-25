@@ -1,24 +1,31 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # INPUT
 from qgis.PyQt.QtCore import QVariant
 from qgis.analysis import QgsGraphBuilder
-from qgis.core import (QgsSpatialIndex, QgsGeometry, QgsFeature, QgsFields, QgsField, QgsWkbTypes)
+from qgis.core import (
+    QgsSpatialIndex,
+    QgsGeometry,
+    QgsFeature,
+    QgsFields,
+    QgsField,
+    QgsWkbTypes,
+)
 
 import catchment_analyser.catchment_analysis as catchment
 import catchment_analyser.utility_functions as uf
 from catchment_analyser.analysis_tools import CustomCost
 from perdix.utilities import layer_field_helpers as lfh
-from qgis.networkanalysis import (QgsDistanceArcProperter, QgsLineVectorLayerDirector)
+from qgis.networkanalysis import QgsDistanceArcProperter, QgsLineVectorLayerDirector
 
-origin_vector = lfh.getLayerByName('2595D_pr_tfl_bus_stops')
-network = lfh.getLayerByName('2595D_spm_pr2_seg2')
+origin_vector = lfh.getLayerByName("2595D_pr_tfl_bus_stops")
+network = lfh.getLayerByName("2595D_spm_pr2_seg2")
 origin_name_field = None
-cost_field = 'length'
+cost_field = "length"
 tolerance = 0.01
 crs = network.crs()
 epsg = network.crs().authid()[5:]
@@ -34,7 +41,7 @@ for i, f in enumerate(origin_vector.getFeatures()):
         origin_name = f[origin_name_field]
     else:
         origin_name = i  # "origin_" + "%s" % (i+1)
-    origins.append({'name': origin_name, 'geom': f.geometry().centroid()})
+    origins.append({"name": origin_name, "geom": f.geometry().centroid()})
 
 # 2. Build the graph
 otf = False
@@ -43,10 +50,10 @@ network_fields = network.pendingFields()
 network_cost_index = network_fields.indexFromName(cost_field)
 
 # Setting up graph build director
-director = QgsLineVectorLayerDirector(network, -1, '', '', '', 3)
+director = QgsLineVectorLayerDirector(network, -1, "", "", "", 3)
 
 # Determining cost calculation
-if cost_field != 'length':
+if cost_field != "length":
     properter = CustomCost(network_cost_index, 0.01)
 else:
     properter = QgsDistanceArcProperter()
@@ -60,7 +67,7 @@ graph_origin_points = []
 
 # Loop through the origin points and add graph vertex indices
 for index, origin in enumerate(origins):
-    graph_origin_points.append(origins[index]['geom'].asPoint())
+    graph_origin_points.append(origins[index]["geom"].asPoint())
 
 # Get origin graph vertex index
 tied_origin_vertices = director.makeGraph(builder, graph_origin_points)
@@ -73,7 +80,7 @@ tied_origins = {}
 
 # Combine origin names and tied point vertices
 for index, tied_origin in enumerate(tied_origin_vertices):
-    tied_origins[index] = {'name': origins[index]['name'], 'vertex': tied_origin}
+    tied_origins[index] = {"name": origins[index]["name"], "vertex": tied_origin}
 
 spIndex = QgsSpatialIndex()
 indices = {}
@@ -111,50 +118,59 @@ network_fields = network_fields
 
 # Run the analysis
 catchment_network, catchment_points = catchment.graph_analysis(
-    graph,
-    tied_origins,
-    catchment.settings['distances']
+    graph, tied_origins, catchment.settings["distances"]
 )
 
 # Create output signal
-output = {'output network': None,
-          'output polygon': None,
-          'distances': catchment.settings['distances']}
+output = {
+    "output network": None,
+    "output polygon": None,
+    "distances": catchment.settings["distances"],
+}
 
-network = catchment.settings['network']
+network = catchment.settings["network"]
 
 # Write and render the catchment polygons
 
-if catchment.settings['output polygon check']:
+if catchment.settings["output polygon check"]:
     new_fields = QgsFields()
-    new_fields.append(QgsField('id', QVariant.Int))
-    new_fields.append(QgsField('origin', QVariant.String))
-    new_fields.append(QgsField('distance', QVariant.Int))
-    output_polygon = uf.to_layer(new_fields, network.crs(), network.dataProvider().encoding(),
-                                 'Polygon', catchment.settings['layer_type'],
-                                 catchment.settings['output path'][0])
+    new_fields.append(QgsField("id", QVariant.Int))
+    new_fields.append(QgsField("origin", QVariant.String))
+    new_fields.append(QgsField("distance", QVariant.Int))
+    output_polygon = uf.to_layer(
+        new_fields,
+        network.crs(),
+        network.dataProvider().encoding(),
+        "Polygon",
+        catchment.settings["layer_type"],
+        catchment.settings["output path"][0],
+    )
 
     output_polygon = catchment.polygon_writer(
         catchment_points,
-        catchment.settings['distances'],
+        catchment.settings["distances"],
         output_polygon,
-        catchment.settings['polygon tolerance'],
+        catchment.settings["polygon tolerance"],
     )
-    output['output polygon'] = output_polygon
+    output["output polygon"] = output_polygon
 
 # get fields
 
-new_fields = catchment.get_fields(origins, catchment.settings['name'])
+new_fields = catchment.get_fields(origins, catchment.settings["name"])
 
 # create layer
-output_network = uf.to_layer(new_fields, network.crs(), network.dataProvider().encoding(), 'Linestring',
-                             catchment.settings['layer_type'], catchment.settings['output path'][0])
+output_network = uf.to_layer(
+    new_fields,
+    network.crs(),
+    network.dataProvider().encoding(),
+    "Linestring",
+    catchment.settings["layer_type"],
+    catchment.settings["output path"][0],
+)
 
 # Write and render the catchment network
 output_network = catchment.network_writer(
-    output_network,
-    catchment_network,
-    catchment.settings['name']
+    output_network, catchment_network, catchment.settings["name"]
 )
 
-output['output network'] = output_network
+output["output network"] = output_network

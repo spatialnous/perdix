@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 #!/bin/python3
@@ -13,9 +13,9 @@ reusedata = subprocess.check_output(["reuse", "spdx"])
 reusedata = reusedata.decode("utf-8").splitlines()
 
 if len(sys.argv) < 2:
-    sys.exit('Error: No files provided')
+    sys.exit("Error: No files provided")
 
-filesNeeded = [sys.argv[1]]
+filesNeeded = sys.argv[1:]
 
 
 cprPrefix = "SPDX-FileCopyrightText:"
@@ -27,34 +27,37 @@ cprs = []
 
 for line in reusedata:
     if line.startswith("FileName:"):
-        fileName = line[len("FileName:"):].strip()
+        fileName = line[len("FileName:") :].strip()
+        if fileName.startswith("./"):
+            fileName = fileName[len("./") :]
         if fileName in filesNeeded:
             fileData[fileName] = {"maxyear": 1900}
             currentFile = fileName
         else:
             currentFile = ""
-    elif (currentFile != "" and line != ""):
+    elif currentFile != "" and line != "":
         if line.startswith("FileCopyrightText:"):
-            cprs = [line[len("FileCopyrightText:"):].strip()]
+            cprs = [line[len("FileCopyrightText:") :].strip()]
             if not cprs[0].startswith("<text>"):
                 cprs = []
                 continue
-            cprs[0] = cprs[0][len("<text>"):].strip()
+            cprs[0] = cprs[0][len("<text>") :].strip()
             if not cprs[0].startswith(cprPrefix):
                 cprs = []
                 continue
             if cprs[0].endswith("</text>"):
-                cprs[0] = cprs[0][len(cprPrefix):
-                    len(cprs[0]) - len("</text>")].strip()
+                cprs[0] = cprs[0][
+                    len(cprPrefix) : len(cprs[0]) - len("</text>")
+                ].strip()
                 fileData[currentFile]["copyright"] = cprs
                 cprs = []
                 continue
         elif cprs != []:
             if line.endswith("</text>"):
-                line = line[:len(line) - len("</text>")].strip()
+                line = line[: len(line) - len("</text>")].strip()
                 cprs.append(line)
                 for i in range(len(cprs)):
-                    cprs[i] = cprs[i][len(cprPrefix):].strip()
+                    cprs[i] = cprs[i][len(cprPrefix) :].strip()
                 fileData[currentFile]["copyright"] = cprs
                 cprs = []
             else:
@@ -88,7 +91,13 @@ if len(fileData) == 0:
 
 for fd in fileData:
     if fileData[fd]["maxyear"] < datetime.now().year:
-        sys.exit('File ' + fd + " has not had its Copyright " +
-            "statement updated to this year (" + str(datetime.now().year) +
-            "), only goes up to " + str(fileData[fd]["maxyear"]))
+        sys.exit(
+            "File "
+            + fd
+            + " has not had its Copyright "
+            + "statement updated to this year ("
+            + str(datetime.now().year)
+            + "), only goes up to "
+            + str(fileData[fd]["maxyear"])
+        )
 print("Test passed")

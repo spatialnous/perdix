@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import print_function
@@ -15,6 +16,7 @@ import numpy as np
 # ------------------------------
 # General functions
 # ------------------------------
+
 
 # check if a text string is of numeric type
 def isNumeric(txt):
@@ -44,7 +46,7 @@ def convertNumeric(txt):
             try:
                 value = float(txt)
             except ValueError:
-                value = ''
+                value = ""
     return value
 
 
@@ -70,15 +72,15 @@ def roundNumber(num):
 def truncateNumberString(num, digits=9):
     if isNumeric(num):
         truncated = str(num)
-        if '.' in truncated:
+        if "." in truncated:
             truncated = truncated[:digits]
-            truncated = truncated.rstrip('0').rstrip('.')
+            truncated = truncated.rstrip("0").rstrip(".")
         return convertNumeric(truncated)
 
 
 def truncateNumber(num, digits=9):
     if isNumeric(num):
-        truncated = math.floor(num * 10 ** digits) / 10 ** digits
+        truncated = math.floor(num * 10**digits) / 10**digits
         return truncated
 
 
@@ -88,14 +90,16 @@ def numSigDigits(num):
     see: http://www.power-quant.com/?q=node/85
     """
     numdigits = -1
-    decimal = u'.'
+    decimal = "."
     if isNumeric(num):
         # number the digits:
         enumerated_chars = list(enumerate(str(num)))
         # for x in enumerated_chars:
         #    if x[1] in (u'.',u','):
         #        decimal = x[1]
-        non_zero_chars = [x for x in enumerated_chars if (x[1] != '0') and (x[1] != decimal)]
+        non_zero_chars = [
+            x for x in enumerated_chars if (x[1] != "0") and (x[1] != decimal)
+        ]
         most_sig_digit = non_zero_chars[0]
         least_sig_digit = None
         if decimal in [x[1] for x in enumerated_chars]:
@@ -103,7 +107,9 @@ def numSigDigits(num):
         else:
             least_sig_digit = non_zero_chars[-1]
 
-        enumed_sig_digits = [x for x in enumerated_chars[most_sig_digit[0]:least_sig_digit[0] + 1]]
+        enumed_sig_digits = [
+            x for x in enumerated_chars[most_sig_digit[0] : least_sig_digit[0] + 1]
+        ]
         numdigits = len(enumed_sig_digits)
         if decimal in [x[1] for x in enumerated_chars]:
             numdigits -= 1
@@ -112,7 +118,7 @@ def numSigDigits(num):
 
 
 def roundSigDigits(num, sig_figs):
-    """ Round to specified number of significant digits.
+    """Round to specified number of significant digits.
     by Ben Hoyt
     see: http://code.activestate.com/recipes/578114-round-number-to-specified-number-of-significant-di/
     """
@@ -133,7 +139,7 @@ def calcGini(values):
     T = sum(values)
     P = sum(xi * (i + 1) for i, xi in enumerate(S))
     G = 2.0 * P / (N * T)
-    gini = G - 1 - (1. / N)
+    gini = G - 1 - (1.0 / N)
     return gini
 
 
@@ -183,7 +189,7 @@ def calcPvalue(x, y):
 # https://stackoverflow.com/questions/1167617/in-python-how-do-i-indicate-im-overriding-a-method
 def overrides(interface_class):
     def overrider(method):
-        assert (method.__name__ in dir(interface_class))
+        assert method.__name__ in dir(interface_class)
         return method
 
     return overrider

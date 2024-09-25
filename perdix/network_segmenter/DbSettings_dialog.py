@@ -1,11 +1,10 @@
 # SPDX-FileCopyrightText: 2017 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2017 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" This is to load the postgis db settings
-"""
+"""This is to load the postgis db settings"""
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -18,8 +17,9 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from perdix.utilities import db_helpers as dbh
 
-Ui_DbSettingsDialog, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'db_settings_dialog.ui'))
+Ui_DbSettingsDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "db_settings_dialog.ui")
+)
 
 
 class DbSettingsDialog(QtWidgets.QDialog, Ui_DbSettingsDialog):
@@ -44,7 +44,7 @@ class DbSettingsDialog(QtWidgets.QDialog, Ui_DbSettingsDialog):
 
     def popDbs(self):
         self.dbCombo.clear()
-        self.dbCombo.addItems(['select db'] + sorted(self.available_dbs.keys()))
+        self.dbCombo.addItems(["select db"] + sorted(self.available_dbs.keys()))
         return
 
     def getSelectedDb(self):
@@ -53,14 +53,16 @@ class DbSettingsDialog(QtWidgets.QDialog, Ui_DbSettingsDialog):
     def getDbSettings(self):
         connection = self.dbCombo.currentText()
         if connection in list(self.available_dbs.keys()):
-            return {'dbname': connection,
-                    'schema': self.schemaCombo.currentText(),
-                    'table_name': self.nameLineEdit.text()}
+            return {
+                "dbname": connection,
+                "schema": self.schemaCombo.currentText(),
+                "table_name": self.nameLineEdit.text(),
+            }
         else:
             return {}
 
     def popSchemas(self):
-        idx = self.dbCombo.findText('select db')
+        idx = self.dbCombo.findText("select db")
         if idx != -1:
             self.dbCombo.removeItem(idx)
         self.schemaCombo.clear()
@@ -71,27 +73,27 @@ class DbSettingsDialog(QtWidgets.QDialog, Ui_DbSettingsDialog):
             schemas = dbh.getPostgisSchemas(self.connstring)
             # fix_print_with_import
             # fix_print_with_import
-            print('connstring', self.connstring)
+            print("connstring", self.connstring)
         self.schemaCombo.addItems(schemas)
 
     def get_connstring(self, selected_db):
         db_info = self.available_dbs[selected_db]
         # fix_print_with_import
         # fix_print_with_import
-        print('tries', db_info, selected_db)
-        self.connstring = ''
+        print("tries", db_info, selected_db)
+        self.connstring = ""
         try:
-            db_info['user'] = db_info['username']
-            del db_info['username']
+            db_info["user"] = db_info["username"]
+            del db_info["username"]
         except KeyError:
             pass
         try:
-            db_info['dbname'] = db_info['database']
-            del db_info['database']
+            db_info["dbname"] = db_info["database"]
+            del db_info["database"]
         except KeyError:
             pass
         for k, v in list(db_info.items()):
-            self.connstring += str(k) + '=' + str(v) + ' '
+            self.connstring += str(k) + "=" + str(v) + " "
         return
 
     def closeEvent(self, event):

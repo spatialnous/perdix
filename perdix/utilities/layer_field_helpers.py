@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import print_function
@@ -12,10 +12,23 @@ import os.path
 from builtins import str
 from builtins import zip
 
-from qgis.PyQt.QtCore import (QVariant)
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QColor
-from qgis.core import (QgsProject, QgsMapLayer, QgsDataSourceUri, QgsVectorLayer, QgsVectorDataProvider, QgsField,
-                       QgsPoint, QgsGeometry, QgsFeature, QgsFeatureRequest, QgsSpatialIndex, NULL, QgsWkbTypes)
+from qgis.core import (
+    QgsProject,
+    QgsMapLayer,
+    QgsDataSourceUri,
+    QgsVectorLayer,
+    QgsVectorDataProvider,
+    QgsField,
+    QgsPoint,
+    QgsGeometry,
+    QgsFeature,
+    QgsFeatureRequest,
+    QgsSpatialIndex,
+    NULL,
+    QgsWkbTypes,
+)
 
 
 # from pyspatialite import dbapi2 as sqlite
@@ -34,21 +47,21 @@ from qgis.core import (QgsProject, QgsMapLayer, QgsDataSourceUri, QgsVectorLayer
 # ------------------------------
 # Layer functions
 # ------------------------------
-def getVectorLayers(geom='all', provider='all'):
+def getVectorLayers(geom="all", provider="all"):
     """Return list of valid QgsVectorLayer in QgsProject, with specific geometry type and/or data provider"""
     layers_list = []
     for layer in list(QgsProject.instance().mapLayers().values()):
         add_layer = False
         if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
-            if layer.isSpatial() and (geom == 'all' or layer.geometryType() in geom):
-                if provider == 'all' or layer.dataProvider().name() in provider:
+            if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
+                if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
         if add_layer:
             layers_list.append(layer)
     return layers_list
 
 
-def getLegendLayers(iface, geom='all', provider='all'):
+def getLegendLayers(iface, geom="all", provider="all"):
     """
     Return list of layer objects in the legend, with specific geometry type and/or data provider
     :param iface: QgsInterface
@@ -60,22 +73,22 @@ def getLegendLayers(iface, geom='all', provider='all'):
     for layer in QgsProject.instance().mapLayers().values():
         add_layer = False
         if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
-            if layer.isSpatial() and (geom == 'all' or layer.geometryType() in geom):
-                if provider == 'all' or layer.dataProvider().name() in provider:
+            if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
+                if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
         if add_layer:
             layers_list.append(layer)
     return layers_list
 
 
-def getCanvasLayers(iface, geom='all', provider='all'):
+def getCanvasLayers(iface, geom="all", provider="all"):
     """Return list of valid QgsVectorLayer in QgsMapCanvas, with specific geometry type and/or data provider"""
     layers_list = []
     for layer in iface.mapCanvas().layers():
         add_layer = False
         if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
-            if layer.isSpatial() and (geom == 'all' or layer.geometryType() in geom):
-                if provider == 'all' or layer.dataProvider().name() in provider:
+            if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
+                if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
         if add_layer:
             layers_list.append(layer)
@@ -97,8 +110,10 @@ def getPointPolygonLayers():
     layers_list = []
     for layer in QgsProject.instance().mapLayers().values():
         if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
-            if layer.isSpatial() and (layer.geometryType() in [QgsWkbTypes.PointGeometry,
-                                                               QgsWkbTypes.PolygonGeometry]):
+            if layer.isSpatial() and (
+                layer.geometryType()
+                in [QgsWkbTypes.PointGeometry, QgsWkbTypes.PolygonGeometry]
+            ):
                 layers_list.append(layer.name())
     return layers_list
 
@@ -135,13 +150,13 @@ def getCanvasLayerByName(iface, name):
 
 
 def getLayerPath(layer):
-    path = ''
+    path = ""
     provider = layer.dataProvider()
     provider_type = provider.name()
-    if provider_type == 'spatialite':
+    if provider_type == "spatialite":
         uri = QgsDataSourceUri(provider.dataSourceUri())
         path = uri.database()
-    elif provider_type == 'ogr':
+    elif provider_type == "ogr":
         uri = provider.dataSourceUri()
         path = os.path.dirname(uri)
     return path
@@ -151,10 +166,10 @@ def reloadLayer(layer):
     layer_name = layer.name()
     layer_provider = layer.dataProvider().name()
     new_layer = None
-    if layer_provider in ('spatialite', 'postgres'):
+    if layer_provider in ("spatialite", "postgres"):
         uri = QgsDataSourceUri(layer.dataProvider().dataSourceUri())
         new_layer = QgsVectorLayer(uri.uri(), layer_name, layer_provider)
-    elif layer_provider == 'ogr':
+    elif layer_provider == "ogr":
         uri = layer.dataProvider().dataSourceUri()
         new_layer = QgsVectorLayer(uri.split("|")[0], layer_name, layer_provider)
     QgsProject.instance().removeMapLayer(layer.id())
@@ -185,10 +200,16 @@ def getFieldNames(layer):
     return fields_list
 
 
-def getNumericFields(layer, type='all'):
+def getNumericFields(layer, type="all"):
     fields = []
-    if type == 'all':
-        types = (QVariant.Int, QVariant.LongLong, QVariant.Double, QVariant.UInt, QVariant.ULongLong)
+    if type == "all":
+        types = (
+            QVariant.Int,
+            QVariant.LongLong,
+            QVariant.Double,
+            QVariant.UInt,
+            QVariant.ULongLong,
+        )
     else:
         types = type
     if layer and layer.dataProvider():
@@ -198,11 +219,17 @@ def getNumericFields(layer, type='all'):
     return fields
 
 
-def getNumericFieldNames(layer, type='all'):
+def getNumericFieldNames(layer, type="all"):
     field_names = []
     field_indices = []
-    if type == 'all':
-        types = (QVariant.Int, QVariant.LongLong, QVariant.Double, QVariant.UInt, QVariant.ULongLong)
+    if type == "all":
+        types = (
+            QVariant.Int,
+            QVariant.LongLong,
+            QVariant.Double,
+            QVariant.UInt,
+            QVariant.ULongLong,
+        )
     else:
         types = [type]
     if layer and layer.dataProvider():
@@ -213,24 +240,31 @@ def getNumericFieldNames(layer, type='all'):
     return field_names, field_indices
 
 
-def getValidFieldNames(layer, type='all', null='any'):
+def getValidFieldNames(layer, type="all", null="any"):
     field_names = {}
-    if type == 'all':
-        types = (QVariant.Int, QVariant.LongLong, QVariant.Double, QVariant.UInt, QVariant.ULongLong, QVariant.String,
-                 QVariant.Char)
+    if type == "all":
+        types = (
+            QVariant.Int,
+            QVariant.LongLong,
+            QVariant.Double,
+            QVariant.UInt,
+            QVariant.ULongLong,
+            QVariant.String,
+            QVariant.Char,
+        )
     else:
         types = type
     if layer and layer.dataProvider():
         for index, field in enumerate(layer.dataProvider().fields()):
             if field.type() in types:
                 # exclude layers that only have NULL values
-                if null == 'all':
+                if null == "all":
                     maxval = layer.maximumValue(index)
                     minval = layer.minimumValue(index)
                     if maxval != NULL and minval != NULL:
                         field_names[field.name()] = index
                 # exclude layers with any NULL values
-                elif null == 'any':
+                elif null == "any":
                     vals = layer.uniqueValues(index, 2)
                     if len(vals) > 0 and vals[0] != NULL:
                         field_names[field.name()] = index
@@ -282,7 +316,9 @@ def getFieldValues(layer, fieldname, null=True, selection=False):
         if selection:
             features = layer.selectedFeatures()
         else:
-            request = QgsFeatureRequest().setSubsetOfAttributes([getFieldIndex(layer, fieldname)])
+            request = QgsFeatureRequest().setSubsetOfAttributes(
+                [getFieldIndex(layer, fieldname)]
+            )
             features = layer.getFeatures(request)
         if null:
             for feature in features:
@@ -324,12 +360,12 @@ def getFieldsListValues(layer, fieldnames, null=True, selection=False):
                 if False not in [False for x in val if x == NULL]:
                     attributes.append(val)
                     ids.append(feature.id())
-        field_values['id'] = ids
+        field_values["id"] = ids
         values = list(zip(*attributes))
         for seq, field in enumerate(fields):
             field_values[str(field)] = values[seq]
     else:
-        field_values['id'] = []
+        field_values["id"] = []
         for field in fields:
             field_values[str(field)] = []
     return field_values
@@ -341,8 +377,19 @@ def getIdField(layer):
         user_id = layer.dataProvider().fields().field(pk[0]).name()
     else:
         names, idxs = getNumericFieldNames(layer)
-        user_id = ''
-        standard_id = ("pk", "pkuid", "pkid", "pk_id", "pk id", "sid", "uid", "fid", "id", "ref")
+        user_id = ""
+        standard_id = (
+            "pk",
+            "pkuid",
+            "pkid",
+            "pk_id",
+            "pk id",
+            "sid",
+            "uid",
+            "fid",
+            "id",
+            "ref",
+        )
         # look for user defined ID, take first found
         for field in names:
             if field.lower() in standard_id:
@@ -360,7 +407,18 @@ def getIdFieldNames(layer):
         user_ids.append(layer.dataProvider().fields().field(pk[0]).name())
     # followed by other ids
     names, idxs = getNumericFieldNames(layer)
-    standard_id = ("pk", "pkuid", "pkid", "pk_id", "pk id", "sid", "uid", "fid", "id", "ref")
+    standard_id = (
+        "pk",
+        "pkuid",
+        "pkid",
+        "pk_id",
+        "pk id",
+        "sid",
+        "uid",
+        "fid",
+        "id",
+        "ref",
+    )
     # look for user defined ID, take first found
     for field in names:
         if field.lower() in standard_id and field.lower() not in user_ids:
@@ -401,7 +459,9 @@ def getFeaturesListValues(layer, name, values=list):
     features = {}
     if layer:
         if fieldExists(layer, name):
-            request = QgsFeatureRequest().setSubsetOfAttributes([getFieldIndex(layer, name)])
+            request = QgsFeatureRequest().setSubsetOfAttributes(
+                [getFieldIndex(layer, name)]
+            )
             iterator = layer.getFeatures(request)
             for feature in iterator:
                 att = feature.attribute(name)
@@ -414,7 +474,9 @@ def getFeaturesRangeValues(layer, name, min, max):
     features = {}
     if layer:
         if fieldExists(layer, name):
-            request = QgsFeatureRequest().setSubsetOfAttributes([getFieldIndex(layer, name)])
+            request = QgsFeatureRequest().setSubsetOfAttributes(
+                [getFieldIndex(layer, name)]
+            )
             iterator = layer.getFeatures(request)
             for feature in iterator:
                 att = feature.attribute(name)
@@ -474,12 +536,12 @@ def getAllFeatureData(layer):
 # ------------------------------
 def createTempLayer(name, srid, attributes, types, values, coords):
     # create an instance of a memory vector layer
-    type = ''
+    type = ""
     if len(coords) == 2:
-        type = 'Point'
+        type = "Point"
     elif len(coords) == 4:
-        type = 'LineString'
-    vlayer = QgsVectorLayer('%s?crs=EPSG:%s' % (type, srid), name, "memory")
+        type = "LineString"
+    vlayer = QgsVectorLayer("%s?crs=EPSG:%s" % (type, srid), name, "memory")
     provider = vlayer.dataProvider()
     # create the required fields
     fields = []
@@ -490,7 +552,9 @@ def createTempLayer(name, srid, attributes, types, values, coords):
     try:
         provider.addAttributes(fields)
     except Exception as e:
-        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        print(
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+        )
         return None
     # add features by iterating the values
     features = []
@@ -498,13 +562,25 @@ def createTempLayer(name, srid, attributes, types, values, coords):
         feat = QgsFeature()
         # add geometry
         try:
-            if type == 'Point':
-                feat.setGeometry(QgsGeometry.fromPoint([QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]))
-            elif type == 'LineString':
-                feat.setGeometry(QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
-                                                           QgsPoint(float(val[coords[2]]), float(val[coords[3]]))]))
+            if type == "Point":
+                feat.setGeometry(
+                    QgsGeometry.fromPoint(
+                        [QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]
+                    )
+                )
+            elif type == "LineString":
+                feat.setGeometry(
+                    QgsGeometry.fromPolyline(
+                        [
+                            QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
+                            QgsPoint(float(val[coords[2]]), float(val[coords[3]])),
+                        ]
+                    )
+                )
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         # add attribute values
         feat.setAttributes(list(val))
@@ -513,7 +589,9 @@ def createTempLayer(name, srid, attributes, types, values, coords):
     try:
         provider.addFeatures(features)
     except Exception as e:
-        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        print(
+            f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+        )
         return None
 
     vlayer.commitChanges()
@@ -547,14 +625,24 @@ def buildTopology(self, axial, unlinks, links):
     links_list = []
     # get unlinks pairs
     if unlinks:
-        features = unlinks.getFeatures(QgsFeatureRequest().setSubsetOfAttributes(['line1', 'line2'], unlinks.fields()))
+        features = unlinks.getFeatures(
+            QgsFeatureRequest().setSubsetOfAttributes(
+                ["line1", "line2"], unlinks.fields()
+            )
+        )
         for feature in features:
-            unlinks_list.append((feature.attribute('line1'), feature.attribute('line2')))
+            unlinks_list.append(
+                (feature.attribute("line1"), feature.attribute("line2"))
+            )
     # get links pairs
     if links:
-        features = links.getFeatures(QgsFeatureRequest().setSubsetOfAttributes(['line1', 'line2'], links.fields()))
+        features = links.getFeatures(
+            QgsFeatureRequest().setSubsetOfAttributes(
+                ["line1", "line2"], links.fields()
+            )
+        )
         for feature in features:
-            links_list.append((feature.attribute('line1'), feature.attribute('line2')))
+            links_list.append((feature.attribute("line1"), feature.attribute("line2")))
     # get axial intersections
     features = axial.getFeatures(QgsFeatureRequest().setSubsetOfAttributes([]))
     for feature in features:

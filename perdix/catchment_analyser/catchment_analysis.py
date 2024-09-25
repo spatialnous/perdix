@@ -1,20 +1,32 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Network based catchment analysis
-"""
+"""Network based catchment analysis"""
 
 from __future__ import absolute_import
 
 from builtins import range
 from builtins import str
 
-from qgis.PyQt.QtCore import (QObject, pyqtSignal, QVariant)
-from qgis.analysis import (QgsVectorLayerDirector, QgsNetworkDistanceStrategy, QgsGraphBuilder, QgsGraphAnalyzer)
-from qgis.core import (QgsSpatialIndex, QgsGeometry, QgsFeature, QgsFields, QgsField, NULL, QgsWkbTypes)
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QVariant
+from qgis.analysis import (
+    QgsVectorLayerDirector,
+    QgsNetworkDistanceStrategy,
+    QgsGraphBuilder,
+    QgsGraphAnalyzer,
+)
+from qgis.core import (
+    QgsSpatialIndex,
+    QgsGeometry,
+    QgsFeature,
+    QgsFields,
+    QgsField,
+    NULL,
+    QgsWkbTypes,
+)
 
 try:
     from . import analysis_tools as ct
@@ -22,6 +34,7 @@ except ImportError:
     pass
 
 import traceback
+
 try:
     import pydevd
 
@@ -31,6 +44,7 @@ except ImportError:
 
 
 is_debug = False
+
 
 class CatchmentAnalysis(QObject):
     # Setup signals
@@ -48,13 +62,18 @@ class CatchmentAnalysis(QObject):
 
     def analysis(self):
         if has_pydevd and is_debug:
-            pydevd.settrace('localhost', port=53100, stdoutToServer=True, stderrToServer=True, suspend=False)
+            pydevd.settrace(
+                "localhost",
+                port=53100,
+                stdoutToServer=True,
+                stderrToServer=True,
+                suspend=False,
+            )
         if self.settings:
             try:
                 # Prepare the origins
                 origins = self.origin_preparation(
-                    self.settings['origins'],
-                    self.settings['name']
+                    self.settings["origins"], self.settings["name"]
                 )
                 self.progress.emit(10)
                 if self.killed:
@@ -62,12 +81,12 @@ class CatchmentAnalysis(QObject):
 
                 # Build the graph
                 graph, tied_origins = self.graph_builder(
-                    self.settings['network'],
-                    self.settings['cost'],
+                    self.settings["network"],
+                    self.settings["cost"],
                     origins,
-                    self.settings['network tolerance'],
-                    self.settings['crs'],
-                    self.settings['epsg']
+                    self.settings["network tolerance"],
+                    self.settings["crs"],
+                    self.settings["epsg"],
                 )
                 self.progress.emit(20)
                 if self.killed:
@@ -75,36 +94,36 @@ class CatchmentAnalysis(QObject):
 
                 # Run the analysis
                 catchment_network, catchment_points = self.graph_analysis(
-                    graph,
-                    tied_origins,
-                    self.settings['distances']
+                    graph, tied_origins, self.settings["distances"]
                 )
                 self.progress.emit(40)
                 if self.killed:
                     return
 
                 # Create output signal
-                output = {'output network features': None,
-                          'output polygon features': None,
-                          'distances': self.settings['distances']}
+                output = {
+                    "output network features": None,
+                    "output polygon features": None,
+                    "distances": self.settings["distances"],
+                }
 
-                self.settings['network']
+                self.settings["network"]
 
                 # Write and render the catchment polygons
 
-                if self.settings['output polygon check']:
+                if self.settings["output polygon check"]:
                     new_fields = QgsFields()
-                    new_fields.append(QgsField('id', QVariant.Int))
-                    new_fields.append(QgsField('origin', QVariant.String))
-                    new_fields.append(QgsField('distance', QVariant.Int))
+                    new_fields.append(QgsField("id", QVariant.Int))
+                    new_fields.append(QgsField("origin", QVariant.String))
+                    new_fields.append(QgsField("distance", QVariant.Int))
 
                     output_polygon_features = self.polygon_writer(
                         catchment_points,
-                        self.settings['distances'],
+                        self.settings["distances"],
                         new_fields,
-                        self.settings['polygon tolerance'],
+                        self.settings["polygon tolerance"],
                     )
-                    output['output polygon features'] = output_polygon_features
+                    output["output polygon features"] = output_polygon_features
 
                 self.progress.emit(70)
                 if self.killed:
@@ -112,16 +131,14 @@ class CatchmentAnalysis(QObject):
 
                 # get fields
 
-                new_fields = self.get_fields(origins, self.settings['name'])
+                new_fields = self.get_fields(origins, self.settings["name"])
 
                 # Write and render the catchment network
                 output_network_features = self.network_writer(
-                    catchment_network,
-                    new_fields,
-                    self.settings['name']
+                    catchment_network, new_fields, self.settings["name"]
                 )
 
-                output['output network features'] = output_network_features
+                output["output network features"] = output_network_features
 
                 if self.killed is False:
                     self.progress.emit(100)
@@ -131,25 +148,22 @@ class CatchmentAnalysis(QObject):
                 self.error.emit(e, traceback.format_exc())
 
     def origin_preparation(self, origin_vector, origin_name_field):
-
         # Create a dictionary of origin point dictionaries containing name and geometry
         origins = []
 
         # Loop through origin and get or create points
         for i, f in enumerate(origin_vector.getFeatures()):
-
             # Get origin name
             if origin_name_field:
                 origin_name = f[origin_name_field]
             else:
                 origin_name = i  # "origin_" + "%s" % (i+1)
 
-            origins.append({'name': origin_name, 'geom': f.geometry().centroid()})
+            origins.append({"name": origin_name, "geom": f.geometry().centroid()})
 
         return origins
 
     def graph_builder(self, network, cost_field, origins, tolerance, crs, epsg):
-
         # Settings
         otf = False
 
@@ -158,10 +172,12 @@ class CatchmentAnalysis(QObject):
         network_cost_index = network_fields.indexFromName(cost_field)
 
         # Setting up graph build director
-        director = QgsVectorLayerDirector(network, -1, '', '', '', QgsVectorLayerDirector.DirectionBoth)
+        director = QgsVectorLayerDirector(
+            network, -1, "", "", "", QgsVectorLayerDirector.DirectionBoth
+        )
 
         # Determining cost calculation
-        if cost_field != 'length':
+        if cost_field != "length":
             strategy = ct.CustomCost(network_cost_index, 0.01)
         else:
             strategy = QgsNetworkDistanceStrategy()
@@ -175,7 +191,7 @@ class CatchmentAnalysis(QObject):
 
         # Loop through the origin points and add graph vertex indices
         for index, origin in enumerate(origins):
-            graph_origin_points.append(origins[index]['geom'].asPoint())
+            graph_origin_points.append(origins[index]["geom"].asPoint())
 
         # Get origin graph vertex index
         tied_origin_vertices = director.makeGraph(builder, graph_origin_points)
@@ -188,7 +204,10 @@ class CatchmentAnalysis(QObject):
 
         # Combine origin names and tied point vertices
         for index, tied_origin in enumerate(tied_origin_vertices):
-            tied_origins[index] = {'name': origins[index]['name'], 'vertex': tied_origin}
+            tied_origins[index] = {
+                "name": origins[index]["name"],
+                "vertex": tied_origin,
+            }
 
         self.spIndex = QgsSpatialIndex()
         self.indices = {}
@@ -242,20 +261,27 @@ class CatchmentAnalysis(QObject):
             # only include one of the two possible arcs
             if inVertexId < outVertexId:
                 arcGeom = QgsGeometry.fromPolylineXY([inVertexGeom, outVertexGeom])
-                catchment_network[index] = {'geom': arcGeom, 'start': inVertexId, 'end': outVertexId, 'cost': {}}
+                catchment_network[index] = {
+                    "geom": arcGeom,
+                    "start": inVertexId,
+                    "end": outVertexId,
+                    "cost": {},
+                }
 
         # Loop through tied origins and write origin names
         for tied_point, origin in enumerate(tied_origins):
-            origin_name = tied_origins[tied_point]['name']
-            catchment_points[tied_point] = {'name': origin_name}
-            catchment_points[tied_point].update({distance: [] for distance in distances})
+            origin_name = tied_origins[tied_point]["name"]
+            catchment_points[tied_point] = {"name": origin_name}
+            catchment_points[tied_point].update(
+                {distance: [] for distance in distances}
+            )
 
         # Loop through tied origins and write costs and polygon points
         i = 1
         for tied_point, origin in enumerate(tied_origins):
             self.progress.emit(20 + int(20 * i / len(tied_origins)))
-            origin_name = tied_origins[tied_point]['name']
-            originVertexId = graph.findVertex(tied_origins[tied_point]['vertex'])
+            origin_name = tied_origins[tied_point]["name"]
+            originVertexId = graph.findVertex(tied_origins[tied_point]["vertex"])
 
             # Run dijkstra and get tree and cost
             (tree, cost) = QgsGraphAnalyzer.dijkstra(graph, originVertexId, 0)
@@ -265,8 +291,8 @@ class CatchmentAnalysis(QObject):
                 if self.killed:
                     break
                 # Define the arc properties
-                inVertexId = catchment_network[index]['start']
-                outVertexId = catchment_network[index]['end']
+                inVertexId = catchment_network[index]["start"]
+                outVertexId = catchment_network[index]["end"]
                 inVertexCost = cost[inVertexId]
                 outVertexCost = cost[outVertexId]
                 # this is the permissive option gives cost to the arc based on the closest point,
@@ -278,21 +304,22 @@ class CatchmentAnalysis(QObject):
 
                 # If arc is the origin set cost to 0
                 if outVertexId == originVertexId or inVertexId == originVertexId:
-                    catchment_network[index]['cost'][origin_name] = 0
+                    catchment_network[index]["cost"][origin_name] = 0
 
                 # If arc is connected and within the maximum radius set cost
                 elif arcCost <= catchment_threshold and tree[inVertexId] != -1:
-                    if origin_name in catchment_network[index]['cost']:
-                        if catchment_network[index]['cost'][origin_name] > int(arcCost):
-                            catchment_network[index]['cost'][origin_name] = int(arcCost)
+                    if origin_name in catchment_network[index]["cost"]:
+                        if catchment_network[index]["cost"][origin_name] > int(arcCost):
+                            catchment_network[index]["cost"][origin_name] = int(arcCost)
                     else:
-                        catchment_network[index]['cost'][origin_name] = int(arcCost)
+                        catchment_network[index]["cost"][origin_name] = int(arcCost)
 
                     # Add catchment points for each given radius
                     inVertexGeom = graph.vertex(inVertexId).point()
                     outVertexGeom = graph.vertex(outVertexId).point()
                     seg_length = catchment_network[index][
-                        'geom'].length()  # math.sqrt(inVertexGeom.sqrDist(outVertexGeom))
+                        "geom"
+                    ].length()  # math.sqrt(inVertexGeom.sqrDist(outVertexGeom))
                     for distance in distances:
                         if self.killed:
                             break
@@ -307,16 +334,27 @@ class CatchmentAnalysis(QObject):
                             # add an extra point with linear referencing
                             if outVertexCost > distance:
                                 target_dist = distance - inVertexCost
-                                midVertexGeom = catchment_network[index]['geom'].interpolate(target_dist).asPoint()
-                                catchment_points[tied_point][distance].append(midVertexGeom)
+                                midVertexGeom = (
+                                    catchment_network[index]["geom"]
+                                    .interpolate(target_dist)
+                                    .asPoint()
+                                )
+                                catchment_points[tied_point][distance].append(
+                                    midVertexGeom
+                                )
                         if outVertexCost <= distance:
                             catchment_points[tied_point][distance].append(outVertexGeom)
                             # add an extra point with linear referencing
                             if inVertexCost > distance:
                                 target_dist = distance - outVertexCost
-                                midVertexGeom = catchment_network[index]['geom'].interpolate(
-                                    seg_length - target_dist).asPoint()
-                                catchment_points[tied_point][distance].append(midVertexGeom)
+                                midVertexGeom = (
+                                    catchment_network[index]["geom"]
+                                    .interpolate(seg_length - target_dist)
+                                    .asPoint()
+                                )
+                                catchment_points[tied_point][distance].append(
+                                    midVertexGeom
+                                )
 
             i += 1
         return catchment_network, catchment_points
@@ -327,32 +365,30 @@ class CatchmentAnalysis(QObject):
 
         # add origin field names
         if use_name:
-            self.names = set([str(origin['name']) for origin in origins])
+            self.names = set([str(origin["name"]) for origin in origins])
             for n in self.names:
                 self.network_fields.append(QgsField(n, QVariant.Int))
         else:
             self.names = list(range(0, len(origins)))
 
-        self.network_fields.append(QgsField('min_dist', QVariant.Int))
+        self.network_fields.append(QgsField("min_dist", QVariant.Int))
 
         return self.network_fields
 
     def network_writer(self, catchment_network, new_fields, use_name):
-
         # Loop through arcs in catchment network and write geometry and costs
         i = 0
         features = []
 
         for k, v in catchment_network.items():
-
             self.progress.emit(70 + int(30 * i / len(catchment_network)))
 
             if self.killed is True:
                 break
 
             # Get arc properties
-            arc_geom = v['geom']
-            arc_cost_dict = {str(key): value for key, value in list(v['cost'].items())}
+            arc_geom = v["geom"]
+            arc_cost_dict = {str(key): value for key, value in list(v["cost"].items())}
 
             i += 1
             # Ignore arc if not connected or outside of catchment
@@ -360,7 +396,9 @@ class CatchmentAnalysis(QObject):
                 # Create feature and write id and geom
                 f = QgsFeature()
                 # get original feature attributes
-                centroid_match = self.spIndex.nearestNeighbor(arc_geom.centroid().asPoint(), 1).pop()
+                centroid_match = self.spIndex.nearestNeighbor(
+                    arc_geom.centroid().asPoint(), 1
+                ).pop()
                 original_feature_id = self.centroids[centroid_match]
                 f_attrs = self.attributes_dict[original_feature_id]
                 arc_cost_list = []
@@ -375,7 +413,9 @@ class CatchmentAnalysis(QObject):
 
                 f.setFields(new_fields)
                 if use_name:
-                    f.setAttributes(f_attrs + arc_cost_list + [min(non_null_arc_cost_list)])
+                    f.setAttributes(
+                        f_attrs + arc_cost_list + [min(non_null_arc_cost_list)]
+                    )
                 else:
                     f.setAttributes(f_attrs + [min(non_null_arc_cost_list)])
 
@@ -388,8 +428,9 @@ class CatchmentAnalysis(QObject):
 
         return features
 
-    def polygon_writer(self, catchment_points, distances, new_fields, polygon_tolerance):
-
+    def polygon_writer(
+        self, catchment_points, distances, new_fields, polygon_tolerance
+    ):
         # Setup unique origin dictionary containing all distances
         unique_origins_list = []
         polygon_dict = {}
@@ -399,7 +440,7 @@ class CatchmentAnalysis(QObject):
             if self.killed:
                 break
             self.progress.emit(40 + int(30 * i / len(catchment_points)))
-            name = catchment_points[tied_point]['name']
+            name = catchment_points[tied_point]["name"]
             if name not in unique_origins_list:
                 polygon_dict[name] = {distance: [] for distance in distances}
                 unique_origins_list.append(name)
@@ -417,26 +458,32 @@ class CatchmentAnalysis(QObject):
         hull_validity = True
         for name in polygon_dict:
             for distance in distances:
-                for hull in polygon_dict[name][distance]:  # Later add combine functionality
+                for hull in polygon_dict[name][
+                    distance
+                ]:  # Later add combine functionality
                     if self.killed:
                         break
                     # Check if hull is a actual polygon
                     try:
-                        polygon_geom = QgsGeometry.fromPolygonXY([hull, ])
+                        polygon_geom = QgsGeometry.fromPolygonXY(
+                            [
+                                hull,
+                            ]
+                        )
                     except TypeError:
                         hull_validity = False
                         continue
                     if polygon_geom:
                         p = QgsFeature()
                         p.setFields(new_fields)
-                        p.setAttribute('id', index)
-                        p.setAttribute('origin', name)
-                        p.setAttribute('distance', distance)
+                        p.setAttribute("id", index)
+                        p.setAttribute("origin", name)
+                        p.setAttribute("distance", distance)
                         p.setGeometry(polygon_geom)
                         output_polygon_features.append(p)
                         index += 1
         if not hull_validity:
-            self.warning.emit('Polygon tolerance too high for small cost bands.')
+            self.warning.emit("Polygon tolerance too high for small cost bands.")
         return output_polygon_features
 
     def kill(self):

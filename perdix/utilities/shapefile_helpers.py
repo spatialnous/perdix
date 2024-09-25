@@ -1,23 +1,33 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Helper functions for dealing with ESRI Shapefiles
-"""
+"""Helper functions for dealing with ESRI Shapefiles"""
 
 from __future__ import print_function
 
 import os.path
 
-from qgis.core import (QgsVectorLayer, QgsVectorDataProvider, QgsFields, QgsField, QgsPoint, QgsGeometry, QgsFeature,
-                       QgsVectorFileWriter, QgsCoordinateTransformContext, QgsWkbTypes)
+from qgis.core import (
+    QgsVectorLayer,
+    QgsVectorDataProvider,
+    QgsFields,
+    QgsField,
+    QgsPoint,
+    QgsGeometry,
+    QgsFeature,
+    QgsVectorFileWriter,
+    QgsCoordinateTransformContext,
+    QgsWkbTypes,
+)
 
 from . import layer_field_helpers as lfh
 
 
 # from pyspatialite import dbapi2 as sqlite
+
 
 # ---------------------------------------------
 # Shape file specific functions
@@ -25,23 +35,27 @@ from . import layer_field_helpers as lfh
 def listShapeFolders():
     # get folder name and path of open layers
     res = dict()
-    res['idx'] = 0
-    res['name'] = []
-    res['path'] = []
-    layers = lfh.getVectorLayers('all', 'ogr')
+    res["idx"] = 0
+    res["name"] = []
+    res["path"] = []
+    layers = lfh.getVectorLayers("all", "ogr")
     for layer in layers:
         layer.dataProvider()
-        if layer.storageType() == 'ESRI Shapefile':
+        if layer.storageType() == "ESRI Shapefile":
             path = os.path.dirname(layer.dataProvider().dataSourceUri())
             try:
-                res['path'].index(path)
+                res["path"].index(path)
             except Exception as e:
-                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
-                res['name'].append(os.path.basename(os.path.normpath(path)))  # layer.name()
-                res['path'].append(path)
+                print(
+                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                )
+                res["name"].append(
+                    os.path.basename(os.path.normpath(path))
+                )  # layer.name()
+                res["path"].append(path)
             # for the file name: os.path.basename(uri).split('|')[0]
     # case: no folders available
-    if len(res['name']) < 1:
+    if len(res["name"]) < 1:
         res = None
     # return the result even if empty
     return res
@@ -66,8 +80,10 @@ def copyLayerToShapeFile(layer, path, name):
     # create an instance of vector file writer, which will create the vector file.
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "ESRI Shapefile"
-    options.fileEncoding = 'utf-8'
-    writer = QgsVectorFileWriter.create(filename, fields, geometry, srid, QgsCoordinateTransformContext(), options)
+    options.fileEncoding = "utf-8"
+    writer = QgsVectorFileWriter.create(
+        filename, fields, geometry, srid, QgsCoordinateTransformContext(), options
+    )
     if writer.hasError() != QgsVectorFileWriter.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
@@ -84,7 +100,9 @@ def copyLayerToShapeFile(layer, path, name):
     return vlayer
 
 
-def create_shapefile_full_layer_data_provider(path, name, srid, attributes, types, values, coords):
+def create_shapefile_full_layer_data_provider(
+    path, name, srid, attributes, types, values, coords
+):
     """
     Creates a shapefile using the Shapefile Data Provider
 
@@ -119,15 +137,27 @@ def create_shapefile_full_layer_data_provider(path, name, srid, attributes, type
     writer = None
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "ESRI Shapefile"
-    options.fileEncoding = 'utf-8'
+    options.fileEncoding = "utf-8"
     if len(coords) == 2:
-        type = 'point'
-        writer = QgsVectorFileWriter.create(filename, QgsFields(), QgsWkbTypes.Point, srid,
-                                            QgsCoordinateTransformContext(), options)
+        type = "point"
+        writer = QgsVectorFileWriter.create(
+            filename,
+            QgsFields(),
+            QgsWkbTypes.Point,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
     elif len(coords) == 4:
-        type = 'line'
-        writer = QgsVectorFileWriter.create(filename, QgsFields(), QgsWkbTypes.LineString, srid,
-                                            QgsCoordinateTransformContext(), options)
+        type = "line"
+        writer = QgsVectorFileWriter.create(
+            filename,
+            QgsFields(),
+            QgsWkbTypes.LineString,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
     if writer.hasError() != QgsVectorFileWriter.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
@@ -146,17 +176,22 @@ def create_shapefile_full_layer_data_provider(path, name, srid, attributes, type
     for i, val in enumerate(values):
         # add geometry
         try:
-            if type == 'point':
-                geometry = QgsGeometry.fromPoint([QgsPoint(float(val[coords[0]]),
-                                                           float(val[coords[1]]))])
-            elif type == 'line':
-                geometry = QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]),
-                                                              float(val[coords[1]])),
-                                                     QgsPoint(float(val[coords[2]]),
-                                                              float(val[coords[3]]))])
+            if type == "point":
+                geometry = QgsGeometry.fromPoint(
+                    [QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]
+                )
+            elif type == "line":
+                geometry = QgsGeometry.fromPolyline(
+                    [
+                        QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
+                        QgsPoint(float(val[coords[2]]), float(val[coords[3]])),
+                    ]
+                )
             feat.setGeometry(geometry)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         # add attributes
         attrs = []
@@ -174,7 +209,9 @@ def create_shapefile_full_layer_data_provider(path, name, srid, attributes, type
     return vl
 
 
-def create_shapefile_full_layer_writer(path, name, srid, attributes, types, values, coords):
+def create_shapefile_full_layer_writer(
+    path, name, srid, attributes, types, values, coords
+):
     """
     Creates a shapefile using the QGIS QgsVectorFileWriter
 
@@ -212,15 +249,27 @@ def create_shapefile_full_layer_writer(path, name, srid, attributes, types, valu
     writer = None
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "ESRI Shapefile"
-    options.fileEncoding = 'utf-8'
+    options.fileEncoding = "utf-8"
     if len(coords) == 2:
-        type = 'point'
-        writer = QgsVectorFileWriter.create(filename, fields, QgsWkbTypes.Point, srid,
-                                            QgsCoordinateTransformContext(), options)
+        type = "point"
+        writer = QgsVectorFileWriter.create(
+            filename,
+            fields,
+            QgsWkbTypes.Point,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
     elif len(coords) == 4:
-        type = 'line'
-        writer = QgsVectorFileWriter.create(filename, fields, QgsWkbTypes.LineString, srid,
-                                            QgsCoordinateTransformContext(), options)
+        type = "line"
+        writer = QgsVectorFileWriter.create(
+            filename,
+            fields,
+            QgsWkbTypes.LineString,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
     if writer.hasError() != QgsVectorFileWriter.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
@@ -229,17 +278,22 @@ def create_shapefile_full_layer_writer(path, name, srid, attributes, types, valu
     for i, val in enumerate(values):
         # add geometry
         try:
-            if type == 'point':
-                geometry = QgsGeometry.fromPoint([QgsPoint(float(val[coords[0]]),
-                                                           float(val[coords[1]]))])
-            elif type == 'line':
-                geometry = QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]),
-                                                              float(val[coords[1]])),
-                                                     QgsPoint(float(val[coords[2]]),
-                                                              float(val[coords[3]]))])
+            if type == "point":
+                geometry = QgsGeometry.fromPoint(
+                    [QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]
+                )
+            elif type == "line":
+                geometry = QgsGeometry.fromPolyline(
+                    [
+                        QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
+                        QgsPoint(float(val[coords[2]]), float(val[coords[3]])),
+                    ]
+                )
             feat.setGeometry(geometry)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             pass
         # add attributes
         attrs = []
@@ -259,11 +313,7 @@ def create_shapefile_full_layer_writer(path, name, srid, attributes, types, valu
 
 def createShapeFile(layer, path, crs):
     shapefile = QgsVectorFileWriter.writeAsVectorFormat(
-        layer,
-        r"%s" % path,
-        "utf-8",
-        crs,
-        "ESRI Shapefile"
+        layer, r"%s" % path, "utf-8", crs, "ESRI Shapefile"
     )
     return shapefile
 
@@ -281,16 +331,34 @@ def createShapeFileLayer(path, name, srid, attributes, types, geometrytype):
     writer = None
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "ESRI Shapefile"
-    options.fileEncoding = 'utf-8'
-    if 'point' in geometrytype.lower():
-        writer = QgsVectorFileWriter.create(filename, fields, QgsWkbTypes.Point, srid, QgsCoordinateTransformContext(),
-                                            options)
-    elif 'line' in geometrytype.lower():
-        writer = QgsVectorFileWriter.create(filename, fields, QgsWkbTypes.LineString, srid,
-                                            QgsCoordinateTransformContext(), options)
-    elif 'polygon' in geometrytype.lower():
-        writer = QgsVectorFileWriter.create(filename, fields, QgsWkbTypes.Polygon, srid,
-                                            QgsCoordinateTransformContext(), options)
+    options.fileEncoding = "utf-8"
+    if "point" in geometrytype.lower():
+        writer = QgsVectorFileWriter.create(
+            filename,
+            fields,
+            QgsWkbTypes.Point,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
+    elif "line" in geometrytype.lower():
+        writer = QgsVectorFileWriter.create(
+            filename,
+            fields,
+            QgsWkbTypes.LineString,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
+    elif "polygon" in geometrytype.lower():
+        writer = QgsVectorFileWriter.create(
+            filename,
+            fields,
+            QgsWkbTypes.Polygon,
+            srid,
+            QgsCoordinateTransformContext(),
+            options,
+        )
     if writer.hasError() != QgsVectorFileWriter.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
@@ -322,13 +390,27 @@ def insertShapeFileValues(layer, attributes, values, coords):
                 try:
                     if geom_type in (0, 3):
                         feat.setGeometry(
-                            QgsGeometry.fromPoint([QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]))
+                            QgsGeometry.fromPoint(
+                                [QgsPoint(float(val[coords[0]]), float(val[coords[1]]))]
+                            )
+                        )
                     elif geom_type in (1, 4):
                         feat.setGeometry(
-                            QgsGeometry.fromPolyline([QgsPoint(float(val[coords[0]]), float(val[coords[1]])),
-                                                      QgsPoint(float(val[coords[2]]), float(val[coords[3]]))]))
+                            QgsGeometry.fromPolyline(
+                                [
+                                    QgsPoint(
+                                        float(val[coords[0]]), float(val[coords[1]])
+                                    ),
+                                    QgsPoint(
+                                        float(val[coords[2]]), float(val[coords[3]])
+                                    ),
+                                ]
+                            )
+                        )
                 except Exception as e:
-                    print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+                    print(
+                        f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                    )
                     pass
                 # add attributes
                 for i, x in enumerate(val):

@@ -7,42 +7,55 @@
 from __future__ import print_function
 
 import os
+
 # Import the PyQt and QGIS libraries
 from builtins import str
 
-from qgis.PyQt.QtCore import (QObject, QVariant)
-from qgis.core import (Qgis, QgsField, QgsProject, QgsMapLayer, QgsVectorLayer, QgsFeature, QgsDataSourceUri, QgsVectorLayerExporter, QgsMessageLog, QgsFeatureRequest, NULL)
+from qgis.PyQt.QtCore import QObject, QVariant
+from qgis.core import (
+    Qgis,
+    QgsField,
+    QgsProject,
+    QgsMapLayer,
+    QgsVectorLayer,
+    QgsFeature,
+    QgsDataSourceUri,
+    QgsVectorLayerExporter,
+    QgsMessageLog,
+    QgsFeatureRequest,
+    NULL,
+)
 
 from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
 
 is_debug = False
 
+
 class LanduseTool(QObject):
+    lu_id_attribute = "LU_ID"
+    floors_attribute = "Floors"
+    area_attribute = "Area"
 
-    lu_id_attribute = 'LU_ID'
-    floors_attribute = 'Floors'
-    area_attribute = 'Area'
+    gf_cat_attribute = "GF_Cat"
+    gf_subcat_attribute = "GF_SubCat"
+    gf_ssx_attribute = "GF_SSx"
+    gf_nlud_attribute = "GF_NLUD"
+    gf_tcpa_attribute = "GF_TCPA"
+    gf_descrip_attribute = "GF_Descrip"
 
-    gf_cat_attribute = 'GF_Cat'
-    gf_subcat_attribute = 'GF_SubCat'
-    gf_ssx_attribute = 'GF_SSx'
-    gf_nlud_attribute = 'GF_NLUD'
-    gf_tcpa_attribute = 'GF_TCPA'
-    gf_descrip_attribute = 'GF_Descrip'
+    lf_cat_attribute = "LF_Cat"
+    lf_subcat_attribute = "LF_SubCat"
+    lf_ssx_attribute = "LF_SSx"
+    lf_nlud_attribute = "LF_NLUD"
+    lf_tcpa_attribute = "LF_TCPA"
+    lf_descrip_attribute = "LF_Descrip"
 
-    lf_cat_attribute = 'LF_Cat'
-    lf_subcat_attribute = 'LF_SubCat'
-    lf_ssx_attribute = 'LF_SSx'
-    lf_nlud_attribute = 'LF_NLUD'
-    lf_tcpa_attribute = 'LF_TCPA'
-    lf_descrip_attribute = 'LF_Descrip'
-
-    uf_cat_attribute = 'UF_Cat'
-    uf_subcat_attribute = 'UF_SubCat'
-    uf_ssx_attribute = 'UF_SSx'
-    uf_nlud_attribute = 'UF_NLUD'
-    uf_ntcpa_attribute = 'UF_TCPA'
-    uf_descrip_attribute = 'UF_Descrip'
+    uf_cat_attribute = "UF_Cat"
+    uf_subcat_attribute = "UF_SubCat"
+    uf_ssx_attribute = "UF_SSx"
+    uf_nlud_attribute = "UF_NLUD"
+    uf_ntcpa_attribute = "UF_TCPA"
+    uf_descrip_attribute = "UF_Descrip"
 
     def __init__(self, iface, dockwidget):
         QObject.__init__(self)
@@ -57,14 +70,18 @@ class LanduseTool(QObject):
 
         # signals from dockwidget
         self.dockwidget.updateLUIDButton.clicked.connect(self.updateIDLU)
-        self.dockwidget.useExistingLUcomboBox.currentIndexChanged.connect(self.loadLULayer)
+        self.dockwidget.useExistingLUcomboBox.currentIndexChanged.connect(
+            self.loadLULayer
+        )
         self.dockwidget.updateLUButton.clicked.connect(self.updateSelectedLUAttribute)
         self.dockwidget.pushButtonNewLUFile.clicked.connect(self.updatebuildingLayers)
 
         # signals from new landuse dialog
         self.ludlg.create_new_layer.connect(self.newLULayer)
         self.ludlg.selectbuildingCombo.currentIndexChanged.connect(self.popIdColumn)
-        self.ludlg.createNewLUFileCheckBox.stateChanged.connect(self.updatebuildingLayers)
+        self.ludlg.createNewLUFileCheckBox.stateChanged.connect(
+            self.updatebuildingLayers
+        )
 
     #######
     #   Data functions
@@ -124,10 +141,10 @@ class LanduseTool(QObject):
         layer.startEditing()
 
     def isRequiredLULayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer \
-                and layer.geometryType() == type:
-            if lfh.layerHasFields(layer, [LanduseTool.gf_cat_attribute,
-                                          LanduseTool.gf_subcat_attribute]):
+        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+            if lfh.layerHasFields(
+                layer, [LanduseTool.gf_cat_attribute, LanduseTool.gf_subcat_attribute]
+            ):
                 return True
 
         return False
@@ -150,20 +167,25 @@ class LanduseTool(QObject):
 
     # Create New Layer
     def newLULayer(self):
-
-        if self.ludlg.LUincUFcheckBox.checkState() == 0 and self.ludlg.LUincLFcheckBox.checkState() == 0 and self.ludlg.LUincGFcheckBox.checkState() == 0:
+        if (
+            self.ludlg.LUincUFcheckBox.checkState() == 0
+            and self.ludlg.LUincLFcheckBox.checkState() == 0
+            and self.ludlg.LUincGFcheckBox.checkState() == 0
+        ):
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Select floors')
+            msg = msgBar.createMessage("Select floors")
             msgBar.pushWidget(msg, Qgis.Info, 10)
 
         else:
             idcolumn = self.ludlg.getSelectedLULayerID()
             # if create from existing building layer
             if self.ludlg.createNewLUFileCheckBox.isChecked():
-                print('aaaa')
+                print("aaaa")
                 building_layer = self.getSelectedLULayer()
                 crs = building_layer.crs()
-                vl = QgsVectorLayer("Polygon?crs=" + crs.authid(), "memory:landuse", "memory")
+                vl = QgsVectorLayer(
+                    "Polygon?crs=" + crs.authid(), "memory:landuse", "memory"
+                )
             else:
                 # create memory layer
                 vl = QgsVectorLayer("Polygon?crs=", "memory:landuse", "memory")
@@ -172,29 +194,35 @@ class LanduseTool(QObject):
             provider = vl.dataProvider()
             # provider.addAttributes([])
 
-            ground_floor_attributes = [QgsField(LanduseTool.lu_id_attribute, QVariant.Int),
-                                       QgsField(LanduseTool.floors_attribute, QVariant.Int),
-                                       QgsField(LanduseTool.area_attribute, QVariant.Double),
-                                       QgsField(LanduseTool.gf_cat_attribute, QVariant.String),
-                                       QgsField(LanduseTool.gf_subcat_attribute, QVariant.String),
-                                       QgsField(LanduseTool.gf_ssx_attribute, QVariant.String),
-                                       QgsField(LanduseTool.gf_nlud_attribute, QVariant.String),
-                                       QgsField(LanduseTool.gf_tcpa_attribute, QVariant.String),
-                                       QgsField(LanduseTool.gf_descrip_attribute, QVariant.String)]
+            ground_floor_attributes = [
+                QgsField(LanduseTool.lu_id_attribute, QVariant.Int),
+                QgsField(LanduseTool.floors_attribute, QVariant.Int),
+                QgsField(LanduseTool.area_attribute, QVariant.Double),
+                QgsField(LanduseTool.gf_cat_attribute, QVariant.String),
+                QgsField(LanduseTool.gf_subcat_attribute, QVariant.String),
+                QgsField(LanduseTool.gf_ssx_attribute, QVariant.String),
+                QgsField(LanduseTool.gf_nlud_attribute, QVariant.String),
+                QgsField(LanduseTool.gf_tcpa_attribute, QVariant.String),
+                QgsField(LanduseTool.gf_descrip_attribute, QVariant.String),
+            ]
 
-            lower_floor_attributes = [QgsField(LanduseTool.lf_cat_attribute, QVariant.String),
-                                      QgsField(LanduseTool.lf_subcat_attribute, QVariant.String),
-                                      QgsField(LanduseTool.lf_ssx_attribute, QVariant.String),
-                                      QgsField(LanduseTool.lf_nlud_attribute, QVariant.String),
-                                      QgsField(LanduseTool.lf_tcpa_attribute, QVariant.String),
-                                      QgsField(LanduseTool.lf_descrip_attribute, QVariant.String)]
+            lower_floor_attributes = [
+                QgsField(LanduseTool.lf_cat_attribute, QVariant.String),
+                QgsField(LanduseTool.lf_subcat_attribute, QVariant.String),
+                QgsField(LanduseTool.lf_ssx_attribute, QVariant.String),
+                QgsField(LanduseTool.lf_nlud_attribute, QVariant.String),
+                QgsField(LanduseTool.lf_tcpa_attribute, QVariant.String),
+                QgsField(LanduseTool.lf_descrip_attribute, QVariant.String),
+            ]
 
-            upper_floor_attributes = [QgsField(LanduseTool.uf_cat_attribute, QVariant.String),
-                                      QgsField(LanduseTool.uf_subcat_attribute, QVariant.String),
-                                      QgsField(LanduseTool.uf_ssx_attribute, QVariant.String),
-                                      QgsField(LanduseTool.uf_nlud_attribute, QVariant.String),
-                                      QgsField(LanduseTool.uf_ntcpa_attribute, QVariant.String),
-                                      QgsField(LanduseTool.uf_descrip_attribute, QVariant.String)]
+            upper_floor_attributes = [
+                QgsField(LanduseTool.uf_cat_attribute, QVariant.String),
+                QgsField(LanduseTool.uf_subcat_attribute, QVariant.String),
+                QgsField(LanduseTool.uf_ssx_attribute, QVariant.String),
+                QgsField(LanduseTool.uf_nlud_attribute, QVariant.String),
+                QgsField(LanduseTool.uf_ntcpa_attribute, QVariant.String),
+                QgsField(LanduseTool.uf_descrip_attribute, QVariant.String),
+            ]
 
             if self.ludlg.LUincGFcheckBox.checkState() == 2:
                 provider.addAttributes(ground_floor_attributes)
@@ -211,9 +239,8 @@ class LanduseTool(QObject):
             vl.updateFields()
             # if create from existing building layer
             if self.ludlg.createNewLUFileCheckBox.isChecked():
-
                 null_attr = []
-                provider.addAttributes([QgsField('build_id', QVariant.String)])
+                provider.addAttributes([QgsField("build_id", QVariant.String)])
 
                 if self.ludlg.LUincGFcheckBox.checkState() == 2:
                     # TODO: has removed [QgsField("Build_ID", QVariant.Int)] +
@@ -245,65 +272,71 @@ class LanduseTool(QObject):
                 vl.commitChanges()
 
             if self.ludlg.lu_shp_radioButton.isChecked():  # layer_type == 'shapefile':
-
                 path = self.ludlg.lineEditLU.text()
 
-                if path and path != '':
-
+                if path and path != "":
                     filename = os.path.basename(path)
                     location = os.path.abspath(path)
 
                     shph.createShapeFile(vl, path, vl.crs())
-                    print('cri', vl.crs().authid())
+                    print("cri", vl.crs().authid())
                     input2 = self.iface.addVectorLayer(location, filename[:-4], "ogr")
                 else:
-                    input2 = 'invalid data source'
+                    input2 = "invalid data source"
 
             elif self.ludlg.lu_postgis_radioButton.isChecked():
-
                 db_path = self.ludlg.lineEditLU.text()
-                if db_path and db_path != '':
-                    (database, schema, table_name) = db_path.split(':')
+                if db_path and db_path != "":
+                    (database, schema, table_name) = db_path.split(":")
                     db_con_info = self.ludlg.dbsettings_dlg.available_dbs[database]
                     uri = QgsDataSourceUri()
                     # passwords, usernames need to be empty if not provided or else connection will fail
-                    if 'service' in list(db_con_info.keys()):
-                        uri.setConnection(db_con_info['service'], '', '', '')
-                    elif 'password' in list(db_con_info.keys()):
-                        uri.setConnection(db_con_info['host'], db_con_info['port'], db_con_info['dbname'],
-                                          db_con_info['user'], db_con_info['password'])
+                    if "service" in list(db_con_info.keys()):
+                        uri.setConnection(db_con_info["service"], "", "", "")
+                    elif "password" in list(db_con_info.keys()):
+                        uri.setConnection(
+                            db_con_info["host"],
+                            db_con_info["port"],
+                            db_con_info["dbname"],
+                            db_con_info["user"],
+                            db_con_info["password"],
+                        )
                     else:
                         print(db_con_info)  # db_con_info['host']
-                        uri.setConnection('', db_con_info['port'], db_con_info['dbname'], '', '')
+                        uri.setConnection(
+                            "", db_con_info["port"], db_con_info["dbname"], "", ""
+                        )
                     uri.setDataSource(schema, table_name, "geom")
-                    error = QgsVectorLayerExporter.exportLayer(vl, uri.uri(), "postgres", vl.crs())
+                    error = QgsVectorLayerExporter.exportLayer(
+                        vl, uri.uri(), "postgres", vl.crs()
+                    )
                     if error[0] != QgsVectorLayerExporter.NoError:
                         print("Error when creating postgis layer: ", error[1])
-                        input2 = 'duplicate'
+                        input2 = "duplicate"
                     else:
                         input2 = QgsVectorLayer(uri.uri(), table_name, "postgres")
                 else:
-                    input2 = 'invalid data source'
+                    input2 = "invalid data source"
 
             else:
                 input2 = vl
 
-            if input2 == 'invalid data source':
+            if input2 == "invalid data source":
                 msgBar = self.iface.messageBar()
-                msg = msgBar.createMessage(u'Specify output path!')
+                msg = msgBar.createMessage("Specify output path!")
                 msgBar.pushWidget(msg, Qgis.Info, 10)
-            elif input2 == 'duplicate':
+            elif input2 == "duplicate":
                 msgBar = self.iface.messageBar()
-                msg = msgBar.createMessage(u'Land use layer already exists!')
+                msg = msgBar.createMessage("Land use layer already exists!")
                 msgBar.pushWidget(msg, Qgis.Info, 10)
             elif not input2:
                 msgBar = self.iface.messageBar()
-                msg = msgBar.createMessage(u'Land use layer failed to load!')
+                msg = msgBar.createMessage("Land use layer failed to load!")
                 msgBar.pushWidget(msg, Qgis.Info, 10)
             else:
                 QgsProject.instance().addMapLayer(input2)
                 msgBar = self.iface.messageBar()
-                msg = msgBar.createMessage(u'Land use layer created!')
+                msg = msgBar.createMessage("Land use layer created!")
                 msgBar.pushWidget(msg, Qgis.Info, 10)
                 input2.startEditing()
 
@@ -332,12 +365,16 @@ class LanduseTool(QObject):
     def disconnectLULayer(self):
         try:
             if self.lu_layer:
-                self.lu_layer.selectionChanged.disconnect(self.dockwidget.addLUDataFields)
+                self.lu_layer.selectionChanged.disconnect(
+                    self.dockwidget.addLUDataFields
+                )
                 self.lu_layer.featureAdded.disconnect(self.logLUFeatureAdded)
-                self.lu_layer.featureDeleted.disconnect(self.dockwidget.clearLUDataFields)
+                self.lu_layer.featureDeleted.disconnect(
+                    self.dockwidget.clearLUDataFields
+                )
                 self.lu_layer = None
         except RuntimeError as e:
-            if str(e) == 'wrapped C/C++ object of type QgsVectorLayer has been deleted':
+            if str(e) == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
                 # QT object has already been deleted
                 return
             else:
@@ -345,7 +382,6 @@ class LanduseTool(QObject):
 
     # Draw New Feature
     def logLUFeatureAdded(self, fid):
-
         if is_debug:
             QgsMessageLog.logMessage("feature added, id = " + str(fid))
 
@@ -414,7 +450,7 @@ class LanduseTool(QObject):
             v_layer.changeAttributeValue(fid, UFupdate6, description, True)
 
         # area can be obtained after the layer is added
-        request = QgsFeatureRequest().setFilterExpression(u'"lu_id" = %s' % inputid)
+        request = QgsFeatureRequest().setFilterExpression('"lu_id" = %s' % inputid)
         features = v_layer.getFeatures(request)
         for feat in features:
             geom = feat.geometry()

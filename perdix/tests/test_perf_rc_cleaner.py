@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import print_function
@@ -11,11 +11,11 @@ import time
 from qgis.core import QgsProject
 
 from rcl_cleaner.sGraph.sGraph import sGraph
-from rcl_cleaner.sGraph.utilityFunctions import (clean_features_iter, to_layer)
+from rcl_cleaner.sGraph.utilityFunctions import clean_features_iter, to_layer
 from perdix.utilities import layer_field_helpers as lfh
 
 # parameters
-layer_name = 'gb_roadlink_test'
+layer_name = "gb_roadlink_test"
 # time with previous version: ~ 16 minutes
 # time with new      version: ~ 3 minutes
 # reduction: 80%
@@ -27,7 +27,7 @@ geom_type = layer.dataProvider().geometryType()
 getUnlinks = True
 snap_threshold = 1
 angle_threshold = 0
-merge_type = 'intersections'
+merge_type = "intersections"
 # merge_type = 'collinear'
 orphans = False
 fix_unlinks = True
@@ -55,8 +55,15 @@ cleaned_features = [e.feature for e in list(graph.sEdges.values())]
 # QgsProject.instance().addMapLayer(pseudo_layer)
 print(time.time() - _time)
 
-broken_layer = to_layer([e.feature for e in list(graph.sEdges.values())], crs, encoding, 'Linestring', 'memory', path,
-                        'broken_layer')
+broken_layer = to_layer(
+    [e.feature for e in list(graph.sEdges.values())],
+    crs,
+    encoding,
+    "Linestring",
+    "memory",
+    path,
+    "broken_layer",
+)
 QgsProject.instance().addMapLayer(broken_layer)
 
 # nodes
@@ -72,8 +79,15 @@ print(time.time() - _time)
 _time = time.time()
 graph.snap_endpoints(snap_threshold)
 
-snapped_layer = to_layer([e.feature for e in list(graph.sEdges.values())], crs, encoding, 'Linestring', 'memory', None,
-                         'snapped_layer')
+snapped_layer = to_layer(
+    [e.feature for e in list(graph.sEdges.values())],
+    crs,
+    encoding,
+    "Linestring",
+    "memory",
+    None,
+    "snapped_layer",
+)
 QgsProject.instance().addMapLayer(snapped_layer)
 
 # 4. CLEAN || & CLOSED POLYLINES
@@ -90,8 +104,15 @@ _time = time.time()
 graph.merge_b_intersections(angle_threshold)
 print(time.time() - _time)
 
-merged_layer = to_layer([e.feature for e in list(graph.sEdges.values())], crs, encoding, 'Linestring', 'memory', None,
-                        'merged_layer')
+merged_layer = to_layer(
+    [e.feature for e in list(graph.sEdges.values())],
+    crs,
+    encoding,
+    "Linestring",
+    "memory",
+    None,
+    "merged_layer",
+)
 QgsProject.instance().addMapLayer(merged_layer)
 
 # nodes
@@ -104,13 +125,13 @@ graph.clean(True, True, snap_threshold, False)
 print(time.time() - _time)
 
 # simplify angle
-route_graph = graph.merge(('route hierarchy', 45))
-angle_column = route_graph.applyAngularCost({'class': 'value'})
-route_graph.simplifyAngle('angle_column')
+route_graph = graph.merge(("route hierarchy", 45))
+angle_column = route_graph.applyAngularCost({"class": "value"})
+route_graph.simplifyAngle("angle_column")
 graph = route_graph.break_graph(graph.unlinks)
 
 # collapse to node rb, short (has happened)
-graph.simplify_roundabouts({'rb_column': 'rb_value'})
+graph.simplify_roundabouts({"rb_column": "rb_value"})
 
 # collapse to medial axis
 # graph.simplify_parallel_lines({'dc column': 'dc_value'}, {'dc column_distance': 'dc_distance_value'})

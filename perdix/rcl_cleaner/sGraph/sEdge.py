@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # general imports
@@ -35,6 +36,8 @@ class sEdge(QObject):
     def replace_end(self, id, point):
         self.nodes[1] = id
         geometry = self.feature.geometry()
-        geometry.moveVertex(point.x(), point.y(), len(self.feature.geometry().asPolyline()) - 1)
+        geometry.moveVertex(
+            point.x(), point.y(), len(self.feature.geometry().asPolyline()) - 1
+        )
         self.feature.setGeometry(geometry)
         return

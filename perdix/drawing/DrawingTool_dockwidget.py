@@ -1,11 +1,10 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" Drawing tool for axial lines, segment lines and unlinks.
-"""
+"""Drawing tool for axial lines, segment lines and unlinks."""
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -13,15 +12,16 @@ from __future__ import print_function
 import os
 from builtins import range
 
-from qgis.PyQt import (QtWidgets, uic)
-from qgis.PyQt.QtCore import (pyqtSignal, QSize)
-from qgis.PyQt.QtGui import (QPixmap, QIcon)
-from qgis.core import (QgsProject, QgsSnappingConfig, QgsTolerance, Qgis)
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import pyqtSignal, QSize
+from qgis.PyQt.QtGui import QPixmap, QIcon
+from qgis.core import QgsProject, QgsSnappingConfig, QgsTolerance, Qgis
 
 from perdix.utilities import layer_field_helpers as lfh
 
-Ui_DrawingToolDockWidget, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'drawing_dock_widget.ui'))
+Ui_DrawingToolDockWidget, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "drawing_dock_widget.ui")
+)
 
 
 class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
@@ -37,7 +37,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         axial_icon = QPixmap(os.path.dirname(__file__) + "/icons/axial_disabled.png")
-        segment_icon = QPixmap(os.path.dirname(__file__) + "/icons/segment_disabled.png")
+        segment_icon = QPixmap(
+            os.path.dirname(__file__) + "/icons/segment_disabled.png"
+        )
         unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")
         self.axialButton.setIcon(QIcon(axial_icon))
         self.axialButton.setIconSize(QSize(40, 40))
@@ -51,7 +53,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.segmentButton.setFixedWidth(60)
         self.axialButton.setFixedHeight(60)
         self.axialButton.setFixedWidth(60)
-        self.activatedUnlinks = 'no unlinks'
+        self.activatedUnlinks = "no unlinks"
         self.unlink_mode = False
         self.axial_mode = False
         self.segment_mode = False
@@ -83,14 +85,17 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.activatedNetwork = self.settings[0]
         # fix_print_with_import
         # fix_print_with_import
-        print('user selected network', self.settings[0])
-        combo_items = [self.networkCombo.itemText(i) for i in range(self.networkCombo.count())]
+        print("user selected network", self.settings[0])
+        combo_items = [
+            self.networkCombo.itemText(i) for i in range(self.networkCombo.count())
+        ]
         if combo_items.count(self.settings[0]) > 1:
             self.iface.messageBar().pushMessage(
                 "Drawing Tool: ",
                 "Rename layers in the layers panel that have the same names!",
                 level=Qgis.Warning,
-                duration=5)
+                duration=5,
+            )
         if self.segment_mode:
             self.setSegmentSnapping()
         elif self.axial_mode:
@@ -104,14 +109,17 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.activatedUnlinks = self.settings[1]
         # fix_print_with_import
         # fix_print_with_import
-        print('user selected unlinks', self.settings[1])
-        combo_items = [self.unlinksCombo.itemText(i) for i in range(self.unlinksCombo.count())]
+        print("user selected unlinks", self.settings[1])
+        combo_items = [
+            self.unlinksCombo.itemText(i) for i in range(self.unlinksCombo.count())
+        ]
         if combo_items.count(self.settings[1]) > 1:
             self.iface.messageBar().pushMessage(
                 "Drawing Tool: ",
                 "Rename layers in the layers panel that have the same names!",
                 level=Qgis.Warning,
-                duration=5)
+                duration=5,
+            )
         if self.unlink_mode:
             self.setUnlinkSnapping()
         return
@@ -122,7 +130,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.settings[2] = self.toleranceSpin.value()
         # fix_print_with_import
         # fix_print_with_import
-        print('tolerance upd', self.settings)
+        print("tolerance upd", self.settings)
         return
 
     def setAxialSnapping(self):
@@ -140,12 +148,12 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.axialButton.setIconSize(QSize(40, 40))
 
         # snap to nothing
-        if self.settings[0] != '':
+        if self.settings[0] != "":
             proj = QgsProject.instance()
             # fix_print_with_import
             # fix_print_with_import
-            print(proj, 'ax')
-            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+            print(proj, "ax")
+            proj.writeEntry("Digitizing", "SnappingMode", "advanced")
             layer = lfh.getLayerByName(self.settings[0])
             self.iface.setActiveLayer(layer)
             # if layer.isEditable():
@@ -154,8 +162,12 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             #    layer.startEditing()
             snapConfig = QgsSnappingConfig()
             snapConfig.setMode(QgsSnappingConfig.AdvancedConfiguration)
-            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(False, QgsSnappingConfig.Vertex,
-                                                                        self.settings[2], QgsTolerance.LayerUnits)
+            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(
+                False,
+                QgsSnappingConfig.Vertex,
+                self.settings[2],
+                QgsTolerance.LayerUnits,
+            )
             snapConfig.setIndividualLayerSettings(layer, layerSnapConfig)
             snapConfig.setEnabled(False)
             proj.setAvoidIntersectionsLayers([layer])
@@ -163,7 +175,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             proj.setTopologicalEditing(False)
             self.axial_mode = True
         else:
-            self.iface.messageBar().pushMessage("Network layer not specified!", Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                "Network layer not specified!", Qgis.Critical, duration=5
+            )
             self.axial_mode = False
         return
 
@@ -176,12 +190,12 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.segmentButton.setIconSize(QSize(40, 40))
 
         # snap to vertex
-        if self.settings[0] != '':
+        if self.settings[0] != "":
             proj = QgsProject.instance()
             # fix_print_with_import
             # fix_print_with_import
-            print(proj, 'seg')
-            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+            print(proj, "seg")
+            proj.writeEntry("Digitizing", "SnappingMode", "advanced")
             layer = lfh.getLayerByName(self.settings[0])
             self.iface.setActiveLayer(layer)
             # if layer.isEditable():
@@ -190,8 +204,12 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             #    layer.startEditing()
             snapConfig = QgsSnappingConfig()
             snapConfig.setMode(QgsSnappingConfig.AdvancedConfiguration)
-            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(True, QgsSnappingConfig.Vertex,
-                                                                        self.settings[2], QgsTolerance.LayerUnits)
+            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(
+                True,
+                QgsSnappingConfig.Vertex,
+                self.settings[2],
+                QgsTolerance.LayerUnits,
+            )
             snapConfig.setIndividualLayerSettings(layer, layerSnapConfig)
             proj.setAvoidIntersectionsLayers([layer])
             snapConfig.setIntersectionSnapping(False)
@@ -200,7 +218,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             proj.setTopologicalEditing(True)
             self.segment_mode = True
         else:
-            self.iface.messageBar().pushMessage("Network layer not specified!", Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                "Network layer not specified!", Qgis.Critical, duration=5
+            )
             self.segment_mode = False
         return
 
@@ -209,7 +229,7 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         self.resetSnapping()
 
         # snap to vertex
-        if self.settings[1] != 'no unlinks':
+        if self.settings[1] != "no unlinks":
             self.resetIcons()
             unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink.png")
             self.unlinksButton.setIcon(QIcon(unlink_icon))
@@ -217,8 +237,8 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             proj = QgsProject.instance()
             # fix_print_with_import
             # fix_print_with_import
-            print(proj, 'un')
-            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+            print(proj, "un")
+            proj.writeEntry("Digitizing", "SnappingMode", "advanced")
             layer = lfh.getLayerByName(self.settings[0])
             unlinks_layer = lfh.getLayerByName(self.settings[1])
             # if unlinks_layer.isEditable():
@@ -228,8 +248,12 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             self.iface.setActiveLayer(unlinks_layer)
             snapConfig = QgsSnappingConfig()
             snapConfig.setMode(QgsSnappingConfig.AdvancedConfiguration)
-            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(True, QgsSnappingConfig.Vertex,
-                                                                        self.settings[2], QgsTolerance.LayerUnits)
+            layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(
+                True,
+                QgsSnappingConfig.Vertex,
+                self.settings[2],
+                QgsTolerance.LayerUnits,
+            )
             snapConfig.setIndividualLayerSettings(layer, layerSnapConfig)
             proj.setAvoidIntersectionsLayers([layer])
             snapConfig.setIntersectionSnapping(True)
@@ -238,7 +262,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
             proj.setTopologicalEditing(False)
             self.unlink_mode = True
         else:
-            self.iface.messageBar().pushMessage("Unlinks layer not specified!", Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                "Unlinks layer not specified!", Qgis.Critical, duration=5
+            )
             self.unlink_mode = False
         return
 
@@ -247,22 +273,30 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         # disable previous snapping setting
         proj = QgsProject.instance()
         snapConfig = QgsSnappingConfig()
-        if self.settings[0] != '' and self.settings[0]:
+        if self.settings[0] != "" and self.settings[0]:
             # proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
             layer = lfh.getLayerByName(self.settings[0])
             if layer:  # layer might have been removed
                 snapConfig.setMode(QgsSnappingConfig.AdvancedConfiguration)
-                layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(False, QgsSnappingConfig.Vertex,
-                                                                            self.settings[2], QgsTolerance.LayerUnits)
+                layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(
+                    False,
+                    QgsSnappingConfig.Vertex,
+                    self.settings[2],
+                    QgsTolerance.LayerUnits,
+                )
                 snapConfig.setIndividualLayerSettings(layer, layerSnapConfig)
                 proj.setAvoidIntersectionsLayers([layer])
-        if self.settings[1] != 'no unlinks' and self.settings[1]:
+        if self.settings[1] != "no unlinks" and self.settings[1]:
             # proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
             layer = lfh.getLayerByName(self.settings[1])
             if layer:
                 snapConfig.setMode(QgsSnappingConfig.AdvancedConfiguration)
-                layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(False, QgsSnappingConfig.Vertex,
-                                                                            self.settings[2], QgsTolerance.LayerUnits)
+                layerSnapConfig = QgsSnappingConfig.IndividualLayerSettings(
+                    False,
+                    QgsSnappingConfig.Vertex,
+                    self.settings[2],
+                    QgsTolerance.LayerUnits,
+                )
                 snapConfig.setIndividualLayerSettings(layer, layerSnapConfig)
                 proj.setAvoidIntersectionsLayers([])
         snapConfig.setIntersectionSnapping(False)
@@ -273,7 +307,9 @@ class DrawingToolDockWidget(QtWidgets.QDockWidget, Ui_DrawingToolDockWidget):
         axial_icon = QPixmap(os.path.dirname(__file__) + "/icons/axial_disabled.png")
         self.axialButton.setIcon(QIcon(axial_icon))
         self.axialButton.setIconSize(QSize(40, 40))
-        segment_icon = QPixmap(os.path.dirname(__file__) + "/icons/segment_disabled.png")
+        segment_icon = QPixmap(
+            os.path.dirname(__file__) + "/icons/segment_disabled.png"
+        )
         self.segmentButton.setIcon(QIcon(segment_icon))
         self.segmentButton.setIconSize(QSize(40, 40))
         unlink_icon = QPixmap(os.path.dirname(__file__) + "/icons/unlink_disabled.png")

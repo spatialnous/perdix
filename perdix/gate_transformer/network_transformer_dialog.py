@@ -1,23 +1,22 @@
 # SPDX-FileCopyrightText: 2016 Stephen Law <s.law@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" This plugin performs basic transformation on a line in qgis.
-"""
+"""This plugin performs basic transformation on a line in qgis."""
 
 import os.path
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog
 
-Ui_NetworkTransformerDialog, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'network_transformer_dialog.ui'))
+Ui_NetworkTransformerDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "network_transformer_dialog.ui")
+)
 
 
 class NetworkTransformerDialog(QDialog, Ui_NetworkTransformerDialog):
-
     ############################ initialisation ############################
 
     def __init__(self, parent=None):
@@ -49,7 +48,7 @@ class NetworkTransformerDialog(QDialog, Ui_NetworkTransformerDialog):
             self.disable_all(False)
             self.disable_button()
         else:
-            self.comboBox.addItem('No vector layer found.')
+            self.comboBox.addItem("No vector layer found.")
             self.disable_all(True)
 
     # get layer - retrieving the value of the current selected layer

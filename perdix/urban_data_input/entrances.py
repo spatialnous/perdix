@@ -7,21 +7,31 @@
 from __future__ import print_function
 
 import os
+
 # Import the PyQt and QGIS libraries
 from builtins import str
 
-from qgis.PyQt.QtCore import (QObject, QVariant)
-from qgis.core import (QgsProject, QgsVectorLayer, QgsField, QgsCoordinateReferenceSystem, QgsDataSourceUri, QgsVectorLayerExporter, QgsMessageLog, QgsMapLayer, Qgis)
+from qgis.PyQt.QtCore import QObject, QVariant
+from qgis.core import (
+    QgsProject,
+    QgsVectorLayer,
+    QgsField,
+    QgsCoordinateReferenceSystem,
+    QgsDataSourceUri,
+    QgsVectorLayerExporter,
+    QgsMessageLog,
+    QgsMapLayer,
+    Qgis,
+)
 
 from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
 
 
 class EntranceTool(QObject):
-
-    id_attribute = 'E_ID'
-    category_attribute = 'E_Category'
-    subcat_attribute = 'E_SubCat'
-    level_attribute = 'E_Level'
+    id_attribute = "E_ID"
+    category_attribute = "E_Category"
+    subcat_attribute = "E_SubCat"
+    level_attribute = "E_Level"
 
     def __init__(self, iface, dockwidget):
         QObject.__init__(self)
@@ -36,9 +46,13 @@ class EntranceTool(QObject):
         self.entrance_layer = None
 
         # signals from dockwidget
-        self.dockwidget.updateEntranceButton.clicked.connect(self.updateSelectedEntranceAttribute)
+        self.dockwidget.updateEntranceButton.clicked.connect(
+            self.updateSelectedEntranceAttribute
+        )
         self.dockwidget.updateEntranceIDButton.clicked.connect(self.updateIDEntrances)
-        self.dockwidget.useExistingEntrancescomboBox.currentIndexChanged.connect(self.loadEntranceLayer)
+        self.dockwidget.useExistingEntrancescomboBox.currentIndexChanged.connect(
+            self.loadEntranceLayer
+        )
 
         # signals from new entrance dialog
         self.entrancedlg.create_new_layer.connect(self.newEntranceLayer)
@@ -62,9 +76,10 @@ class EntranceTool(QObject):
         layer.startEditing()
 
     def isRequiredEntranceLayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer \
-                and layer.geometryType() == type:
-            if lfh.layerHasFields(layer, [EntranceTool.category_attribute, EntranceTool.subcat_attribute]):
+        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+            if lfh.layerHasFields(
+                layer, [EntranceTool.category_attribute, EntranceTool.subcat_attribute]
+            ):
                 return True
 
         return False
@@ -88,21 +103,23 @@ class EntranceTool(QObject):
 
     # Create New Layer
     def newEntranceLayer(self):
-
         vl = QgsVectorLayer("Point?crs=", "memory:Entrances", "memory")
 
         provider = vl.dataProvider()
-        provider.addAttributes([QgsField(EntranceTool.id_attribute, QVariant.Int),
-                                QgsField(EntranceTool.category_attribute, QVariant.String),
-                                QgsField(EntranceTool.subcat_attribute, QVariant.String),
-                                QgsField(EntranceTool.level_attribute, QVariant.Double)])
+        provider.addAttributes(
+            [
+                QgsField(EntranceTool.id_attribute, QVariant.Int),
+                QgsField(EntranceTool.category_attribute, QVariant.String),
+                QgsField(EntranceTool.subcat_attribute, QVariant.String),
+                QgsField(EntranceTool.level_attribute, QVariant.Double),
+            ]
+        )
         if vl.crs().toWkt() == "":
             vl.setCrs(QgsProject.instance().crs())
         vl.updateFields()
         if self.entrancedlg.e_shp_radioButton.isChecked():  # layer_type == 'shapefile':
-
             path = self.entrancedlg.lineEditEntrances.text()
-            if path and path != '':
+            if path and path != "":
                 filename = os.path.basename(path)
                 location = os.path.abspath(path)
                 crs = QgsCoordinateReferenceSystem()
@@ -110,53 +127,59 @@ class EntranceTool(QObject):
                 shph.createShapeFile(vl, path, crs)
                 vl = self.iface.addVectorLayer(location, filename[:-4], "ogr")
             else:
-                vl = 'invalid data source'
+                vl = "invalid data source"
 
         elif self.entrancedlg.e_postgis_radioButton.isChecked():
-
             db_path = self.entrancedlg.lineEditEntrances.text()
-            if db_path and db_path != '':
-
-                (database, schema, table_name) = db_path.split(':')
+            if db_path and db_path != "":
+                (database, schema, table_name) = db_path.split(":")
                 db_con_info = self.entrancedlg.dbsettings_dlg.available_dbs[database]
                 uri = QgsDataSourceUri()
                 # passwords, usernames need to be empty if not provided or else connection will fail
-                if 'service' in list(db_con_info.keys()):
-                    uri.setConnection(db_con_info['service'], '', '', '')
-                elif 'password' in list(db_con_info.keys()):
-                    uri.setConnection(db_con_info['host'], db_con_info['port'], db_con_info['dbname'],
-                                      db_con_info['user'],
-                                      db_con_info['password'])
+                if "service" in list(db_con_info.keys()):
+                    uri.setConnection(db_con_info["service"], "", "", "")
+                elif "password" in list(db_con_info.keys()):
+                    uri.setConnection(
+                        db_con_info["host"],
+                        db_con_info["port"],
+                        db_con_info["dbname"],
+                        db_con_info["user"],
+                        db_con_info["password"],
+                    )
                 else:
                     print(db_con_info)  # db_con_info['host']
-                    uri.setConnection('', db_con_info['port'], db_con_info['dbname'], '', '')
+                    uri.setConnection(
+                        "", db_con_info["port"], db_con_info["dbname"], "", ""
+                    )
                 uri.setDataSource(schema, table_name, "geom")
-                error = QgsVectorLayerExporter.exportLayer(vl, uri.uri(), "postgres", vl.crs())
+                error = QgsVectorLayerExporter.exportLayer(
+                    vl, uri.uri(), "postgres", vl.crs()
+                )
                 if error[0] != QgsVectorLayerExporter.NoError:
                     print("Error when creating postgis layer: ", error[1])
-                    vl = 'duplicate'
+                    vl = "duplicate"
                 else:
                     vl = QgsVectorLayer(uri.uri(), table_name, "postgres")
             else:
-                vl = 'invalid data source'
+                vl = "invalid data source"
 
-        if vl == 'invalid data source':
+        if vl == "invalid data source":
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Specify output path!')
+            msg = msgBar.createMessage("Specify output path!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
-        elif vl == 'duplicate':
+        elif vl == "duplicate":
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Fronatges layer already exists!')
+            msg = msgBar.createMessage("Fronatges layer already exists!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
         elif not vl:
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Entrance layer failed to load!')
+            msg = msgBar.createMessage("Entrance layer failed to load!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
 
         else:
             QgsProject.instance().addMapLayer(vl)
             msgBar = self.iface.messageBar()
-            msg = msgBar.createMessage(u'Entrances layer created!')
+            msg = msgBar.createMessage("Entrances layer created!")
             msgBar.pushWidget(msg, Qgis.Info, 10)
             vl.startEditing()
 
@@ -177,27 +200,34 @@ class EntranceTool(QObject):
     def connectEntranceLayer(self):
         if self.entrance_layer:
             self.entrance_layer.featureAdded.connect(self.logEntranceFeatureAdded)
-            self.entrance_layer.selectionChanged.connect(self.dockwidget.addEntranceDataFields)
-            self.entrance_layer.featureDeleted.connect(self.dockwidget.clearEntranceDataFields)
+            self.entrance_layer.selectionChanged.connect(
+                self.dockwidget.addEntranceDataFields
+            )
+            self.entrance_layer.featureDeleted.connect(
+                self.dockwidget.clearEntranceDataFields
+            )
 
     def disconnectEntranceLayer(self):
         try:
             if self.entrance_layer:
-                self.entrance_layer.selectionChanged.disconnect(self.dockwidget.addEntranceDataFields)
-                self.entrance_layer.featureAdded.disconnect(self.logEntranceFeatureAdded)
-                self.entrance_layer.featureDeleted.disconnect(self.dockwidget.clearEntranceDataFields)
+                self.entrance_layer.selectionChanged.disconnect(
+                    self.dockwidget.addEntranceDataFields
+                )
+                self.entrance_layer.featureAdded.disconnect(
+                    self.logEntranceFeatureAdded
+                )
+                self.entrance_layer.featureDeleted.disconnect(
+                    self.dockwidget.clearEntranceDataFields
+                )
                 self.entrance_layer = None
         except RuntimeError as e:
-            if str(e) == 'wrapped C/C++ object of type QgsVectorLayer has been deleted':
+            if str(e) == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
                 # QT object has already been deleted
                 return
             else:
                 raise e
 
-
-
     def logEntranceFeatureAdded(self, fid):
-
         QgsMessageLog.logMessage("feature added, id = " + str(fid))
 
         self.canvas

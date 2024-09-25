@@ -10,9 +10,12 @@ reuse lint
 
 ruff check
 
-for FILE in $(git diff --cached --name-only --diff-filter=M)
-do
-    echo "Checking file: $FILE"
-    python3 ./scripts/check-copyright-year.py ./$FILE
-done
+ruff format --diff
+
+# for FILE in $(git diff --cached --name-only --diff-filter=M)
+# do
+#     echo "Checking file: $FILE"
+#     python3 ./scripts/check-copyright-year.py ./$FILE
+# done
+python3 ./scripts/check-copyright-year.py $(git diff --cached --name-only --diff-filter=M)
 echo "Copyright year checker satisfied"

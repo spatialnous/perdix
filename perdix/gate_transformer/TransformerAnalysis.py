@@ -1,17 +1,24 @@
 # SPDX-FileCopyrightText: 2016 Stephen Law <s.law@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-""" This plugin performs basic transformation on a line in qgis.
-"""
+"""This plugin performs basic transformation on a line in qgis."""
 
 from __future__ import absolute_import
 
 import math
 
 from qgis.PyQt.QtCore import QObject
-from qgis.core import (QgsProject, QgsMapLayer, QgsWkbTypes, QgsFeature, QgsGeometry, QgsPoint)
+from qgis.core import (
+    QgsProject,
+    QgsMapLayer,
+    QgsWkbTypes,
+    QgsFeature,
+    QgsGeometry,
+    QgsPoint,
+)
 
 from perdix.utilities import gui_helpers as guih
 from perdix.utilities.exceptions import BadInputError
@@ -20,7 +27,6 @@ from .network_transformer_dialog import NetworkTransformerDialog
 
 # analysis class
 class GateTransformer(QObject):
-
     # initialise class with self and iface
     def __init__(self, iface):
         QObject.__init__(self)
@@ -53,7 +59,10 @@ class GateTransformer(QObject):
         layers = list(QgsProject.instance().mapLayers().values())
         layer_objects = []
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QgsWkbTypes.LineGeometry:
+            if (
+                layer.type() == QgsMapLayer.VectorLayer
+                and layer.geometryType() == QgsWkbTypes.LineGeometry
+            ):
                 layer_objects.append((layer.name(), layer))
 
         return layer_objects
@@ -81,7 +90,6 @@ class GateTransformer(QObject):
 
     @staticmethod
     def check_singlepart_lines(layer):
-
         # do not allow non-line layers
         if layer.geometryType() != QgsWkbTypes.LineGeometry:
             raise BadInputError("Only line layers can be resized")
@@ -94,24 +102,34 @@ class GateTransformer(QObject):
                 polys = geom.asMultiPolyline()
                 if len(polys) == 0:
                     raise BadInputError(
-                        "Feature with id " + str(feature.id()) + " has no line geometry, please correct")
+                        "Feature with id "
+                        + str(feature.id())
+                        + " has no line geometry, please correct"
+                    )
                 if len(polys) > 1:
                     raise BadInputError(
-                        "Feature with id " + str(feature.id()) +
-                        " contains more than 1 line, please correct")
+                        "Feature with id "
+                        + str(feature.id())
+                        + " contains more than 1 line, please correct"
+                    )
                 pt = polys[0]
             else:
                 pt = geom.asPolyline()
             if len(pt) < 2:
                 raise BadInputError(
-                    "Line with id " + str(feature.id()) + " has fewer than 2 vertices, please correct")
+                    "Line with id "
+                    + str(feature.id())
+                    + " has fewer than 2 vertices, please correct"
+                )
             if len(pt) > 2:
                 raise BadInputError(
-                    "Line with id " + str(feature.id()) + " has more than 2 vertices, please correct")
+                    "Line with id "
+                    + str(feature.id())
+                    + " has more than 2 vertices, please correct"
+                )
 
     @staticmethod
     def rotate_line(layer, value):
-
         layer.startEditing()
         layer.selectAll()
         set_angle = value
@@ -127,7 +145,6 @@ class GateTransformer(QObject):
 
     @staticmethod
     def resize_line(layer, value):
-
         GateTransformer.check_singlepart_lines(layer)
 
         layer.startEditing()
@@ -145,12 +162,24 @@ class GateTransformer(QObject):
             dx = pt[1][0] - pt[0][0]
             angle = math.atan2(dy, dx)
             length = geom.length()
-            startx = geom.centroid().asPoint()[0] + ((0.5 * length * set_length / length) * math.cos(angle))
-            starty = geom.centroid().asPoint()[1] + ((0.5 * length * set_length / length) * math.sin(angle))
-            endx = geom.centroid().asPoint()[0] - ((0.5 * length * set_length / length) * math.cos(angle))
-            endy = geom.centroid().asPoint()[1] - ((0.5 * length * set_length / length) * math.sin(angle))
+            startx = geom.centroid().asPoint()[0] + (
+                (0.5 * length * set_length / length) * math.cos(angle)
+            )
+            starty = geom.centroid().asPoint()[1] + (
+                (0.5 * length * set_length / length) * math.sin(angle)
+            )
+            endx = geom.centroid().asPoint()[0] - (
+                (0.5 * length * set_length / length) * math.cos(angle)
+            )
+            endy = geom.centroid().asPoint()[1] - (
+                (0.5 * length * set_length / length) * math.sin(angle)
+            )
             n_geom = QgsFeature()
-            n_geom.setGeometry(QgsGeometry.fromPolyline([QgsPoint(startx, starty), QgsPoint(endx, endy)]))
+            n_geom.setGeometry(
+                QgsGeometry.fromPolyline(
+                    [QgsPoint(startx, starty), QgsPoint(endx, endy)]
+                )
+            )
             layer.changeGeometry(feature.id(), n_geom.geometry())
 
         layer.updateExtents()
@@ -159,7 +188,6 @@ class GateTransformer(QObject):
 
     @staticmethod
     def rescale_line(layer, value):
-
         GateTransformer.check_singlepart_lines(layer)
 
         layer.startEditing()
@@ -177,12 +205,24 @@ class GateTransformer(QObject):
             dx = pt[1][0] - pt[0][0]
             angle = math.atan2(dy, dx)
             length = geom.length()
-            startx = geom.centroid().asPoint()[0] + ((0.5 * length * set_scale) * math.cos(angle))
-            starty = geom.centroid().asPoint()[1] + ((0.5 * length * set_scale) * math.sin(angle))
-            endx = geom.centroid().asPoint()[0] - ((0.5 * length * set_scale) * math.cos(angle))
-            endy = geom.centroid().asPoint()[1] - ((0.5 * length * set_scale) * math.sin(angle))
+            startx = geom.centroid().asPoint()[0] + (
+                (0.5 * length * set_scale) * math.cos(angle)
+            )
+            starty = geom.centroid().asPoint()[1] + (
+                (0.5 * length * set_scale) * math.sin(angle)
+            )
+            endx = geom.centroid().asPoint()[0] - (
+                (0.5 * length * set_scale) * math.cos(angle)
+            )
+            endy = geom.centroid().asPoint()[1] - (
+                (0.5 * length * set_scale) * math.sin(angle)
+            )
             new_geom = QgsFeature()
-            new_geom.setGeometry(QgsGeometry.fromPolyline([QgsPoint(startx, starty), QgsPoint(endx, endy)]))
+            new_geom.setGeometry(
+                QgsGeometry.fromPolyline(
+                    [QgsPoint(startx, starty), QgsPoint(endx, endy)]
+                )
+            )
             layer.changeGeometry(feature.id(), new_geom.geometry())
 
         layer.updateExtents()

@@ -1,10 +1,11 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # Import the PyQt and QGIS libraries
-from qgis.PyQt.QtCore import (QThread, pyqtSignal)
+from qgis.PyQt.QtCore import QThread, pyqtSignal
 
 
 class AttributeStats(QThread):

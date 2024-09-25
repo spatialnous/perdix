@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import unittest
@@ -9,10 +10,9 @@ from perdix.utilities import utility_functions as uf
 
 
 class TestUtilityFunctions(unittest.TestCase):
-
     def test_isNumeric(self):
         self.assertTrue(uf.isNumeric("1"))
-        self.assertTrue(uf.isNumeric(u"\u0031"))  # unicode 1
+        self.assertTrue(uf.isNumeric("\u0031"))  # unicode 1
         self.assertTrue(uf.isNumeric("1.2"))
         self.assertTrue(uf.isNumeric("19245"))
         # self.assertTrue(uf.isNumeric("19,241"))
@@ -32,7 +32,7 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual(uf.convertNumeric("19245"), 19245)
         # self.assertEqual(uf.convertNumeric("19,241"), 19241)
         self.assertEqual(uf.convertNumeric("-144.0"), -144)
-        self.assertEqual(uf.convertNumeric("a"), '')
+        self.assertEqual(uf.convertNumeric("a"), "")
 
     def test_roundNumber_wrong_type(self):
         self.assertRaises(TypeError, lambda: uf.roundNumber("0.002000"))
@@ -84,14 +84,19 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual(uf.roundSigDigits(-3.1415, sig_figs=2), -3.1)
         self.assertEqual(uf.roundSigDigits(0.00098765, sig_figs=2), 0.00099)
         self.assertEqual(uf.roundSigDigits(0.00098765, sig_figs=3), 0.000988)
-        self.assertRaises(TypeError, lambda: uf.roundSigDigits("0.00098765", sig_figs=3))
+        self.assertRaises(
+            TypeError, lambda: uf.roundSigDigits("0.00098765", sig_figs=3)
+        )
 
     def test_calcGini(self):
         self.assertAlmostEqual(uf.calcGini([1, 1, 4, 10, 10]), 0.4153846)
         self.assertAlmostEqual(uf.calcGini([1, 1, 1, 1, 100]), 0.76153846)
         self.assertAlmostEqual(uf.calcGini([1, 1, 1, 1, 1]), 0)
         self.assertAlmostEqual(uf.calcGini([0, 1]), 0.5)
-        self.assertAlmostEqual(uf.calcGini([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]), 0.95)
+        self.assertAlmostEqual(
+            uf.calcGini([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+            0.95,
+        )
 
     def test_calcBins(self):
         self.assertEqual(uf.calcBins([1, 1, 4, 10, 10]), 3)
@@ -102,8 +107,13 @@ class TestUtilityFunctions(unittest.TestCase):
     def test_calcPvalue(self):
         self.assertAlmostEqual(uf.calcPvalue([1, 1, 4, 10, 10], [1, 1, 4, 10, 10]), 1)
         self.assertAlmostEqual(uf.calcPvalue([0, 5, 10], [10, 5, 0]), -1)
-        self.assertAlmostEqual(uf.calcPvalue([2.044, -2.709, 0.192, 0.695], [-0.473, -0.578, 0.222, -0.686]), 0.1011293)
+        self.assertAlmostEqual(
+            uf.calcPvalue(
+                [2.044, -2.709, 0.192, 0.695], [-0.473, -0.578, 0.222, -0.686]
+            ),
+            0.1011293,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

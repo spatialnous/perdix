@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
 # SPDX-FileCopyrightText: 2024 Petros Koutsolampros
-# 
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 """
@@ -18,8 +18,9 @@ from qgis.PyQt.QtWidgets import QDialog
 
 from .DbSettings_dialog import DbSettingsDialog
 
-Ui_RoadNetworkCleanerDialog, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'network_segmenter_dialog.ui'))
+Ui_RoadNetworkCleanerDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "network_segmenter_dialog.ui")
+)
 
 
 class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
@@ -43,13 +44,13 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         # Setup some defaults
         self.stubsCheckBox.setDisabled(False)
         self.stubsCheckBox.setChecked(True)
-        self.stubsSpin.setSuffix('%')
+        self.stubsSpin.setSuffix("%")
         self.stubsSpin.setRange(1, 60)
         self.stubsSpin.setSingleStep(10)
         self.stubsSpin.setValue(40)
         self.stubsSpin.setDisabled(True)
 
-        self.bufferSpinBox.setSuffix('m')
+        self.bufferSpinBox.setSuffix("m")
         self.bufferSpinBox.setRange(0, 50)
         self.bufferSpinBox.setSingleStep(0.01)
         self.bufferSpinBox.setValue(1)
@@ -96,7 +97,7 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         return self.inputCombo.currentText()
 
     def getUnlinks(self):
-        if self.unlinksCombo.currentText() == 'no unlinks':
+        if self.unlinksCombo.currentText() == "no unlinks":
             return None
         else:
             return self.unlinksCombo.currentText()
@@ -107,16 +108,16 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
             return shp_path, shp_path[:-4] + "_breakpoints.shp"
         elif self.postgisRadioButton.isChecked():
             try:
-                database, schema, table_name = self.outputCleaned.text().split(':')
+                database, schema, table_name = self.outputCleaned.text().split(":")
                 db_path = self.dbsettings_dlg.connstring, schema, table_name
                 db_path_errors = list(db_path)
-                db_path_errors[2] = db_path[2] + '_breakpoints'
+                db_path_errors[2] = db_path[2] + "_breakpoints"
                 return db_path, tuple(db_path_errors)
             except ValueError:
-                return '', ''
+                return "", ""
         else:
             temp_name = self.outputCleaned.text()
-            return temp_name, temp_name + '_breakpoints'
+            return temp_name, temp_name + "_breakpoints"
 
     def popActiveLayers(self, layers_list):
         self.inputCombo.clear()
@@ -128,7 +129,7 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def popUnlinksLayers(self, layers_list):
         self.unlinksCombo.clear()
-        self.unlinksCombo.addItems(['no unlinks'] + layers_list)
+        self.unlinksCombo.addItems(["no unlinks"] + layers_list)
 
     def lockGUI(self, onoff):
         self.stubsCheckBox.setDisabled(onoff)
@@ -169,11 +170,11 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def get_output_type(self):
         if self.shpRadioButton.isChecked():
-            return 'shapefile'
+            return "shapefile"
         elif self.postgisRadioButton.isChecked():
-            return 'postgis'
+            return "postgis"
         else:
-            return 'memory'
+            return "memory"
 
     def set_enabled_tolerance(self):
         if self.stubsCheckBox.isChecked():
@@ -182,9 +183,15 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
             self.stubsSpin.setDisabled(True)
 
     def get_settings(self):
-        settings = {'input': self.getNetwork(), 'unlinks': self.getUnlinks(), 'output': self.getOutput(),
-                    'stub_ratio': self.getStubRatio(),
-                    'errors': self.get_breakages(), 'buffer': self.getBuffer(), 'output_type': self.get_output_type()}
+        settings = {
+            "input": self.getNetwork(),
+            "unlinks": self.getUnlinks(),
+            "output": self.getOutput(),
+            "stub_ratio": self.getStubRatio(),
+            "errors": self.get_breakages(),
+            "buffer": self.getBuffer(),
+            "output_type": self.get_output_type(),
+        }
         return settings
 
     def get_dbsettings(self):
@@ -193,8 +200,9 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
 
     def setOutput(self):
         if self.shpRadioButton.isChecked():
-            self.file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save output file ", self.getNetwork() + "_seg",
-                                                                      '*.shp')
+            self.file_name, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, "Save output file ", self.getNetwork() + "_seg", "*.shp"
+            )
             if self.file_name:
                 self.outputCleaned.setText(self.file_name)
             else:
@@ -218,10 +226,15 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
             try:
                 self.dbsettings = self.dbsettings_dlg.getDbSettings()
                 db_layer_name = "%s:%s:%s" % (
-                    self.dbsettings['dbname'], self.dbsettings['schema'], self.dbsettings['table_name'])
+                    self.dbsettings["dbname"],
+                    self.dbsettings["schema"],
+                    self.dbsettings["table_name"],
+                )
                 self.outputCleaned.setText(db_layer_name)
             except Exception as e:
-                print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+                print(
+                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+                )
                 self.outputCleaned.clear()
 
     def setTempOutput(self):
@@ -235,6 +248,8 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         try:
             self.outputCleaned.setText(self.file_name)
         except Exception as e:
-            print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+            print(
+                f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            )
             self.outputCleaned.clear()
         self.outputCleaned.setDisabled(True)

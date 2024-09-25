@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# 
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+#
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # general imports
@@ -10,15 +11,14 @@ from qgis.PyQt.QtCore import QObject, QVariant
 from qgis.core import QgsField, QgsFields
 
 flds = QgsFields()
-flds.append(QgsField('id', QVariant.Int))
+flds.append(QgsField("id", QVariant.Int))
 
 flds2 = QgsFields(flds)
-flds2.append(QgsField('topology', QVariant.String))
-flds2.append(QgsField('adj_edges', QVariant.String))
+flds2.append(QgsField("topology", QVariant.String))
+flds2.append(QgsField("adj_edges", QVariant.String))
 
 
 class sNode(QObject):
-
     def __init__(self, id, feature, topology, adj_edges):
         QObject.__init__(self)
         self.id = id
