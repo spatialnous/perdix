@@ -8,6 +8,8 @@ set -e
 
 reuse lint
 
+ruff check
+
 for FILE in $(git diff --cached --name-only --diff-filter=M)
 do
     echo "Checking file: $FILE"
