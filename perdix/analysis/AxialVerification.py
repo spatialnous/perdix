@@ -128,10 +128,10 @@ class AxialVerification(QThread):
             if has_networkx:
                 start_time = time.time()
                 if 'spatialite' in datastore:
-                    graph_links = self.spatialiteBuildTopology(connection, axialname, geomname, unlinkname, linkname)
+                    graph_links = self.spatialiteBuildTopology(connection, axialname, geomname, unlinkname)
                 else:
                     graph_links = self.postgisBuildTopology(connection, layerinfo['schema'], axialname, geomname,
-                                                            unlinkschema, unlinkname, linkschema, linkname)
+                                                            unlinkschema, unlinkname)
                 if is_debug:
                     print("Building topology: %s" % str(time.time() - start_time))
             self.verificationProgress.emit(90)
@@ -391,7 +391,7 @@ class AxialVerification(QThread):
 
         query = """SELECT "%s" FROM "%s"."%s" WHERE NOT ST_IsSimple("%s") OR NOT ST_IsValid("%s")""" % (
             idcol, schema, axialname, geomname, geomname)
-        dbh.executePostgisQuery(connection, query)
+        header, data, error = dbh.executePostgisQuery(connection, query)
         if data:
             nodes = list(zip(*data)[0])
             self.problem_nodes.extend(nodes)

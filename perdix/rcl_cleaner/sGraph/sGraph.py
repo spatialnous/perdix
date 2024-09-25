@@ -13,7 +13,7 @@ from builtins import zip
 from collections import defaultdict
 
 from qgis.PyQt.QtCore import (QObject, pyqtSignal, QVariant)
-from qgis.core import (QgsGeometry, QgsSpatialIndex, QgsFields, QgsField, QgsFeature, QgsMessageLog, Qgis, NULL,
+from qgis.core import (QgsGeometry, QgsSpatialIndex, QgsFields, QgsField, QgsFeature, QgsMessageLog, Qgis,
                        QgsWkbTypes)
 
 # plugin module imports
@@ -383,33 +383,33 @@ class sGraph(QObject):
         return self.node_id, centroid.asPoint()
 
     # TODO add agg_cost
-    def route_nodes(self, group, step):
-        count = 1
-        group = [group]
-        while count <= step:
-            last_visited = group[-1]
-            group = group[:-1] + group[-1]
-            con_nodes = set(itertools.chain.from_iterable(
-                [self.sNodes[last_node].topology for last_node in last_visited])).difference(group)
-            group += [con_nodes]
-            count += 1
-            for nd in con_nodes:
-                yield count - 1, nd
+    # def route_nodes(self, group, step):
+    #     count = 1
+    #     group = [group]
+    #     while count <= step:
+    #         last_visited = group[-1]
+    #         group = group[:-1] + group[-1]
+    #         con_nodes = set(itertools.chain.from_iterable(
+    #             [self.sNodes[last_node].topology for last_node in last_visited])).difference(group)
+    #         group += [con_nodes]
+    #         count += 1
+    #         for nd in con_nodes:
+    #             yield count - 1, nd
 
-    def route_edges(self, group, step):
-        count = 1
-        group = [group]
-        while count <= step:
-            last_visited = group[-1]
-            group = group[:-1] + group[-1]
-            con_edges = set(
-                itertools.chain.from_iterable([self.sNodes[last_node].topology for last_node in last_visited]))
-            con_nodes = [con_node for con_node in con_nodes if con_node not in group]
-            group += [con_nodes]
-            count += 1
-            # TODO: return circles
-            for dg in con_edges:
-                yield count - 1, nd, dg
+    # def route_edges(self, group, step):
+    #     count = 1
+    #     group = [group]
+    #     while count <= step:
+    #         last_visited = group[-1]
+    #         group = group[:-1] + group[-1]
+    #         con_edges = set(
+    #             itertools.chain.from_iterable([self.sNodes[last_node].topology for last_node in last_visited]))
+    #         con_nodes = [con_node for con_node in con_nodes if con_node not in group]
+    #         group += [con_nodes]
+    #         count += 1
+    #         # TODO: return circles
+    #         for dg in con_edges:
+    #             yield count - 1, nd, dg
 
     # TODO: snap_geometries (not endpoints)
     # TODO: extend
@@ -584,11 +584,11 @@ class sGraph(QObject):
 
     def merge_collinear(self, collinear_threshold, angle_threshold=0):
 
-        filtered_nodes = dict([id_nd for id_nd in list(graph.sNodes.items()) if
+        filtered_nodes = dict([id_nd for id_nd in list(self.sNodes.items()) if
                                len(id_nd[1].topology) == 2 and len(id_nd[1].adj_edges) == 2])
         filtered_nodes = dict([id_nd1 for id_nd1 in list(filtered_nodes.items()) if
-                               uf.angle_3_points(graph.sNodes[id_nd1[1].topology[0]].feature.geometry().asPoint(),
-                                                 id_nd1[1].feature.geometry().asPoint(), graph.sNodes[
+                               uf.angle_3_points(self.sNodes[id_nd1[1].topology[0]].feature.geometry().asPoint(),
+                                                 id_nd1[1].feature.geometry().asPoint(), self.sNodes[
                                                      id_nd1[1].topology[
                                                          1]].feature.geometry().asPoint()) <= collinear_threshold])
         filtered_nodes = {id: nd.adj_edges for id, nd in list(filtered_nodes.items())}
@@ -793,19 +793,19 @@ class sGraph(QObject):
 
         return
 
-    def simplify_circles(self):
-        roundabouts = NULL
-        short = NULL
-        [self.collapse_to_node(group) for group in con_components(roundabouts + short)]
-        return
+    # def simplify_circles(self):
+    #     roundabouts = NULL
+    #     short = NULL
+    #     [self.collapse_to_node(group) for group in con_components(roundabouts + short)]
+    #     return
 
-    def simplify_parallel_lines(self):
-        dual_car = NULL
-        [self.collapse_to_medial_axis(group) for group in con_components(dual_car)]
-        pass
+    # def simplify_parallel_lines(self):
+    #     dual_car = NULL
+    #     [self.collapse_to_medial_axis(group) for group in con_components(dual_car)]
+    #     pass
 
-    def collapse_to_medial_axis(self):
-        pass
+    # def collapse_to_medial_axis(self):
+    #     pass
 
     def simplify_angle(self, max_angle_threshold):
         pass

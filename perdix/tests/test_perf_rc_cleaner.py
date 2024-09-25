@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -112,4 +113,4 @@ graph = route_graph.break_graph(graph.unlinks)
 graph.simplify_roundabouts({'rb_column': 'rb_value'})
 
 # collapse to medial axis
-graph.simplify_parallel_lines({'dc column': 'dc_value'}, {'dc column_distance': 'dc_distance_value'})
+# graph.simplify_parallel_lines({'dc column': 'dc_value'}, {'dc column_distance': 'dc_distance_value'})
