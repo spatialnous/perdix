@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -11,8 +12,7 @@ from builtins import str
 from builtins import zip
 
 from qgis.PyQt.QtCore import (QObject, QVariant)
-from qgis.core import (QgsProject, QgsMapLayer, QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsVectorFileWriter,
-                       QgsDataSourceUri, QgsVectorLayerExporter, QgsMessageLog, QgsFeatureRequest,
+from qgis.core import (QgsProject, QgsMapLayer, QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsDataSourceUri, QgsVectorLayerExporter, QgsMessageLog, QgsFeatureRequest,
                        QgsVectorDataProvider, NULL, QgsWkbTypes, Qgis)
 
 from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
