@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 # 
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -108,7 +109,7 @@ def createSpatialiteConnection(name, path):
 def getSpatialiteConnection(path):
     try:
         connection = sqlite.connect(path)
-    except sqlite.OperationalError as error:
+    except sqlite.OperationalError:
         # pop_up_error("Unable to connect to selected database: \n %s" % error)
         connection = None
     return connection
@@ -139,7 +140,7 @@ def executeSpatialiteQuery(connection, query, params=(), commit=False):
         data = [row for row in cursor]
         if commit:
             connection.commit()
-    except sqlite.Error as error:
+    except sqlite.Error:
         connection.rollback()
         gh.pop_up_error("The SQL query seems to be invalid. \n %s" % query)
     cursor.close()
@@ -1055,7 +1056,7 @@ def getPostgisSchemas(connstring, commit=False):
                 data = cursor.fetchall()
             if commit:
                 connection.commit()
-        except pgsql.Error as e:
+        except pgsql.Error:
             connection.rollback()
         cursor.close()
 

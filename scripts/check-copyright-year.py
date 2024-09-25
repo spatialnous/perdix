@@ -4,11 +4,13 @@
 
 #!/bin/python3
 
-import sys, subprocess, re
+import sys
+import subprocess
+import re
 from datetime import datetime
 
 reusedata = subprocess.check_output(["reuse", "spdx"])
-reusedata = reusedata.decode("utf-8").splitlines();
+reusedata = reusedata.decode("utf-8").splitlines()
 
 if len(sys.argv) < 2:
     sys.exit('Error: No files provided')
@@ -46,7 +48,7 @@ for line in reusedata:
                     len(cprs[0]) - len("</text>")].strip()
                 fileData[currentFile]["copyright"] = cprs
                 cprs = []
-                continue;
+                continue
         elif cprs != []:
             if line.endswith("</text>"):
                 line = line[:len(line) - len("</text>")].strip()

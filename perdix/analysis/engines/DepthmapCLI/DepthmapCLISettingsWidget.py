@@ -8,8 +8,7 @@
 
 import os
 from perdix.analysis.engines.DepthmapCLI.DepthmapAdvancedDialog import DepthmapAdvancedDialog
-from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph, db_helpers as dbh, \
-    utility_functions as uf
+from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph, db_helpers as dbh
 from perdix.utilities.utility_functions import overrides
 from perdix.analysis.engines.SettingsWidget import SettingsWidget
 from qgis.PyQt.QtCore import (pyqtSignal)

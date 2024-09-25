@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
+# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -134,7 +135,7 @@ class DepthmapEngine(AnalysisEngine):
                                         str(f.geometry().vertexAt(nr + 1).y()) + "\n"
                             nr += 1
             return map_data
-        except Exception as e:
+        except Exception:
             raise AnalysisEngine.AnalysisEngineError("Exporting segment map failed.")
 
     def prepare_unlinks(self, axial_layer, unlinks_layer, axial_id, use_coords=False,
