@@ -143,7 +143,7 @@ def calcGini(values):
     return gini
 
 
-def calcBins(values, minbins=3, maxbins=128):
+def calcBins(values, minbins=3, maxbins=128) -> int:
     """Calculates the best number of bins for the given values
     Uses the Freedman-Diaconis modification of Scott's rule.
     """
@@ -166,7 +166,7 @@ def calcBins(values, minbins=3, maxbins=128):
 
 
 # fixme: this calculates pearson correlation, not p value!
-def calcPvalue(x, y):
+def calcPvalue(x, y) -> float:
     n = len(x)
     if not n == len(y) or not n > 0:
         pearson = None

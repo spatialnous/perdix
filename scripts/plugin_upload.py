@@ -22,7 +22,7 @@ ENDPOINT = "/plugins/RPC2/"
 VERBOSE = False
 
 
-def main(options, args):
+def main(options, args) -> None:
     address = "%s://%s:%s@%s:%s%s" % (
         PROTOCOL,
         options.username,
@@ -53,7 +53,7 @@ def main(options, args):
         print("Fault string: %s" % err.faultString)
 
 
-def hidepassword(url, start=6):
+def hidepassword(url, start=6) -> str:
     """Returns the http url with password part replaced with '*'."""
     passdeb = url.find(":", start) + 1
     passend = url.find("@")
