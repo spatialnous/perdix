@@ -193,3 +193,13 @@ def overrides(interface_class):
         return method
 
     return overrider
+
+
+def disconnectSignal(obj, signal):
+    try:
+        obj.disconnect(signal)
+    except TypeError:
+        # This catches type errors for disconnecting slots from signals
+        # when a slot hasn't been connected. There doesn't seem to be a
+        # more robust way to do this
+        pass

@@ -288,22 +288,12 @@ class ExplorerTool(QObject):
         if no_layer:
             # disconnect eventual slots with the previous layer
             if self.current_layer:
-                try:
-                    self.current_layer.selectionChanged.disconnect(self.updateStats)
-                except Exception as e:
-                    print(
-                        f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
-                    )
-                    pass
-                try:
-                    self.current_layer.selectionChanged.disconnect(
-                        self.changedMapSelection
-                    )
-                except Exception as e:
-                    print(
-                        f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
-                    )
-                    pass
+                uf.disconnectSignal(
+                    self.current_layer.selectionChanged, self.updateStats
+                )
+                uf.disconnectSignal(
+                    self.current_layer.selectionChanged, self.changedMapSelection
+                )
             self.current_layer = None  # QgsVectorLayer()
             self.dlg.setAttributesList([])
             self.dlg.setAttributesSymbology([])
@@ -314,34 +304,30 @@ class ExplorerTool(QObject):
         # change signal connections to trigger actions depending on selected tab
         # disconnect stats and charts
         if tab == 0:
-            try:
-                self.dlg.attributesList.currentRowChanged.disconnect(self.updateStats)
-                if self.current_layer is not None:
-                    self.current_layer.selectionChanged.disconnect(self.updateStats)
-            except Exception as e:
-                print(
-                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
+            uf.disconnectSignal(
+                self.dlg.attributesList.currentRowChanged, self.updateStats
+            )
+            if self.current_layer is not None:
+                uf.disconnectSignal(
+                    self.current_layer.selectionChanged, self.updateStats
                 )
-                pass
-            try:
-                if self.current_layer is not None:
-                    self.current_layer.selectionChanged.disconnect(
-                        self.changedMapSelection
-                    )
-                self.dlg.attributesList.currentRowChanged.disconnect(self.updateCharts)
-                self.dlg.addSelection.disconnect(
-                    self.attributeCharts.addToScatterplotSelection
+                uf.disconnectSignal(
+                    self.current_layer.selectionChanged, self.changedMapSelection
                 )
-                self.dlg.showLinesChanged.disconnect(self.showhideChartLines)
-                self.attributeCharts.histogramSelected.disconnect(self.setMapSelection)
-                self.attributeCharts.scatterplotSelected.disconnect(
-                    self.setMapSelection
-                )
-            except Exception as e:
-                print(
-                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
-                )
-                pass
+
+            uf.disconnectSignal(
+                self.dlg.attributesList.currentRowChanged, self.updateCharts
+            )
+            uf.disconnectSignal(
+                self.dlg.addSelection, self.attributeCharts.addToScatterplotSelection
+            )
+            uf.disconnectSignal(self.dlg.showLinesChanged, self.showhideChartLines)
+            uf.disconnectSignal(
+                self.attributeCharts.histogramSelected, self.setMapSelection
+            )
+            uf.disconnectSignal(
+                self.attributeCharts.scatterplotSelected, self.setMapSelection
+            )
         # do not disconnect symbology as it just retrieves info and updates the display: required
         # connect calculate stats
         elif tab == 1:
@@ -354,25 +340,24 @@ class ExplorerTool(QObject):
                     f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
                 )
                 pass
-            try:
-                if self.current_layer is not None:
-                    self.current_layer.selectionChanged.disconnect(
-                        self.changedMapSelection
-                    )
-                self.dlg.attributesList.currentRowChanged.disconnect(self.updateCharts)
-                self.dlg.addSelection.disconnect(
-                    self.attributeCharts.addToScatterplotSelection
+            if self.current_layer is not None:
+                uf.disconnectSignal(
+                    self.current_layer.selectionChanged, self.changedMapSelection
                 )
-                self.dlg.showLinesChanged.disconnect(self.showhideChartLines)
-                self.attributeCharts.histogramSelected.disconnect(self.setMapSelection)
-                self.attributeCharts.scatterplotSelected.disconnect(
-                    self.setMapSelection
-                )
-            except Exception as e:
-                print(
-                    f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
-                )
-                pass
+            uf.disconnectSignal(
+                self.dlg.attributesList.currentRowChanged, self.updateCharts
+            )
+            uf.disconnectSignal(
+                self.dlg.addSelection, self.attributeCharts.addToScatterplotSelection
+            )
+
+            uf.disconnectSignal(self.dlg.showLinesChanged, self.showhideChartLines)
+            uf.disconnectSignal(
+                self.attributeCharts.histogramSelected, self.setMapSelection
+            )
+            uf.disconnectSignal(
+                self.attributeCharts.scatterplotSelected, self.setMapSelection
+            )
             self.updateStats()
         # connect calculate charts
         elif tab == 2:

@@ -13,6 +13,7 @@ from .entrances import EntranceTool
 from .frontages import FrontageTool
 from .landuse import LanduseTool
 from .urban_data_input_dockwidget import UrbanDataInputDockWidget
+from perdix.utilities import utility_functions as uf
 
 
 class UrbanDataInputTool(QObject):
@@ -82,25 +83,27 @@ class UrbanDataInputTool(QObject):
             QSettings().setValue("/qgis/crs/use_project_crs", self.user_settings["crs"])
 
             # legend change connections
-            self.iface.projectRead.disconnect(self.updateLayers)
-            self.iface.newProjectCreated.disconnect(self.updateLayers)
-            QgsProject.instance().layersRemoved.disconnect(self.updateLayers)
-            QgsProject.instance().layersAdded.disconnect(self.updateLayers)
+            uf.disconnectSignal(self.iface.projectRead, self.updateLayers)
+            uf.disconnectSignal(self.iface.newProjectCreated, self.updateLayers)
+            uf.disconnectSignal(QgsProject.instance().layersRemoved, self.updateLayers)
+            uf.disconnectSignal(QgsProject.instance().layersAdded, self.updateLayers)
+
             # Frontages
-            self.iface.mapCanvas().selectionChanged.disconnect(
-                self.dockwidget.addDataFields
+            uf.disconnectSignal(
+                self.iface.mapCanvas().selectionChanged, self.dockwidget.addDataFields
             )
-            self.dockwidget.disconnectFrontageLayer()
+            self.frontage_tool.disconnectFrontageLayer()
             # Entrances
-            self.iface.mapCanvas().selectionChanged.disconnect(
-                self.dockwidget.addEntranceDataFields
+            uf.disconnectSignal(
+                self.iface.mapCanvas().selectionChanged,
+                self.dockwidget.addEntranceDataFields,
             )
-            self.dockwidget.disconnectEnranceLayer()
+            self.entrance_tool.disconnectEntranceLayer()
             # Landuse
-            self.iface.mapCanvas().selectionChanged.disconnect(
-                self.dockwidget.addLUDataFields
+            uf.disconnectSignal(
+                self.iface.mapCanvas().selectionChanged, self.dockwidget.addLUDataFields
             )
-            self.dockwidget.disconnectLULayer()
+            self.lu_tool.disconnectLULayer()
         except Exception as e:
             print(
                 f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
