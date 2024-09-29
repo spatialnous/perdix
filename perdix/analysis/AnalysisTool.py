@@ -708,38 +708,17 @@ class AnalysisTool(QObject):
             analysis_layer = lfh.getLegendLayerByName(
                 self.iface, self.analysis_layers["map"]
             )
-            # <<<<<<< HEAD
-            #             self.axial_analysis_settings['id'] = lfh.getIdField(analysis_layer)
-            #             self.axial_analysis_settings['weight'] = self.dlg.get_analysis_weighted()
-            #             self.axial_analysis_settings['weightBy'] = self.dlg.get_analysis_weight_attribute()
-            #             txt = self.analysis_engine.parse_radii(self.dlg.get_analysis_radius_text())
-            #             if txt == '':
-            #                 self.dlg.write_analysis_report("Please verify the radius values.")
-            #                 return
-            #             else:
-            #                 self.axial_analysis_settings['rvalues'] = txt
-            #             self.axial_analysis_settings['output'] = self.dlg.get_analysis_output_table()
-            #             self.analysis_output = self.axial_analysis_settings['output']
-            #             # get the advanced analysis settings
-            #             self.axial_analysis_settings['distance'] = self.dlg.get_analysis_distance_type()
-            #             self.axial_analysis_settings['radius'] = self.dlg.get_analysis_radius_type()
-            #             self.axial_analysis_settings['fullset'] = self.dlg.get_analysis_fullset()
-            #             self.axial_analysis_settings['betweenness'] = self.dlg.get_analysis_choice()
-            #             self.axial_analysis_settings['newnorm'] = self.dlg.get_analysis_normalised()
-            #             self.axial_analysis_settings['stubs'] = self.dlg.get_analysis_stubs()
-            # =======
             self.dlg.prepare_analysis_settings(analysis_layer, self.datastore)
             analysis_settings = self.dlg.get_analysis_settings()
             if not analysis_settings["valid"]:
                 raise AnalysisEngine.AnalysisEngineError("Analysis settings invalid")
-            # >>>>>>> master
 
             self.analysis_output = analysis_settings["output"]
 
             analysis_ready = self.analysis_engine.setup_analysis(
                 self.analysis_layers, analysis_settings
             )
-            if analysis_ready[0]:
+            if analysis_ready:
                 self.updateProjectSettings()
                 self.start_time = datetime.datetime.now()
                 # write a short analysis summary
@@ -747,12 +726,6 @@ class AnalysisTool(QObject):
                 # print message in results window
                 self.dlg.write_analysis_report(message)
                 self.dlg.lock_analysis_tab(True)
-                self.iface.messageBar().pushMessage(
-                    "Info",
-                    "Do not close QGIS or depthmapXnet while the analysis is running!",
-                    level=0,
-                    duration=5,
-                )
                 self.analysis_engine.start_analysis()
                 # timer to check if results are ready, in milliseconds
                 self.timer.start(1000)

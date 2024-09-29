@@ -14,6 +14,7 @@ from perdix.utilities import (
     layer_field_helpers as lfh,
     shapefile_helpers as shph,
     db_helpers as dbh,
+    utility_functions as uf,
 )
 from perdix.utilities.utility_functions import overrides
 from perdix.analysis.engines.SettingsWidget import SettingsWidget
@@ -43,7 +44,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         self.axial_analysis_settings = {
             "type": 0,
             "distance": 0,
-            "radius": 0,
+            "radiustype": 0,
             "rvalues": "n",
             "output": "",
             "fullset": 0,
@@ -293,9 +294,9 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
                 self.dlg_depthmap.setCalculateChoice(settings["betweenness"])
             else:
                 self.dlg_depthmap.setCalculateChoice(True)
-            # project list of radii
-            if "radius" in settings:
-                self.dlg_depthmap.setRadiusType(settings["radius"])
+            # radius type
+            if "radiustype" in settings:
+                self.dlg_depthmap.setRadiusType(settings["radiustype"])
             else:
                 self.dlg_depthmap.setRadiusType(2)
             # project calculate new normalised segment measures
@@ -308,6 +309,20 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
                 self.dlg_depthmap.setRemoveStubs(settings["stubs"])
             else:
                 self.dlg_depthmap.setRemoveStubs(40)
+
+    def parse_radii(self, txt):
+        radii = txt
+        radii.lower()
+        radii = radii.replace(" ", "")
+        radii = radii.split(",")
+        radii.sort()
+        radii = list(set(radii))
+        radii = ["n" if x == "0" else x for x in radii]
+        for r in radii:
+            if r != "n" and not uf.isNumeric(r):
+                return ""
+        radii = ",".join(radii)
+        return radii
 
     def prepare_analysis_settings(self, analysis_layer, datastore):
         self.axial_analysis_settings["valid"] = False
@@ -323,7 +338,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         self.axial_analysis_settings["id"] = lfh.getIdField(analysis_layer)
         self.axial_analysis_settings["weight"] = self.get_analysis_weighted()
         self.axial_analysis_settings["weightBy"] = self.get_analysis_weight_attribute()
-        txt = SettingsWidget.parse_radii(self.get_analysis_radius_text(), True)
+        txt = self.parse_radii(self.get_analysis_radius_text())
         if txt == "":
             self.dockWidget.write_analysis_report("Please verify the radius values.")
             return
@@ -333,7 +348,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
 
         # get the advanced analysis settings
         self.axial_analysis_settings["distance"] = self.get_analysis_distance_type()
-        self.axial_analysis_settings["radius"] = self.get_analysis_radius_type()
+        self.axial_analysis_settings["radiustype"] = self.get_analysis_radius_type()
         self.axial_analysis_settings["fullset"] = self.get_analysis_fullset()
         self.axial_analysis_settings["betweenness"] = self.get_analysis_choice()
         self.axial_analysis_settings["newnorm"] = self.get_analysis_normalised()
@@ -402,11 +417,11 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
             message += (
                 "\n   weighted by - %s" % self.axial_analysis_settings["weightBy"]
             )
-        if self.axial_analysis_settings["radius"] == 0:
+        if self.axial_analysis_settings["radiustype"] == 0:
             txt = "topological"
-        elif self.axial_analysis_settings["radius"] == 1:
+        elif self.axial_analysis_settings["radiustype"] == 1:
             txt = "angular"
-        elif self.axial_analysis_settings["radius"] == 2:
+        elif self.axial_analysis_settings["radiustype"] == 2:
             txt = "metric"
         message += "\n   %s radius - %s" % (
             txt,

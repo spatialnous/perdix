@@ -6,18 +6,21 @@
 
 import csv
 import os
+import stat
 import platform
 import re
 import subprocess
 import tempfile
 import threading
+
 from builtins import str
+from typing import Optional, Tuple
 
 from qgis.PyQt.QtCore import QObject
 
 from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
 from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
-from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
+from perdix.utilities import layer_field_helpers as lfh
 from perdix.utilities.utility_functions import overrides
 from perdix.utilities.exceptions import BadInputError
 from perdix.analysis.engines.DepthmapCLI.DepthmapCLISettingsWidget import (
@@ -62,7 +65,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         return startupinfo
 
     @staticmethod
-    def get_depthmap_cli():
+    def get_depthmap_cli() -> str:
         if platform.system() == "Windows":
             ext = "exe"
         elif platform.system() == "Darwin":
@@ -71,12 +74,25 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             ext = "linux"
         else:
             raise ValueError("Unknown platform: " + platform.system())
-        basepath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        basepath = os.path.dirname(os.path.realpath(__file__))
         return os.path.join(basepath, "depthmapXcli/depthmapXcli." + ext)
 
     @staticmethod
-    def ready():
-        return os.path.isfile(DepthmapCLIEngine.get_depthmap_cli())
+    def ready() -> bool:
+        cliFile = DepthmapCLIEngine.get_depthmap_cli()
+        if not os.path.isfile(cliFile):
+            return False
+        if platform.system() == "Linux":
+            if not os.access(cliFile, os.X_OK):
+                print(
+                    f"The file {cliFile} is not executable, trying to make it executable..."
+                )
+                st = os.stat(cliFile)
+                os.chmod(cliFile, st.st_mode | stat.S_IEXEC)
+                if not os.access(cliFile, os.X_OK):
+                    print(f"Failed to make the file {cliFile} executable.")
+                    return False
+        return True
 
     @staticmethod
     def parse_result_file(result_file):
@@ -215,20 +231,6 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             return True
         return False
 
-    def parse_radii(self, txt):
-        radii = txt
-        radii.lower()
-        radii = radii.replace(" ", "")
-        radii = radii.split(",")
-        radii.sort()
-        radii = list(set(radii))
-        radii = ["n" if x == "0" else x for x in radii]
-        for r in radii:
-            if r != "n" and not uf.isNumeric(r):
-                return ""
-        radii = ",".join(radii)
-        return radii
-
     def start_analysis(self):
         depthmap_cli = DepthmapCLIEngine.get_depthmap_cli()
 
@@ -296,7 +298,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         self.analysis_process = DepthmapCLIEngine.AnalysisThread(cli_command)
         self.analysis_process.start()
 
-    def parse_progress(self, msg):
+    def parse_progress(self, msg) -> Tuple[Optional[int], Optional[int], Optional[str]]:
         # calculate percent done
         p = re.compile(
             ".*?step:\\s?([0-9]+)\\s?/\\s?([0-9]+)\\s?record:\\s?([0-9]+)\\s?/\\s?([0-9]+).*?"
@@ -310,8 +312,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 prog = int(m.group(3))
                 step = int(m.group(1))
                 relprog = (float(prog) / float(self.analysis_nodes)) * 100
-                return step, relprog
-        return None, None
+                return step, relprog, ""
+        return None, None, None
 
     class AnalysisThread(threading.Thread):
         def __init__(self, cmd):
@@ -329,11 +331,14 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             )
             while True:
                 self.current_line = self.p.stdout.readline()
+                print("starttt " + self.current_line.decode("utf-8"))
                 if not self.current_line:
                     break
             self.p.stdout.close()
 
-    def get_progress(self, settings, datastore):
+    def get_progress(
+        self, settings, datastore
+    ) -> Tuple[Optional[int], Optional[int], Optional[str]]:
         rc = self.analysis_process.p.poll()
         if rc is None:
             # process still running
@@ -368,8 +373,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             self.analysis_results = DepthmapEngine.process_analysis_result(
                 settings, datastore, attributes, values
             )
-            return 0, 100
-        return None, None
+            return 0, 100, "Completed"
+        return None, None, None
 
     def cleanup(self):
         if os.path.isfile(self.analysis_graph_file.name):
@@ -410,14 +415,14 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 command.append("-sic")
             command.extend(["-st", "tulip"])
             command.extend(["-stb", "1024"])
-            if settings["radius"] == 0:
+            if settings["radiustype"] == 0:
                 command.extend(["-srt", "steps"])
-            elif settings["radius"] == 1:
+            elif settings["radiustype"] == 1:
                 command.extend(["-srt", "angular"])
-            elif settings["radius"] == 2:
+            elif settings["radiustype"] == 2:
                 command.extend(["-srt", "metric"])
             else:
-                raise BadInputError("Unknown radius type " + settings["radius"])
+                raise BadInputError("Unknown radius type " + settings["radiustype"])
 
             command.extend(["-sr", str(radii)])
             if weight_by != "":

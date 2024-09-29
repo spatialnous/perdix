@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from builtins import str
+from typing import Optional, Tuple
 
 from qgis.PyQt.QtCore import QObject, QThread, pyqtSignal
 from qgis.core import QgsVertexId
@@ -44,7 +45,7 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
     def create_settings_widget(self, dock_widget):
         return DepthmapNetSettingsWidget(dock_widget)
 
-    def ready(self):
+    def ready(self) -> bool:
         return self.connect_depthmap_net()
 
     @staticmethod
@@ -71,6 +72,12 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
         return connected
 
     def start_analysis(self):
+        self.iface.messageBar().pushMessage(
+            "Info",
+            "Do not close QGIS or depthmapXnet while the analysis is running!",
+            level=0,
+            duration=5,
+        )
         # start the analysis by sending the command and starting the timer
         self.socket.sendData(self.command)
 
@@ -112,7 +119,9 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
                 relprog = int((float(prog) / float(self.analysis_nodes)) * 100)
         return step, relprog, ""
 
-    def get_progress(self, analysis_settings, datastore):
+    def get_progress(
+        self, analysis_settings, datastore
+    ) -> Tuple[Optional[int], Optional[int], Optional[str]]:
         if not self.socket.isReady():
             raise AnalysisEngine.AnalysisEngineError(
                 "Socket connection failed, make sure" "depthmapXNet is running"
