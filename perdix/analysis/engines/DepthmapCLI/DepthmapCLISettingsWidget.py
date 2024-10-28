@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.uic import loadUiType
 
 Ui_DepthmapCLISettingsWidget, _ = loadUiType(
-    os.path.join(os.path.dirname(__file__), "ui_DepthmapCLISettingsWidget.ui")
+    os.path.join(os.path.dirname(__file__), "ui/settings_widget.ui")
 )
 
 
