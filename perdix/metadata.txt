@@ -116,9 +116,9 @@ changelog=
 # tags are comma separated with spaces allowed
 tags= network analysis,spatial analysis,numeric attribute visualisation, space syntax
 
-homepage=https://github.com/SpaceGroupUCL/qgisSpaceSyntaxToolkit
-tracker=https://github.com/SpaceGroupUCL/qgisSpaceSyntaxToolkit/issues
-repository=https://github.com/SpaceGroupUCL/qgisSpaceSyntaxToolkit/tree/master/perdix
+homepage=https://github.com/spatialnous/perdix
+tracker=https://github.com/spatialnous/perdix/issues
+repository=https://github.com/spatialnous/perdix/tree/master/perdix
 icon=icons/esst_logo.png
 # experimental flag
 experimental=False
