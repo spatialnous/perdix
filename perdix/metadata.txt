@@ -14,7 +14,7 @@
 # Mandatory items:
 
 [general]
-name=Perdix
+name=Perdix-lts
 qgisMinimumVersion=3.10
 description=Collection of tools for space syntax analysis workflows in a GIS environment.
 version=0.3.10
