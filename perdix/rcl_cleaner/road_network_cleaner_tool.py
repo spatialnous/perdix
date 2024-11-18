@@ -315,7 +315,7 @@ class NetworkCleanerTool(QObject):
         # Setup signals
         finished = pyqtSignal(object)
         error = pyqtSignal(Exception, str)
-        cl_progress = pyqtSignal(float)
+        cl_progress = pyqtSignal(int)
         warning = pyqtSignal(str)
         cl_killed = pyqtSignal(bool)
 
