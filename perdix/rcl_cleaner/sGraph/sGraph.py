@@ -13,7 +13,7 @@ import itertools
 from builtins import zip
 from collections import defaultdict
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QMetaType
 from qgis.core import (
     QgsGeometry,
     QgsSpatialIndex,
@@ -44,12 +44,12 @@ except ImportError:
 
 unlink_feat = QgsFeature()
 unlink_flds = QgsFields()
-unlink_flds.append(QgsField("id", QVariant.Int))
+unlink_flds.append(QgsField("id", QMetaType.Type.Int))
 unlink_feat.setFields(unlink_flds)
 
 error_feat = QgsFeature()
 error_flds = QgsFields()
-error_flds.append(QgsField("error_type", QVariant.String))
+error_flds.append(QgsField("error_type", QMetaType.Type.QString))
 error_feat.setFields(error_flds)
 
 

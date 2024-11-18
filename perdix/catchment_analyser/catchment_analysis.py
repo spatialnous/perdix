@@ -11,7 +11,7 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import str
 
-from qgis.PyQt.QtCore import QObject, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QMetaType
 from qgis.analysis import (
     QgsVectorLayerDirector,
     QgsNetworkDistanceStrategy,
@@ -113,9 +113,9 @@ class CatchmentAnalysis(QObject):
 
                 if self.settings["output polygon check"]:
                     new_fields = QgsFields()
-                    new_fields.append(QgsField("id", QVariant.Int))
-                    new_fields.append(QgsField("origin", QVariant.String))
-                    new_fields.append(QgsField("distance", QVariant.Int))
+                    new_fields.append(QgsField("id", QMetaType.Type.Int))
+                    new_fields.append(QgsField("origin", QMetaType.Type.QString))
+                    new_fields.append(QgsField("distance", QMetaType.Type.Int))
 
                     output_polygon_features = self.polygon_writer(
                         catchment_points,
@@ -367,11 +367,11 @@ class CatchmentAnalysis(QObject):
         if use_name:
             self.names = set([str(origin["name"]) for origin in origins])
             for n in self.names:
-                self.network_fields.append(QgsField(n, QVariant.Int))
+                self.network_fields.append(QgsField(n, QMetaType.Type.Int))
         else:
             self.names = list(range(0, len(origins)))
 
-        self.network_fields.append(QgsField("min_dist", QVariant.Int))
+        self.network_fields.append(QgsField("min_dist", QMetaType.Type.Int))
 
         return self.network_fields
 

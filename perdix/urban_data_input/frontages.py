@@ -12,7 +12,7 @@ import os
 from builtins import str
 from builtins import zip
 
-from qgis.PyQt.QtCore import QObject, QVariant
+from qgis.PyQt.QtCore import QObject, QMetaType
 from qgis.core import (
     QgsProject,
     QgsMapLayer,
@@ -203,10 +203,10 @@ class FrontageTool(QObject):
         provider = vl.dataProvider()
         provider.addAttributes(
             [
-                QgsField(FrontageTool.id_attribute, QVariant.Int),
-                QgsField(FrontageTool.group_attribute, QVariant.String),
-                QgsField(FrontageTool.type_attribute, QVariant.String),
-                QgsField(FrontageTool.length_attribute, QVariant.Double),
+                QgsField(FrontageTool.id_attribute, QMetaType.Type.Int),
+                QgsField(FrontageTool.group_attribute, QMetaType.Type.QString),
+                QgsField(FrontageTool.type_attribute, QMetaType.Type.QString),
+                QgsField(FrontageTool.length_attribute, QMetaType.Type.Double),
             ]
         )
         vl.updateFields()
@@ -409,7 +409,7 @@ class FrontageTool(QObject):
         # print buildingID
         newColumn = "b_" + buildingID
         frontlayer_pr = frontlayer.dataProvider()
-        frontlayer_pr.addAttributes([QgsField(newColumn, QVariant.Int)])
+        frontlayer_pr.addAttributes([QgsField(newColumn, QMetaType.Type.Int)])
         frontlayer.commitChanges()
         frontlayer.startEditing()
         frontlayer_caps = frontlayer_pr.capabilities()
