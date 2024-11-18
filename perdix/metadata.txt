@@ -15,7 +15,7 @@
 
 [general]
 name=Perdix
-qgisMinimumVersion=3.38
+qgisMinimumVersion=3.10
 description=Collection of tools for space syntax analysis workflows in a GIS environment.
 version=0.3.10
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
