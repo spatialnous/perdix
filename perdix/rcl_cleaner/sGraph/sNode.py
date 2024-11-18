@@ -7,15 +7,15 @@
 # general imports
 from builtins import str
 
-from qgis.PyQt.QtCore import QObject, QMetaType
+from qgis.PyQt.QtCore import QObject, QVariant
 from qgis.core import QgsField, QgsFields
 
 flds = QgsFields()
-flds.append(QgsField("id", QMetaType.Type.Int))
+flds.append(QgsField("id", QVariant.Int))
 
 flds2 = QgsFields(flds)
-flds2.append(QgsField("topology", QMetaType.Type.QString))
-flds2.append(QgsField("adj_edges", QMetaType.Type.QString))
+flds2.append(QgsField("topology", QVariant.String))
+flds2.append(QgsField("adj_edges", QVariant.String))
 
 
 class sNode(QObject):
