@@ -20,7 +20,11 @@ from .sGraph.sGraph import (
     sGraph,
 )  # better give these a name to make it explicit to which module the methods belong
 from .sGraph import utilityFunctions as utf
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from perdix.utilities import (
+    db_helpers as dbh,
+    layer_field_helpers as lfh,
+    utility_functions as uf,
+)
 
 # Import the debug library - required for the cleaning class in separate thread
 # set is_debug to False in release version
@@ -287,19 +291,21 @@ class NetworkCleanerTool(QObject):
         # add emit signal to breakTool or mergeTool only to stop the loop
         if self.cleaning:
             # Disconnect signals
-            self.cleaning.finished.disconnect(self.workerFinished)
-            self.cleaning.error.disconnect(self.workerError)
-            self.cleaning.warning.disconnect(self.giveMessage)
-            self.cleaning.cl_progress.disconnect(self.dlg.cleaningProgress.setValue)
-            try:  # it might not have been connected already
-                self.cleaning.graph.progress.disconnect(
-                    self.dlg.cleaningProgress.setValue
+            uf.disconnectSignal(self.cleaning.finished, self.workerFinished)
+            uf.disconnectSignal(self.cleaning.error, self.workerError)
+            uf.disconnectSignal(self.cleaning.warning, self.giveMessage)
+            uf.disconnectSignal(
+                self.cleaning.cl_progress, self.dlg.cleaningProgress.setValue
+            )
+            if (
+                self.cleaning.graph is not None
+            ):  # it might not have been connected already
+                uf.disconnectSignal(
+                    self.cleaning.graph.progress, self.dlg.cleaningProgress.setValue
                 )
-            except TypeError:
-                pass
+                self.cleaning.graph.kill()  # todo
             # Clean up thread and analysis
             self.cleaning.kill()
-            self.cleaning.graph.kill()  # todo
             self.cleaning.deleteLater()
             self.thread.quit()
             self.thread.wait()
