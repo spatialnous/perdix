@@ -33,4 +33,4 @@ cd /tmp/perdix/perdix
 sed -i "s/$VERSION_PATT/&.$COMMITS_SINCE_LAST_VERSION/g" metadata.txt
 
 cd ..
-zip --update "$DIR/.generated/perdix.zip" "perdix/metadata.txt" 
+zip --update "$DIR/.generated/$NAME.zip" "perdix/metadata.txt"
