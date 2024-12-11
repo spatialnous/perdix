@@ -16,6 +16,7 @@
 [general]
 name=Perdix-lts
 qgisMinimumVersion=3.10
+qgisMaximumVersion=3.38
 description=Collection of tools for space syntax analysis workflows in a GIS environment. (Version compatible with QGIS Long-term support version)
 version=0.3.10
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
