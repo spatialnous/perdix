@@ -64,6 +64,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         return startupinfo
 
+    def inDebugMode(self):
+        return self.analysis_settings["debugMode"] == 1
+
     @staticmethod
     def get_depthmap_cli() -> str:
         if platform.system() == "Windows":
@@ -295,7 +298,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         ]
         cli_command.extend(command)
 
-        self.analysis_process = DepthmapCLIEngine.AnalysisThread(cli_command)
+        self.analysis_process = DepthmapCLIEngine.AnalysisThread(
+            cli_command, self.inDebugMode()
+        )
         self.analysis_process.start()
 
     def parse_progress(self, msg) -> Tuple[Optional[int], Optional[int], Optional[str]]:
@@ -316,10 +321,11 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         return None, None, None
 
     class AnalysisThread(threading.Thread):
-        def __init__(self, cmd):
+        def __init__(self, cmd, inDebugMode):
             self.cmd = cmd
             self.p = None
             self.current_line = ""
+            self.inDebugMode = inDebugMode
             threading.Thread.__init__(self)
 
         def run(self):
@@ -331,7 +337,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             )
             while True:
                 self.current_line = self.p.stdout.readline()
-                print("out:  " + self.current_line.decode("utf-8"))
+                if self.inDebugMode:
+                    print("out:  " + self.current_line.decode("utf-8"))
                 if not self.current_line:
                     break
             self.p.stdout.close()

@@ -53,6 +53,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
             "weight": 0,
             "weightBy": "",
             "stubs": 40,
+            "debugMode": 0,
             "id": "",
             "valid": False,
         }
@@ -243,6 +244,12 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         else:
             return 0
 
+    def get_debug_mode(self):
+        if self.dlg_depthmap.debugModeCheck.isChecked():
+            return 1
+        else:
+            return 0
+
     def get_analysis_normalised(self):
         if self.dlg_depthmap.axialCalculateNormCheck.isChecked():
             return 1
@@ -309,6 +316,11 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
                 self.dlg_depthmap.setRemoveStubs(settings["stubs"])
             else:
                 self.dlg_depthmap.setRemoveStubs(40)
+            # debug mode
+            if "debugMode" in settings:
+                self.dlg_depthmap.setDebugModeCheck(settings["debugMode"])
+            else:
+                self.dlg_depthmap.setDebugModeCheck(True)
 
     def parse_radii(self, txt):
         radii = txt
@@ -353,6 +365,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         self.axial_analysis_settings["betweenness"] = self.get_analysis_choice()
         self.axial_analysis_settings["newnorm"] = self.get_analysis_normalised()
         self.axial_analysis_settings["stubs"] = self.get_analysis_stubs()
+        self.axial_analysis_settings["debugMode"] = self.get_debug_mode()
 
         # check if output file/table already exists
         table_exists = False
@@ -436,6 +449,8 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
             and self.axial_analysis_settings["newnorm"] == 1
         ):
             message += "\n   calculate NACH and NAIN"
+        if self.axial_analysis_settings["debugMode"] == 1:
+            message += "\n   debug mode ON"
         return message
 
     def set_axial_depthmap_calculate_tooltip(self, txt):

@@ -67,6 +67,9 @@ class DepthmapAdvancedDialog(QtWidgets.QDialog, Ui_DepthmapAdvancedDialog):
         self.axialStubsLabel.setDisabled(onoff)
         self.axialStubsEdit.setDisabled(onoff)
 
+    def setDebugModeCheck(self, onoff):
+        self.debugModeCheck.setChecked(onoff)
+
     def checkRemoveStubs(self):
         try:
             int(self.axialStubsEdit.text())
