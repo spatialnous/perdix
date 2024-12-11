@@ -331,7 +331,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             )
             while True:
                 self.current_line = self.p.stdout.readline()
-                print("starttt " + self.current_line.decode("utf-8"))
+                print("out:  " + self.current_line.decode("utf-8"))
                 if not self.current_line:
                     break
             self.p.stdout.close()
