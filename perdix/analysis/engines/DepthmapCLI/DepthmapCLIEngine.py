@@ -343,6 +343,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     break
             self.p.stdout.close()
 
+        def terminate(self):
+            self.p.terminate()
+
     def get_progress(
         self, settings, datastore
     ) -> Tuple[Optional[int], Optional[int], Optional[str]]:
@@ -384,6 +387,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         return None, None, None
 
     def cleanup(self):
+        if self.analysis_process is not None:
+            self.analysis_process.terminate()
+            self.analysis_process = None
         if os.path.isfile(self.analysis_graph_file.name):
             self.analysis_graph_file.close()
             os.unlink(self.analysis_graph_file.name)
