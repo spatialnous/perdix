@@ -104,6 +104,7 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         self.axialDepthmapOutputText.clear()
         self.dockWidget.analysisProgressBar.setValue(0)
         self.dockWidget.analysisProgressOutput.clear()
+        self.dlg_depthmap.setRemoveStubs(40)
 
     def set_depthmap_axial_analysis(self):
         self.axial_analysis_type = 0
