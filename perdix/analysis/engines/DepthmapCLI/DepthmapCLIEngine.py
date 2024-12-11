@@ -311,7 +311,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             if self.analysis_nodes > 0:
                 prog = int(m.group(3))
                 step = int(m.group(1))
-                relprog = (float(prog) / float(self.analysis_nodes)) * 100
+                relprog = int((float(prog) / float(self.analysis_nodes)) * 100)
                 return step, relprog, ""
         return None, None, None
 

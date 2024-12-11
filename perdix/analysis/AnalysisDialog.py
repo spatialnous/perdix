@@ -424,11 +424,11 @@ class AnalysisDialog(QtWidgets.QDockWidget, Ui_AnalysisDialog):
     def clear_analysis_tab(self):
         self.analysis_settings.set_defaults()
 
-    def set_analysis_progressbar(self, value, maximum=100):
+    def set_analysis_progressbar(self, value: int, maximum=100):
         self.analysisProgressBar.setMaximum(maximum)
         self.analysisProgressBar.setValue(value)
 
-    def update_analysis_progressbar(self, value):
+    def update_analysis_progressbar(self, value: int):
         self.analysisProgressBar.setValue(value)
 
     def write_analysis_report(self, txt):
