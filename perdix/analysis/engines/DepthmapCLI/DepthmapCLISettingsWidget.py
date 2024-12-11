@@ -113,8 +113,13 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
 
     def dock_widget_settings_changed(self):
         if self.dockWidget.getSegmentedMode() == 2:
+            # RCL-only has been checked, can't use axial
+            # switch to segment
             self.axialDepthmapSegmentRadio.setChecked(True)
-            self.set_depthmap_segment_analysis()
+            self.axialDepthmapAxialRadio.setDisabled(True)
+        else:
+            self.axialDepthmapAxialRadio.setDisabled(False)
+        self.set_depthmap_segment_analysis()
 
     def set_depthmap_segment_analysis(self):
         if self.dockWidget.getSegmentedMode() == 0:
@@ -152,20 +157,16 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
         txt, idxs = lfh.getNumericFieldNames(layer)
         if self.axial_analysis_type == 0:
             self.set_axial_depthmap_output_table(self.dockWidget.layers[0]["name"])
-            # self.axialDepthmapAxialRadio.setDisabled(False)
             txt.insert(0, "Line Length")
         elif self.axial_analysis_type == 1:
             self.set_axial_depthmap_output_table(
                 self.dockWidget.layers[0]["name"] + "_segment"
             )
-            # self.axialDepthmapAxialRadio.setDisabled(False)
             txt.insert(0, "Segment Length")
         elif self.axial_analysis_type == 2:
             self.set_axial_depthmap_output_table(
                 self.dockWidget.layers[0]["name"] + "_analysis"
             )
-            # self.axialDepthmapSegmentRadio.setChecked(True)
-            self.axialDepthmapAxialRadio.setDisabled(True)
             # txt.insert(0, "Segment Length")
         self.set_depthmap_weight_attributes(txt)
         self.update_axial_depthmap_advanced_settings()
