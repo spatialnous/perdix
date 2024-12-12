@@ -324,6 +324,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         def __init__(self, cmd, inDebugMode):
             self.cmd = cmd
             self.p = None
+            self.maxlog = 5
+            self.lastlog = []
             self.current_line = ""
             self.inDebugMode = inDebugMode
             threading.Thread.__init__(self)
@@ -337,6 +339,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             )
             while True:
                 self.current_line = self.p.stdout.readline()
+                self.lastlog.append(self.current_line.decode("utf-8"))
+                if len(self.lastlog) > self.maxlog:
+                    self.lastlog.pop(0)
                 if self.inDebugMode:
                     print("out:  " + self.current_line.decode("utf-8"))
                 if not self.current_line:
@@ -384,6 +389,11 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 settings, datastore, attributes, values
             )
             return 0, 100, "Completed"
+        else:
+            # process errored
+            raise AnalysisEngine.AnalysisEngineError(
+                "\n".join(self.analysis_process.lastlog)
+            )
         return None, None, None
 
     def cleanup(self):
