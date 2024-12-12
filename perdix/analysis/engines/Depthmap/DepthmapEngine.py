@@ -140,7 +140,7 @@ class DepthmapEngine(AnalysisEngine):
             if include_header:
                 map_data = "Ref,x1,y1,x2,y2"
                 if weight not in defaults:
-                    map_data += weight
+                    map_data += "," + weight
                 map_data += "\n"
             if ref != "":
                 if weight not in defaults:
