@@ -244,6 +244,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         self.analysis_graph_file = tempfile.NamedTemporaryFile(
             "w+t", suffix=".graph", delete=False
         )
+        maxlog = 5
+        lastlog = []
         process = subprocess.Popen(
             [
                 depthmap_cli,
@@ -256,10 +258,23 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 "-it",
                 "data",
             ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             startupinfo=DepthmapCLIEngine.getStartupInfo(),
         )
-        process.wait()
+        while True:
+            current_line = process.stdout.readline()
+            lastlog.append(current_line.decode("utf-8"))
+            if len(lastlog) > maxlog:
+                lastlog.pop(0)
+            if self.inDebugMode:
+                print("import:  " + current_line.decode("utf-8"))
+            if not current_line:
+                break
+        process.communicate()
         os.unlink(line_data_file.name)
+        if process.returncode != 0:
+            raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
 
         unlink_data_file = tempfile.NamedTemporaryFile(
             "w+t", suffix=".tsv", delete=False
@@ -280,11 +295,26 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 self.analysis_graph_file.name,
             ]
             cli_command.extend(prep_command)
+            maxlog = 5
+            lastlog = []
             process = subprocess.Popen(
-                cli_command, startupinfo=DepthmapCLIEngine.getStartupInfo()
+                cli_command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                startupinfo=DepthmapCLIEngine.getStartupInfo(),
             )
-            process.wait()
-
+            while True:
+                current_line = process.stdout.readline()
+                lastlog.append(current_line.decode("utf-8"))
+                if len(lastlog) > maxlog:
+                    lastlog.pop(0)
+                if self.inDebugMode:
+                    print("prep:  " + current_line.decode("utf-8"))
+                if not current_line:
+                    break
+            process.communicate()
+            if process.returncode != 0:
+                raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
         os.unlink(unlink_data_file.name)
 
         command = DepthmapCLIEngine.get_analysis_command(self.analysis_settings)
@@ -433,7 +463,6 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         # 2: segment analysis settings, data only
         elif settings["type"] in (1, 2):
             command.extend(["-m", "SEGMENT"])
-            # command += "segment.stubs:" + str(settings['stubs']) + "\n"
             if settings["betweenness"] == 1:
                 command.append("-sic")
             command.extend(["-st", "tulip"])

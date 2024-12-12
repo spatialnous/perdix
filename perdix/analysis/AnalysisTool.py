@@ -726,10 +726,17 @@ class AnalysisTool(QObject):
                 # print message in results window
                 self.dlg.write_analysis_report(message)
                 self.dlg.lock_analysis_tab(True)
-                self.analysis_engine.start_analysis()
-                # timer to check if results are ready, in milliseconds
-                self.timer.start(1000)
-                self.analysis_running = True
+                try:
+                    self.analysis_engine.start_analysis()
+                    # timer to check if results are ready, in milliseconds
+                    self.timer.start(1000)
+                    self.analysis_running = True
+                except AnalysisEngine.AnalysisEngineError as engine_error:
+                    self.dlg.lock_analysis_tab(False)
+                    self.dlg.write_analysis_report(
+                        "Preparation error: " + str(engine_error)
+                    )
+                    self.analysis_engine.cleanup()
             else:
                 self.dlg.write_analysis_report(
                     "Unable to run this analysis. Please check the input layer and analysis settings."
