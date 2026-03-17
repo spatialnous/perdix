@@ -33,6 +33,8 @@ about=Perdix is a QGIS plugin forked from the "Space Syntax Toolkit" and offerin
     Dependencies: For network analysis requires depthmapXnet 0.35. It can be downloaded from: http://archtech.gr/varoudis/depthmapX/?dir=depthmapXnet
 category = Vector
 changelog=
+    0.4.1 -
+    * Added newer depthmap clis. Now also for linux and mac arm versions
     0.4.0 -
     * First release for QGIS 4
     0.3.10 -
