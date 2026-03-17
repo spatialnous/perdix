@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -276,14 +276,17 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         if process.returncode != 0:
             raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
 
-        unlink_data_file = tempfile.NamedTemporaryFile(
-            "w+t", suffix=".tsv", delete=False
-        )
-        unlink_data_file.write(self.prep_unlink_data)
-        unlink_data_file.close()
+        unlink_data_file_name = None
+        if self.prep_unlink_data:
+            unlink_data_file = tempfile.NamedTemporaryFile(
+                "w+t", suffix=".tsv", delete=False
+            )
+            unlink_data_file.write(self.prep_unlink_data)
+            unlink_data_file.close()
+            unlink_data_file_name = unlink_data_file.name
 
         prep_commands = DepthmapCLIEngine.get_prep_commands(
-            self.analysis_settings, unlink_data_file.name
+            self.analysis_settings, unlink_data_file_name
         )
 
         for prep_command in prep_commands:
@@ -315,7 +318,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             process.communicate()
             if process.returncode != 0:
                 raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
-        os.unlink(unlink_data_file.name)
+
+        if self.prep_unlink_data:
+            os.unlink(unlink_data_file.name)
 
         command = DepthmapCLIEngine.get_analysis_command(self.analysis_settings)
         cli_command = [
