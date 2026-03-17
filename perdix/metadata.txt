@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2017 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,9 +14,10 @@
 # Mandatory items:
 
 [general]
-name=Perdix
+name=Perdix-ltr
 qgisMinimumVersion=3.38
-description=Collection of tools for space syntax analysis workflows in a GIS environment.
+qgisMaximumVersion=3.44
+description=Collection of tools for space syntax analysis workflows in a GIS environment. Version compatible with QGIS Long-term support version
 version=0.3.10
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
 email=jorge.gil@chalmers.se
