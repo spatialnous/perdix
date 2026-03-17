@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -68,7 +68,7 @@ def clean_features_iter(feat_iter):
                 ml_error.setGeometry(QgsGeometry.fromPointXY(f_geom.asPolyline()[0]))
             ml_error.setAttributes(["point"])
             points.append(ml_error)
-        elif f_geom.type() == QgsWkbTypes.LineGeometry:
+        elif f_geom.type() == QgsWkbTypes.GeometryType.LineGeometry:
             if not f_geom.isMultipart():
                 f.setId(id)
                 id += 1
@@ -198,9 +198,9 @@ def to_layer(features, crs, encoding, geom_type, layer_type, path):
 
     elif layer_type == "shapefile":
         wkbTypes = {
-            "Point": QgsWkbTypes.Point,
-            "Linestring": QgsWkbTypes.LineString,
-            "Polygon": QgsWkbTypes.Polygon,
+            "Point": QgsWkbTypes.Type.Point,
+            "Linestring": QgsWkbTypes.Type.LineString,
+            "Polygon": QgsWkbTypes.Type.Polygon,
         }
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "ESRI Shapefile"
@@ -213,7 +213,7 @@ def to_layer(features, crs, encoding, geom_type, layer_type, path):
             QgsCoordinateTransformContext(),
             options,
         )
-        if file_writer.hasError() != QgsVectorFileWriter.NoError:
+        if file_writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
             print("Error when creating shapefile: ", file_writer.errorMessage())
         del file_writer
         layer = QgsVectorLayer(path, ntpath.basename(path)[:-4], "ogr")

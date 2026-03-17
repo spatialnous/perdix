@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -43,6 +43,7 @@ class AnalysisTool(QObject):
         self.legend = QgsProject.instance().mapLayers()
         self.engine_registry = EngineRegistry()
         self.analysis_running = False
+        self.currstep = -1
 
     def engineChanged(self, index):
         new_engine = self.dlg.engineSelectionCombo.currentText()
@@ -94,8 +95,8 @@ class AnalysisTool(QObject):
         self.current_layer = None
 
         # timer to check for analysis result
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.check_analysis_progress)
+        self.progress_timer = QTimer()
+        self.progress_timer.timeout.connect(self.check_analysis_progress)
 
         # define analysis data structures
         self.analysis_layers = {"map": "", "unlinks": "", "map_type": 0}
@@ -369,7 +370,7 @@ class AnalysisTool(QObject):
         if self.edit_mode == 0:
             # get ids (to match the object ids in the map)
             self.user_ids["map"] = "%s" % self.axial_id
-            if axial.geometryType() == QgsWkbTypes.LineGeometry:
+            if axial.geometryType() == QgsWkbTypes.GeometryType.LineGeometry:
                 caps = axial.dataProvider().capabilities()
                 self.verificationThread = AxialVerification(
                     self.iface.mainWindow(),
@@ -424,7 +425,7 @@ class AnalysisTool(QObject):
                     unlinks,
                     self.user_ids["unlinks"],
                 )
-        if not caps & QgsVectorDataProvider.AddFeatures:
+        if not caps & QgsVectorDataProvider.Capability.AddFeatures:
             self.iface.messageBar().pushMessage(
                 "Info",
                 "To edit the selected layer, change to another file format.",
@@ -479,7 +480,7 @@ class AnalysisTool(QObject):
                 )
                 return False
             caps = unlinks.dataProvider().capabilities()
-            if caps & QgsVectorDataProvider.ChangeAttributeValues:
+            if caps & QgsVectorDataProvider.Capability.ChangeAttributeValues:
                 self.dlg.lock_verification_tab(True)
                 self.dlg.clearAxialProblems()
                 ids = lfh.getIdFieldNames(unlinks)
@@ -692,7 +693,10 @@ class AnalysisTool(QObject):
                 if not layerNode.isVisible():
                     layerNode.setItemVisibilityChecked(True)
                 self.iface.mapCanvas().zoomToSelected()
-                if layer.geometryType() in (QgsWkbTypes.Polygon, QgsWkbTypes.Point):
+                if layer.geometryType() in (
+                    QgsWkbTypes.Type.Polygon,
+                    QgsWkbTypes.Type.Point,
+                ):
                     self.iface.mapCanvas().zoomOut()
 
     def run_analysis(self):
@@ -719,6 +723,7 @@ class AnalysisTool(QObject):
                 self.analysis_layers, analysis_settings
             )
             if analysis_ready:
+                self.currstep = -1
                 self.updateProjectSettings()
                 self.start_time = datetime.datetime.now()
                 # write a short analysis summary
@@ -729,7 +734,7 @@ class AnalysisTool(QObject):
                 try:
                     self.analysis_engine.start_analysis()
                     # timer to check if results are ready, in milliseconds
-                    self.timer.start(1000)
+                    self.progress_timer.start(1000)
                     self.analysis_running = True
                 except AnalysisEngine.AnalysisEngineError as engine_error:
                     self.dlg.lock_analysis_tab(False)
@@ -761,21 +766,22 @@ class AnalysisTool(QObject):
             self.dlg.set_analysis_progressbar(0, 100)
             self.dlg.lock_analysis_tab(False)
             self.dlg.write_analysis_report("Analysis canceled by user.")
-        self.timer.stop()
+        self.progress_timer.stop()
+        self.analysis_engine.terminate()
         self.analysis_engine.cleanup()
         self.analysis_running = False
 
     def check_analysis_progress(self):
         analysis_settings = self.dlg.get_analysis_settings()
         try:
-            step, progress, logmsg = self.analysis_engine.get_progress(
+            step, stepname, progress, logmsg = self.analysis_engine.get_progress(
                 analysis_settings, self.datastore
             )
-            if not progress:
+            if progress is None:
                 # no progress, just wait...
                 return
             elif progress == 100:
-                self.timer.stop()
+                self.progress_timer.stop()
                 # update calculation time
                 dt = datetime.datetime.now()
                 feedback = "Finish: %s" % dt.strftime("%d/%m/%Y %H:%M:%S")
@@ -786,14 +792,17 @@ class AnalysisTool(QObject):
             else:
                 if self.analysis_running:
                     self.dlg.update_analysis_progressbar(progress)
+                    if self.currstep != step:
+                        self.dlg.write_analysis_report(stepname)
+                        self.currstep = step
                     if step > 0:
-                        self.timer.start(step)
+                        self.progress_timer.start(step)
         except AnalysisEngine.AnalysisEngineError as engine_error:
             if self.analysis_running:
                 self.dlg.set_analysis_progressbar(0, 100)
                 self.dlg.lock_analysis_tab(False)
                 self.dlg.write_analysis_report("Analysis error: " + str(engine_error))
-            self.timer.stop()
+            self.progress_timer.stop()
             self.analysis_engine.cleanup()
             self.analysis_running = False
 
@@ -903,7 +912,7 @@ class AnalysisTool(QObject):
                             "Existing file and newly suggested file have different "
                             "number of lines, but can not create new file as too many "
                             "existing duplicates",
-                            level=Qgis.Critical,
+                            level=Qgis.MessageLevel.Critical,
                             duration=5,
                         )
 
@@ -912,7 +921,7 @@ class AnalysisTool(QObject):
                     "Warning",
                     "Existing file and newly suggested file have different "
                     "number of lines, new file created with different name",
-                    level=Qgis.Warning,
+                    level=Qgis.MessageLevel.Warning,
                     duration=5,
                 )
             if original_table_name == table and (

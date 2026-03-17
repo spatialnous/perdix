@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 - 2018 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 - 2018 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,7 +14,6 @@ import os
 import traceback
 from builtins import range, str, zip
 
-from future import standard_library
 from qgis.PyQt.QtCore import QThread, QObject, pyqtSignal
 from qgis.core import Qgis, QgsProject, QgsGeometry, QgsMessageLog
 
@@ -23,18 +22,15 @@ from . import utilityFunctions as uf
 from .network_segmenter_dialog import NetworkSegmenterDialog
 from .segment_tools import segmentor
 
-standard_library.install_aliases()
-
 # Import the debug library - required for the cleaning class in separate thread
 # set is_debug to False in release version
 is_debug = False
-try:
-    import pydevd
 
-    has_pydevd = True
-except ModuleNotFoundError:
-    has_pydevd = False
-    is_debug = False
+if is_debug:
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 
 class NetworkSegmenterTool(QObject):
@@ -90,7 +86,7 @@ class NetworkSegmenterTool(QObject):
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        self.dlg.exec_()
+        self.dlg.exec()
 
     def unloadGUI(self):
         if self.dlg:
@@ -156,7 +152,9 @@ class NetworkSegmenterTool(QObject):
             self.settings.update(db_settings)
 
         if lfh.getLayerByName(self.settings["input"]).crs().postgisSrid() == 4326:
-            self.giveMessage("Re-project the layer. EPSG:4326 not allowed.", Qgis.Info)
+            self.giveMessage(
+                "Re-project the layer. EPSG:4326 not allowed.", Qgis.MessageLevel.Info
+            )
         elif self.settings["output"] != "":
             segmenting = self.Worker(self.settings, self.iface)
             self.dlg.lockGUI(True)
@@ -176,7 +174,7 @@ class NetworkSegmenterTool(QObject):
             self.thread = thread
             self.segmenting = segmenting
         else:
-            self.giveMessage("Missing user input!", Qgis.Info)
+            self.giveMessage("Missing user input!", Qgis.MessageLevel.Info)
             return
 
     def workerFinished(self, ret):
@@ -220,7 +218,7 @@ class NetworkSegmenterTool(QObject):
 
             if self.settings["errors"]:
                 if len(break_points) == 0:
-                    self.giveMessage("No points detected!", Qgis.Info)
+                    self.giveMessage("No points detected!", Qgis.MessageLevel.Info)
                 else:
                     errors = uf.to_layer(
                         break_points,
@@ -237,13 +235,13 @@ class NetworkSegmenterTool(QObject):
                     node = QgsProject.instance().layerTreeRoot().findLayer(errors.id())
                     self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
 
-            self.giveMessage("Process ended successfully!", Qgis.Info)
+            self.giveMessage("Process ended successfully!", Qgis.MessageLevel.Info)
 
         elif self.thread_error != "":
             # notify the user that sth went wrong
             self.giveMessage(
                 "Something went wrong! See the message log for more information",
-                Qgis.Critical,
+                Qgis.MessageLevel.Critical,
             )
             QgsMessageLog.logMessage("Network segmenter error: %s" % self.thread_error)
 
@@ -283,7 +281,7 @@ class NetworkSegmenterTool(QObject):
         # Setup signals
         finished = pyqtSignal(object)
         error = pyqtSignal(Exception, str)
-        segm_progress = pyqtSignal(float)
+        segm_progress = pyqtSignal(int)
         warning = pyqtSignal(str)
         segm_killed = pyqtSignal(bool)
 
@@ -297,14 +295,10 @@ class NetworkSegmenterTool(QObject):
             # print ' class initiated'
 
         def run(self):
-            if has_pydevd and is_debug:
-                pydevd.settrace(
-                    "localhost",
-                    port=53100,
-                    stdoutToServer=True,
-                    stderrToServer=True,
-                    suspend=False,
-                )
+            if is_debug:
+                # old debug entry point, replaced with logger
+                logger.debug("Debug mode enabled in: ", __name__)
+
             ret = None
             # if self.settings:
             try:

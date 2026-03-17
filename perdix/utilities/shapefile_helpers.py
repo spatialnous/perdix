@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -84,7 +84,7 @@ def copyLayerToShapeFile(layer, path, name):
     writer = QgsVectorFileWriter.create(
         filename, fields, geometry, srid, QgsCoordinateTransformContext(), options
     )
-    if writer.hasError() != QgsVectorFileWriter.NoError:
+    if writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
     # add features by iterating the values
@@ -143,7 +143,7 @@ def create_shapefile_full_layer_data_provider(
         writer = QgsVectorFileWriter.create(
             filename,
             QgsFields(),
-            QgsWkbTypes.Point,
+            QgsWkbTypes.Type.Point,
             srid,
             QgsCoordinateTransformContext(),
             options,
@@ -153,12 +153,12 @@ def create_shapefile_full_layer_data_provider(
         writer = QgsVectorFileWriter.create(
             filename,
             QgsFields(),
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             srid,
             QgsCoordinateTransformContext(),
             options,
         )
-    if writer.hasError() != QgsVectorFileWriter.NoError:
+    if writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
     del writer
@@ -255,7 +255,7 @@ def create_shapefile_full_layer_writer(
         writer = QgsVectorFileWriter.create(
             filename,
             fields,
-            QgsWkbTypes.Point,
+            QgsWkbTypes.Type.Point,
             srid,
             QgsCoordinateTransformContext(),
             options,
@@ -265,12 +265,12 @@ def create_shapefile_full_layer_writer(
         writer = QgsVectorFileWriter.create(
             filename,
             fields,
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             srid,
             QgsCoordinateTransformContext(),
             options,
         )
-    if writer.hasError() != QgsVectorFileWriter.NoError:
+    if writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
     # add features by iterating the values
@@ -336,7 +336,7 @@ def createShapeFileLayer(path, name, srid, attributes, types, geometrytype):
         writer = QgsVectorFileWriter.create(
             filename,
             fields,
-            QgsWkbTypes.Point,
+            QgsWkbTypes.Type.Point,
             srid,
             QgsCoordinateTransformContext(),
             options,
@@ -345,7 +345,7 @@ def createShapeFileLayer(path, name, srid, attributes, types, geometrytype):
         writer = QgsVectorFileWriter.create(
             filename,
             fields,
-            QgsWkbTypes.LineString,
+            QgsWkbTypes.Type.LineString,
             srid,
             QgsCoordinateTransformContext(),
             options,
@@ -354,12 +354,12 @@ def createShapeFileLayer(path, name, srid, attributes, types, geometrytype):
         writer = QgsVectorFileWriter.create(
             filename,
             fields,
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             srid,
             QgsCoordinateTransformContext(),
             options,
         )
-    if writer.hasError() != QgsVectorFileWriter.NoError:
+    if writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
         print("Error when creating shapefile: ", writer.hasError())
         return None
     # delete the writer to flush features to disk (optional)
@@ -381,7 +381,7 @@ def insertShapeFileValues(layer, attributes, values, coords):
         geom_type = layer.geometryType()
         provider = layer.dataProvider()
         caps = provider.capabilities()
-        if caps & QgsVectorDataProvider.AddFeatures:
+        if caps & QgsVectorDataProvider.Capability.AddFeatures:
             # add features by iterating the values
             features = []
             for val in values:
@@ -438,7 +438,7 @@ def addShapeFileAttributes(layer, attributes, types, values):
         provider = layer.dataProvider()
         caps = provider.capabilities()
         res = False
-        if caps & QgsVectorDataProvider.AddAttributes:
+        if caps & QgsVectorDataProvider.Capability.AddAttributes:
             fields = provider.fields()
             count = fields.count()
             for i, name in enumerate(attributes):
@@ -453,7 +453,7 @@ def addShapeFileAttributes(layer, attributes, types, values):
                 layer.updateFields()
         # update attribute values by iterating the layer's features
         res = False
-        if caps & QgsVectorDataProvider.ChangeAttributeValues:
+        if caps & QgsVectorDataProvider.Capability.ChangeAttributeValues:
             # fields = provider.fields() #the fields must be retrieved again after the updateFields() method
             iter = layer.getFeatures()
             for i, feature in enumerate(iter):

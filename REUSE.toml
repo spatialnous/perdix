@@ -1,7 +1,8 @@
 version = 1
 
 [[annotations]]
-path = ["REUSE.toml", ".gitignore", "README.md", ".ruff.toml"]
+path = ["REUSE.toml", ".gitignore", "README.md", ".ruff.toml",
+    ".gitmodules"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Perdix contributors"
 SPDX-License-Identifier = "GPL-2.0-or-later"

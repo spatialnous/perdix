@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -11,7 +11,7 @@ from __future__ import absolute_import
 import os.path
 
 from qgis.PyQt import uic, QtWidgets
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal, Qt
 from qgis.PyQt.QtWidgets import QDialog
 
 from .DbSettings_dialog import DbSettingsDialog
@@ -80,8 +80,8 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         self.lockSettingsGUI(True)
         self.dataSourceCombo.currentIndexChanged.connect(self.setClSettings)
 
-        self.errorsCheckBox.setCheckState(2)
-        self.unlinksCheckBox.setCheckState(2)
+        self.errorsCheckBox.setCheckState(Qt.CheckState.Checked)
+        self.unlinksCheckBox.setCheckState(Qt.CheckState.Checked)
 
         self.editDefaultButton.clicked.connect(lambda i=False: self.lockSettingsGUI(i))
         self.setClSettings()
@@ -95,34 +95,34 @@ class RoadNetworkCleanerDialog(QDialog, Ui_RoadNetworkCleanerDialog):
     def toggleMergeCollinearSettings(self):
         # untick the self.mergeCollinearCheckBox
         if self.mergeCollinearCheckBox.isChecked():
-            self.mergeCheckBox.setCheckState(0)
+            self.mergeCheckBox.setCheckState(Qt.CheckState.Unchecked)
         return
 
     def toggleMergeSettings(self):
         if self.mergeCheckBox.isChecked():
-            self.mergeCollinearCheckBox.setCheckState(0)
+            self.mergeCollinearCheckBox.setCheckState(Qt.CheckState.Unchecked)
         return
 
     def setClSettings(self):
         if self.dataSourceCombo.currentText() == "OpenStreetMap":
-            self.snapCheckBox.setCheckState(2)
-            self.simplifyCheckBox.setCheckState(2)
+            self.snapCheckBox.setCheckState(Qt.CheckState.Checked)
+            self.simplifyCheckBox.setCheckState(Qt.CheckState.Checked)
             self.snapSpinBox.setValue(10)
             self.angularChangeSpinBox.setValue(10)
-            self.breakCheckBox.setCheckState(2)
-            self.mergeCheckBox.setCheckState(2)
-            self.orphansCheckBox.setCheckState(2)
+            self.breakCheckBox.setCheckState(Qt.CheckState.Checked)
+            self.mergeCheckBox.setCheckState(Qt.CheckState.Checked)
+            self.orphansCheckBox.setCheckState(Qt.CheckState.Checked)
 
             self.lockSettingsGUI(True)
 
         elif self.dataSourceCombo.currentText() == "OrdnanceSurvey":
-            self.snapCheckBox.setCheckState(2)
-            self.simplifyCheckBox.setCheckState(2)
+            self.snapCheckBox.setCheckState(Qt.CheckState.Checked)
+            self.simplifyCheckBox.setCheckState(Qt.CheckState.Checked)
             self.snapSpinBox.setValue(10)
             self.angularChangeSpinBox.setValue(10)
-            self.breakCheckBox.setCheckState(0)
-            self.mergeCheckBox.setCheckState(2)
-            self.orphansCheckBox.setCheckState(2)
+            self.breakCheckBox.setCheckState(Qt.CheckState.Unchecked)
+            self.mergeCheckBox.setCheckState(Qt.CheckState.Checked)
+            self.orphansCheckBox.setCheckState(Qt.CheckState.Checked)
             self.lockSettingsGUI(True)
 
         else:

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -66,15 +66,15 @@ class ProjectManager(QtCore.QObject):
         for key in settings.keys():
             this_type = type(settings[key]).__name__
             if this_type in ("int", "long"):
-                entry = self.proj.readNumEntry("esst", position + str(key))
+                entry = self.proj.readNumEntry("prdx", position + str(key))
             elif this_type == "float":
-                entry = self.proj.readDoubleEntry("esst", position + str(key))
+                entry = self.proj.readDoubleEntry("prdx", position + str(key))
             elif this_type == "bool":
-                entry = self.proj.readBoolEntry("esst", position + str(key))
+                entry = self.proj.readBoolEntry("prdx", position + str(key))
             elif this_type == "list":
-                entry = self.proj.readListEntry("esst", position + str(key))
+                entry = self.proj.readListEntry("prdx", position + str(key))
             else:
-                entry = self.proj.readEntry("esst", position + str(key))
+                entry = self.proj.readEntry("eprdxsst", position + str(key))
             if entry[1]:
                 settings[key] = entry[0]
 
@@ -84,15 +84,15 @@ class ProjectManager(QtCore.QObject):
         else:
             position = ""
         if type in ("int", "long"):
-            entry = self.proj.readNumEntry("esst", position + str(key))
+            entry = self.proj.readNumEntry("prdx", position + str(key))
         elif type == "float":
-            entry = self.proj.readDoubleEntry("esst", position + str(key))
+            entry = self.proj.readDoubleEntry("prdx", position + str(key))
         elif type == "bool":
-            entry = self.proj.readBoolEntry("esst", position + str(key))
+            entry = self.proj.readBoolEntry("prdx", position + str(key))
         elif type == "list":
-            entry = self.proj.readListEntry("esst", position + str(key))
+            entry = self.proj.readListEntry("prdx", position + str(key))
         else:
-            entry = self.proj.readEntry("esst", position + str(key))
+            entry = self.proj.readEntry("prdx", position + str(key))
         if entry[1]:
             setting = entry[0]
         else:
@@ -103,17 +103,17 @@ class ProjectManager(QtCore.QObject):
         # this function returns all settings as strings.
         # impossible to get type from value as read function is always true.
         settings = dict()
-        keys = self.proj.entryList("esst", str(group))
+        keys = self.proj.entryList("prdx", str(group))
         if group != "":
             position = str(group) + "/"
         else:
             position = ""
         for key in keys:
-            entry = self.proj.readEntry("esst", position + str(key))
+            entry = self.proj.readEntry("prdx", position + str(key))
             if entry[1]:
                 settings[key] = entry[0]
             else:
-                settings[key] = self.proj.readListEntry("esst", position + str(key))[0]
+                settings[key] = self.proj.readListEntry("prdx", position + str(key))[0]
         return settings
 
     def getAllSettings(self):
@@ -121,23 +121,23 @@ class ProjectManager(QtCore.QObject):
         # it's impossible to get type from value as read function is always true.
         settings = dict()
         # retrieve ungrouped keys
-        base = self.proj.entryList("esst", "")
+        base = self.proj.entryList("prdx", "")
         if len(base) > 0:
             for key in base:
-                settings[key] = self.proj.readEntry("esst", str(key))[0]
+                settings[key] = self.proj.readEntry("prdx", str(key))[0]
         # retrieve grouped keys (1 level only)
-        groups = self.proj.subkeyList("esst", "")
+        groups = self.proj.subkeyList("prdx", "")
         if len(groups) > 0:
             for group in groups:
-                keys = self.proj.entryList("esst", str(group))
+                keys = self.proj.entryList("prdx", str(group))
                 if len(keys) > 0:
                     for key in keys:
-                        entry = self.proj.readEntry("esst", str(group) + "/" + str(key))
+                        entry = self.proj.readEntry("prdx", str(group) + "/" + str(key))
                         if entry[1]:
                             setting = entry[0]
                         else:
                             setting = self.proj.readListEntry(
-                                "esst", str(group) + "/" + str(key)
+                                "prdx", str(group) + "/" + str(key)
                             )[0]
                         settings[str(group) + "/" + str(key)] = setting
         return settings
@@ -158,7 +158,14 @@ class ProjectManager(QtCore.QObject):
         try:
             for key in settings.keys():
                 val = settings[key]
-                self.proj.writeEntry("esst", position + str(key), val)
+                if isinstance(val, float):
+                    self.proj.writeEntryDouble("prdx", position + str(key), val)
+                elif isinstance(val, bool):
+                    self.proj.writeEntryBool("prdx", position + str(key), val)
+                elif isinstance(val, int):
+                    self.proj.writeEntry("prdx", position + str(key), val)
+                else:
+                    self.proj.writeEntry("prdx", position + str(key), str(val))
             self.settingsUpdated.emit()
             return True
         except Exception as e:
@@ -172,7 +179,14 @@ class ProjectManager(QtCore.QObject):
         if group != "":
             position = str(group) + "/"
         try:
-            self.proj.writeEntry("esst", position + str(key), value)
+            if isinstance(value, float):
+                self.proj.writeEntryDouble("prdx", position + str(key), value)
+            elif isinstance(value, bool):
+                self.proj.writeEntryBool("prdx", position + str(key), value)
+            elif isinstance(value, int):
+                self.proj.writeEntry("prdx", position + str(key), value)
+            else:
+                self.proj.writeEntry("prdx", position + str(key), str(value))
             self.settingsUpdated.emit()
             return True
         except Exception as e:
@@ -183,7 +197,7 @@ class ProjectManager(QtCore.QObject):
 
     def __saveSettings(self):
         for key in self.proj_settings.keys():
-            self.proj.writeEntry("esst", key, self.proj_settings[key])
+            self.proj.writeEntry("prdx", key, self.proj_settings[key])
         self.settingsUpdated.emit()
         # self.__loadSettings()
 

@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
+
+import os
+import sys
 
 from math import atan
 
@@ -17,10 +20,14 @@ try:
     has_pyqtgraph = True
 except ImportError:
     try:
-        from ..external import pyqtgraph as pg
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        sys.path.insert(0, os.path.join(project_root, "external", "colorama"))
+        sys.path.insert(0, os.path.join(project_root, "external", "pyqtgraph"))
+        import pyqtgraph as pg
 
         has_pyqtgraph = True
-    except ImportError:
+    except ImportError as e:
+        print("Could not import pyqtgraph:", e)
         has_pyqtgraph = False
 
 import numpy as np
@@ -63,12 +70,12 @@ class AttributeCharts(QObject):
         y, x = np.histogram(values, bins=np.linspace(xmin, xmax, num=bin))
         # plot the chart
         if has_pyqtgraph:
-            curve = pg.PlotCurveItem()
             self.plot.clear()
+            curve = pg.PlotCurveItem()
             curve.setData(
                 x,
                 y,
-                stepMode=True,
+                stepMode="center",
                 fillLevel=0,
                 brush=(230, 230, 230),
                 pen=pg.mkPen(None),
@@ -106,7 +113,7 @@ class AttributeCharts(QObject):
                 self.hist_selection.setData(
                     x,
                     y,
-                    stepMode=True,
+                    stepMode="center",
                     fillLevel=0,
                     brush=(230, 0, 0),
                     pen=pg.mkPen(None),

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2017 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,13 +14,6 @@ from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QAction, QDialog
 from qgis.PyQt.uic import loadUiType
 
-# Import the debug library
-try:
-    import pydevd_pycharm as pydevd
-
-    has_pydevd = True
-except ImportError:
-    has_pydevd = False
 
 import os.path
 
@@ -38,6 +31,15 @@ from perdix.catchment_analyser import CatchmentAnalyser
 from perdix.urban_data_input import urban_data_input_tool
 from perdix.network_segmenter import network_segmenter_tool
 from perdix.drawing import DrawingTool
+
+# Import the debug library
+is_debug = False
+
+if is_debug:
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 is_debug = False
 
@@ -86,14 +88,9 @@ class Perdix(object):
         self.about_action = None
 
         # for remote debugging
-        if has_pydevd and is_debug:
-            pydevd.settrace(
-                "localhost",
-                port=53100,
-                stdoutToServer=True,
-                stderrToServer=True,
-                suspend=False,
-            )
+        if is_debug:
+            # old debug entry point, replaced with logger
+            logger.debug("Debug mode enabled in: ", __name__)
 
         ###########
         ###########
@@ -255,11 +252,15 @@ class Perdix(object):
     ###########
     def showAnalysis(self):
         self.iface.removeDockWidget(self.explorer.dlg)
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.analysis.dlg)
+        self.iface.addDockWidget(
+            Qt.DockWidgetArea.RightDockWidgetArea, self.analysis.dlg
+        )
 
     def showExplorer(self):
         self.iface.removeDockWidget(self.analysis.dlg)
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.explorer.dlg)
+        self.iface.addDockWidget(
+            Qt.DockWidgetArea.RightDockWidgetArea, self.explorer.dlg
+        )
 
     def showGateTransformer(self):
         self.gate_transformer.load_gui()

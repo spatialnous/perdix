@@ -1,10 +1,11 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+import sys
 
 from builtins import range, str
 
@@ -18,10 +19,14 @@ try:
     has_pyqtgraph = True
 except ImportError:
     try:
-        from ..external import pyqtgraph as pg
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        sys.path.insert(0, os.path.join(project_root, "external", "colorama"))
+        sys.path.insert(0, os.path.join(project_root, "..", "external", "pyqtgraph"))
+        import pyqtgraph as pg
 
         has_pyqtgraph = True
-    except ImportError:
+    except ImportError as e:
+        print("Could not import pyqtgraph:", e)
         has_pyqtgraph = False
 
 from perdix.utilities import utility_functions as uf
@@ -82,9 +87,10 @@ class ExplorerDialog(QtWidgets.QDockWidget, Ui_ExplorerDialog):
             # Enable/disable antialiasing for prettier plots, but much slower
             pg.setConfigOptions(antialias=False)
         else:
+            # This path is not really tested and doesn't truly work
             self.chartPlotWidget = QtWidgets.QGraphicsView(self.chartsTab)
-        self.chartPlotWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.chartPlotWidget.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.chartPlotWidget.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.chartPlotWidget.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
         self.chartPlotWidget.setObjectName("chartPlotWidget")
         self.chartsLayout.addWidget(self.chartPlotWidget)
         self.chartsLayout.setStretch(1, 1)
@@ -117,11 +123,11 @@ class ExplorerDialog(QtWidgets.QDockWidget, Ui_ExplorerDialog):
     # General functions of the explorer dialog
 
     def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == QtCore.Qt.Key_Shift:
+        if QKeyEvent.key() == QtCore.Qt.Key.Key_Shift:
             self.addSelection.emit(True)
 
     def keyReleaseEvent(self, QKeyEvent):
-        if QKeyEvent.key() == QtCore.Qt.Key_Shift:
+        if QKeyEvent.key() == QtCore.Qt.Key.Key_Shift:
             self.addSelection.emit(False)
 
     # Layer and attributes group
@@ -505,14 +511,14 @@ class ExplorerDialog(QtWidgets.QDockWidget, Ui_ExplorerDialog):
                     self.statisticsTable.setItem(row, 2, item)
             else:
                 self.statisticsTable.setItem(row, 2, QtWidgets.QTableWidgetItem(""))
-        self.statisticsTable.horizontalHeader().setResizeMode(
-            0, QtWidgets.QHeaderView.ResizeToContents
+        self.statisticsTable.horizontalHeader().setSectionResizeMode(
+            0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
         )
-        self.statisticsTable.horizontalHeader().setResizeMode(
-            1, QtWidgets.QHeaderView.Stretch
+        self.statisticsTable.horizontalHeader().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Stretch
         )
-        self.statisticsTable.horizontalHeader().setResizeMode(
-            2, QtWidgets.QHeaderView.Stretch
+        self.statisticsTable.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch
         )
         self.statisticsTable.resizeRowsToContents()
 

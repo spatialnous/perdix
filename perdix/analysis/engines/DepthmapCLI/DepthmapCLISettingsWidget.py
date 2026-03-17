@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -397,11 +397,11 @@ class DepthmapCLISettingsWidget(SettingsWidget, Ui_DepthmapCLISettingsWidget):
                 "Overwrite table",
                 "The output table already exists in:\n %s.\nOverwrite?"
                 % datastore["path"],
-                QMessageBox.Ok | QMessageBox.Cancel,
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
             )
-            if action == QMessageBox.Ok:  # Yes
+            if action == QMessageBox.StandardButton.Ok:  # Yes
                 pass
-            elif action == QMessageBox.Cancel:  # No
+            elif action == QMessageBox.StandardButton.Cancel:  # No
                 return
             else:
                 return

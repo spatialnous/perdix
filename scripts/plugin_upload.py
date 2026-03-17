@@ -1,18 +1,16 @@
 #!/usr/bin/env python
-# This script uploads a plugin package on the server
+# SPDX-FileCopyrightText: A. Pasotti, V. Picavet
+# SPDX-FileCopyrightText: 2026 Petros Koutsolampros
 #
-# Author: A. Pasotti, V. Picavet
+# This script uploads a plugin package on the server
 
 from __future__ import print_function
-from future import standard_library
 
 from builtins import input
 import xmlrpc.client
 import sys
 import getpass
 from optparse import OptionParser
-
-standard_library.install_aliases()
 
 # Configuration
 PROTOCOL = "http"

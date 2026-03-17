@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -9,6 +9,7 @@ from __future__ import absolute_import
 import numpy as np
 
 # Import the PyQt and QGIS libraries
+from qgis.PyQt.sip import isdeleted
 from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsProject, NULL, QgsRenderContext
 
@@ -203,7 +204,11 @@ class ExplorerTool(QObject):
                     )
                     self.current_layer = None
         # get layer attributes
-        if self.current_layer and self.update_attributtes:
+        if (
+            self.current_layer is not None
+            and not isdeleted(self.current_layer)
+            and self.update_attributtes
+        ):
             node = (
                 QgsProject.instance().layerTreeRoot().findLayer(self.current_layer.id())
             )
@@ -287,7 +292,7 @@ class ExplorerTool(QObject):
             no_layer = True
         if no_layer:
             # disconnect eventual slots with the previous layer
-            if self.current_layer:
+            if self.current_layer is not None and not isdeleted(self.current_layer):
                 uf.disconnectSignal(
                     self.current_layer.selectionChanged, self.updateStats
                 )
@@ -362,9 +367,13 @@ class ExplorerTool(QObject):
         # connect calculate charts
         elif tab == 2:
             try:
-                self.dlg.attributesList.currentRowChanged.disconnect(self.updateStats)
+                uf.disconnectSignal(
+                    self.dlg.attributesList.currentRowChanged, self.updateStats
+                )
                 if self.current_layer is not None:
-                    self.current_layer.selectionChanged.disconnect(self.updateStats)
+                    uf.disconnectSignal(
+                        self.current_layer.selectionChanged, self.updateStats
+                    )
             except Exception as e:
                 print(
                     f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}"
@@ -663,6 +672,9 @@ class ExplorerTool(QObject):
                     # select Histogram
                     if chart_type == 0:
                         idx = self.checkValuesAvailable(attribute)
+                        if idx == -1:
+                            self.retrieveAttributeValues(attribute)
+                            idx = len(self.attribute_values) - 1
                         bins = self.attribute_values[idx]["bins"]
                         self.attributeCharts.setHistogramSelection(
                             self.selection_values,

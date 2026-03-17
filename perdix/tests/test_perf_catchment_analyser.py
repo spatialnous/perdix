@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -88,7 +88,7 @@ attributes_dict = {}
 centroids = {}
 i = 0
 for f in network.getFeatures():
-    if f.geometry().type() == QgsWkbTypes.LineGeometry:
+    if f.geometry().type() == QgsWkbTypes.GeometryType.LineGeometry:
         if not f.geometry().isMultipart():
             attributes_dict[f.id()] = f.attributes()
             polyline = f.geometry().asPolyline()

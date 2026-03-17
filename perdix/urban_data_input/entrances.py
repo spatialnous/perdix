@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -76,7 +76,10 @@ class EntranceTool(QObject):
         layer.startEditing()
 
     def isRequiredEntranceLayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+        if (
+            layer.type() == QgsMapLayer.LayerType.VectorLayer
+            and layer.geometryType() == type
+        ):
             if lfh.layerHasFields(
                 layer, [EntranceTool.category_attribute, EntranceTool.subcat_attribute]
             ):
@@ -155,7 +158,7 @@ class EntranceTool(QObject):
                 error = QgsVectorLayerExporter.exportLayer(
                     vl, uri.uri(), "postgres", vl.crs()
                 )
-                if error[0] != QgsVectorLayerExporter.NoError:
+                if error[0] != QgsVectorLayerExporter.ExportError.NoError:
                     print("Error when creating postgis layer: ", error[1])
                     vl = "duplicate"
                 else:
@@ -166,21 +169,21 @@ class EntranceTool(QObject):
         if vl == "invalid data source":
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Specify output path!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
         elif vl == "duplicate":
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Fronatges layer already exists!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
         elif not vl:
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Entrance layer failed to load!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
 
         else:
             QgsProject.instance().addMapLayer(vl)
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Entrances layer created!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
             vl.startEditing()
 
         self.updateEntranceLayer()

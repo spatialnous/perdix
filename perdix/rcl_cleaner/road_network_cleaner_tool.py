@@ -1,13 +1,11 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import absolute_import
 from __future__ import print_function
-
-from future import standard_library
 
 from builtins import str
 import traceback
@@ -29,17 +27,12 @@ from perdix.utilities import (
 # Import the debug library - required for the cleaning class in separate thread
 # set is_debug to False in release version
 is_debug = False
-try:
-    import pydevd_pycharm
 
-    has_pydevd = True
-except ImportError:
-    has_pydevd = False
-    is_debug = False
+if is_debug:
+    import logging
 
-standard_library.install_aliases()
-
-# sys.path.append("pydevd-pycharm.egg")
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 
 class NetworkCleanerTool(QObject):
@@ -87,7 +80,7 @@ class NetworkCleanerTool(QObject):
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        self.dlg.exec_()
+        self.dlg.exec()
 
     def unloadGUI(self):
         if self.dlg:
@@ -136,25 +129,27 @@ class NetworkCleanerTool(QObject):
             if "dbname" not in db_settings:
                 self.giveMessage(
                     "Please make sure a database is set for exporting to PostGIS",
-                    Qgis.Info,
+                    Qgis.MessageLevel.Info,
                 )
                 return
             if "schema" not in db_settings:
                 self.giveMessage(
                     "Please make sure a schema is set for exporting to PostGIS",
-                    Qgis.Info,
+                    Qgis.MessageLevel.Info,
                 )
                 return
             if "table_name" not in db_settings:
                 self.giveMessage(
                     "Please make sure a table is set for exporting to PostGIS",
-                    Qgis.Info,
+                    Qgis.MessageLevel.Info,
                 )
                 return
             self.settings.update(db_settings)
 
         if lfh.getLayerByName(self.settings["input"]).crs().postgisSrid() == 4326:
-            self.giveMessage("Re-project the layer. EPSG:4326 not allowed.", Qgis.Info)
+            self.giveMessage(
+                "Re-project the layer. EPSG:4326 not allowed.", Qgis.MessageLevel.Info
+            )
             return
         elif self.settings["output"] != "":
             cleaning = self.Worker(self.settings, self.iface)
@@ -179,7 +174,7 @@ class NetworkCleanerTool(QObject):
             if is_debug:
                 print("started")
         else:
-            self.giveMessage("Missing user input!", Qgis.Info)
+            self.giveMessage("Missing user input!", Qgis.MessageLevel.Info)
             return
 
     def workerFinished(self, ret):
@@ -229,10 +224,10 @@ class NetworkCleanerTool(QObject):
                     node = QgsProject.instance().layerTreeRoot().findLayer(errors.id())
                     self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
                     QgsMessageLog.logMessage(
-                        "layer name %s" % layer_name, level=Qgis.Critical
+                        "layer name %s" % layer_name, level=Qgis.MessageLevel.Critical
                     )
                 else:
-                    self.giveMessage("No errors detected!", Qgis.Info)
+                    self.giveMessage("No errors detected!", Qgis.MessageLevel.Info)
 
             if self.settings["unlinks"]:
                 if len(unlinks_features) > 0:
@@ -251,7 +246,7 @@ class NetworkCleanerTool(QObject):
                     node = QgsProject.instance().layerTreeRoot().findLayer(unlinks.id())
                     self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
                 else:
-                    self.giveMessage("No unlinks detected!", Qgis.Info)
+                    self.giveMessage("No unlinks detected!", Qgis.MessageLevel.Info)
 
             cleaned = utf.to_layer(
                 cleaned_features,
@@ -267,14 +262,14 @@ class NetworkCleanerTool(QObject):
             self.iface.layerTreeView().layerTreeModel().refreshLayerLegend(node)
             cleaned.updateExtents()
 
-            self.giveMessage("Process ended successfully!", Qgis.Info)
+            self.giveMessage("Process ended successfully!", Qgis.MessageLevel.Info)
             self.dlg.cleaningProgress.setValue(100)
 
         elif self.thread_error != "":
             # notify the user that sth went wrong
             self.giveMessage(
                 "Something went wrong! See the message log for more information",
-                Qgis.Critical,
+                Qgis.MessageLevel.Critical,
             )
             QgsMessageLog.logMessage("Cleaning thread error: %s" % self.thread_error)
 
@@ -334,14 +329,9 @@ class NetworkCleanerTool(QObject):
             self.graph = None
 
         def run(self):
-            if has_pydevd and is_debug:
-                pydevd_pycharm.settrace(
-                    "localhost",
-                    port=53100,
-                    stdoutToServer=True,
-                    stderrToServer=True,
-                    suspend=False,
-                )
+            if is_debug:
+                logger.debug("Debug mode enabled in: ", __name__)
+
             ret = None
             # if self.settings:
             try:
@@ -368,7 +358,7 @@ class NetworkCleanerTool(QObject):
                     fix_range,
                 ] = self.settings["progress_ranges"]
                 QgsMessageLog.logMessage(
-                    "settings %s" % self.settings, level=Qgis.Critical
+                    "settings %s" % self.settings, level=Qgis.MessageLevel.Critical
                 )
 
                 self.cl_progress.emit(0)
@@ -382,7 +372,8 @@ class NetworkCleanerTool(QObject):
                         utf.clean_features_iter(layer.getFeatures())
                     )
                     QgsMessageLog.logMessage(
-                        "pseudo_graph edges added %s" % load_range, level=Qgis.Critical
+                        "pseudo_graph edges added %s" % load_range,
+                        level=Qgis.MessageLevel.Critical,
                     )
                     self.pseudo_graph.step = break_range / float(
                         len(self.pseudo_graph.sEdges)
@@ -395,7 +386,7 @@ class NetworkCleanerTool(QObject):
                     )
                     QgsMessageLog.logMessage(
                         "pseudo_graph edges broken %s" % break_range,
-                        level=Qgis.Critical,
+                        level=Qgis.MessageLevel.Critical,
                     )
                     self.pseudo_graph.progress.disconnect()
                     self.graph.progress.connect(self.cl_progress.emit)
@@ -409,7 +400,8 @@ class NetworkCleanerTool(QObject):
                         utf.clean_features_iter(layer.getFeatures()), angle_threshold
                     )
                     QgsMessageLog.logMessage(
-                        "graph edges added %s" % load_range, level=Qgis.Critical
+                        "graph edges added %s" % load_range,
+                        level=Qgis.MessageLevel.Critical,
                     )
 
                 self.graph.step = cl1_range / (float(len(self.graph.sEdges)) * 2.0)
@@ -419,14 +411,15 @@ class NetworkCleanerTool(QObject):
                     self.graph.clean(True, False, snap_threshold, False)
                 QgsMessageLog.logMessage(
                     "graph clean parallel and closed pl %s" % cl1_range,
-                    level=Qgis.Critical,
+                    level=Qgis.MessageLevel.Critical,
                 )
 
                 if fix_unlinks:
                     self.graph.step = fix_range / float(len(self.graph.sEdges))
                     self.graph.fix_unlinks()
                     QgsMessageLog.logMessage(
-                        "unlinks added  %s" % fix_range, level=Qgis.Critical
+                        "unlinks added  %s" % fix_range,
+                        level=Qgis.MessageLevel.Critical,
                     )
 
                 # TODO clean iteratively until no error
@@ -435,7 +428,7 @@ class NetworkCleanerTool(QObject):
                     self.graph.step = snap_range / float(len(self.graph.sNodes))
                     self.graph.snap_endpoints(snap_threshold)
                     QgsMessageLog.logMessage(
-                        "snap  %s" % snap_range, level=Qgis.Critical
+                        "snap  %s" % snap_range, level=Qgis.MessageLevel.Critical
                     )
                     self.graph.step = cl2_range / (float(len(self.graph.sEdges)) * 2.0)
 
@@ -444,7 +437,7 @@ class NetworkCleanerTool(QObject):
                     else:
                         self.graph.clean(True, False, snap_threshold, False)
                     QgsMessageLog.logMessage(
-                        "clean   %s" % cl2_range, level=Qgis.Critical
+                        "clean   %s" % cl2_range, level=Qgis.MessageLevel.Critical
                     )
 
                 if merge_type == "intersections":
@@ -452,14 +445,14 @@ class NetworkCleanerTool(QObject):
                     self.graph.merge_b_intersections(angle_threshold)
                     QgsMessageLog.logMessage(
                         "merge %s %s angle_threshold " % (merge_range, angle_threshold),
-                        level=Qgis.Critical,
+                        level=Qgis.MessageLevel.Critical,
                     )
 
                 elif merge_type == "collinear":
                     self.graph.step = merge_range / float(len(self.graph.sEdges))
                     self.graph.merge_collinear(collinear_threshold, angle_threshold)
                     QgsMessageLog.logMessage(
-                        "merge  %s" % merge_range, level=Qgis.Critical
+                        "merge  %s" % merge_range, level=Qgis.MessageLevel.Critical
                     )
 
                 # cleaned multiparts so that unlinks are generated properly
@@ -467,20 +460,21 @@ class NetworkCleanerTool(QObject):
                     self.graph.step = cl3_range / (float(len(self.graph.sEdges)) * 2.0)
                     self.graph.clean(True, orphans, snap_threshold, False, True)
                     QgsMessageLog.logMessage(
-                        "clean  %s" % cl3_range, level=Qgis.Critical
+                        "clean  %s" % cl3_range, level=Qgis.MessageLevel.Critical
                     )
                 else:
                     self.graph.step = cl3_range / (float(len(self.graph.sEdges)) * 2.0)
                     self.graph.clean(True, False, snap_threshold, False, True)
                     QgsMessageLog.logMessage(
-                        "clean %s" % cl3_range, level=Qgis.Critical
+                        "clean %s" % cl3_range, level=Qgis.MessageLevel.Critical
                     )
 
                 if getUnlinks:
                     self.graph.step = unlinks_range / float(len(self.graph.sEdges))
                     self.graph.generate_unlinks()
                     QgsMessageLog.logMessage(
-                        "unlinks generated %s" % unlinks_range, level=Qgis.Critical
+                        "unlinks generated %s" % unlinks_range,
+                        level=Qgis.MessageLevel.Critical,
                     )
                     unlinks = self.graph.unlinks
                 else:

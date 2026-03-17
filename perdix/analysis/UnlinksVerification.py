@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,12 +19,12 @@ from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
 
 # Import the debug library
 is_debug = False
-try:
-    import pydevd_pycharm as pydevd
 
-    has_pydevd = True
-except ImportError:
-    has_pydevd = False
+if is_debug:
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 
 class UnlinksVerification(QThread):
@@ -60,14 +60,9 @@ class UnlinksVerification(QThread):
         }
 
     def run(self):
-        if has_pydevd and is_debug:
-            pydevd.settrace(
-                "localhost",
-                port=53100,
-                stdoutToServer=True,
-                stderrToServer=True,
-                suspend=False,
-            )
+        if is_debug:
+            logger.debug("Debug mode enabled in: ", __name__)
+
         self.running = True
         # reset all the errors
         self.problem_nodes = []
@@ -242,7 +237,10 @@ class UnlinksVerification(QThread):
         self.verificationProgress.emit(progress)
         print("analyse no id: %s" % str(time.time() - start_time))
         # create temp table for intersection results
-        if self.unlink_type in (QgsWkbTypes.PolygonGeometry, QgsWkbTypes.LineGeometry):
+        if self.unlink_type in (
+            QgsWkbTypes.GeometryType.PolygonGeometry,
+            QgsWkbTypes.GeometryType.LineGeometry,
+        ):
             operat_a = "ST_Intersects"
             operat_b = ""
         else:
@@ -413,7 +411,10 @@ class UnlinksVerification(QThread):
         self.verificationProgress.emit(progress)
         print("analyse same id: %s" % str(time.time() - start_time))
         # create temp table for intersection results
-        if self.unlink_type in (QgsWkbTypes.PolygonGeometry, QgsWkbTypes.LineGeometry):
+        if self.unlink_type in (
+            QgsWkbTypes.GeometryType.PolygonGeometry,
+            QgsWkbTypes.GeometryType.LineGeometry,
+        ):
             operat_a = "ST_Intersects"
             operat_b = ""
         else:
@@ -572,7 +573,10 @@ class UnlinksVerification(QThread):
             progress += steps
             self.verificationProgress.emit(progress)
             # get intersection results
-            if self.unlink_type == QgsWkbTypes.PointGeometry and threshold > 0:
+            if (
+                self.unlink_type == QgsWkbTypes.GeometryType.PointGeometry
+                and threshold > 0
+            ):
                 buff = geom.buffer(threshold, 4)
             else:
                 buff = geom
@@ -642,10 +646,9 @@ class UnlinksIdUpdate(QThread):
         self.axial_id = axial_id
 
     def run(self):
-        if has_pydevd and is_debug:
-            pydevd.settrace(
-                "localhost", port=53100, stdoutToServer=True, stderrToServer=True
-            )
+        if is_debug:
+            logger.debug("Debug mode enabled in: ", __name__)
+
         self.running = True
         # get line ids (to match the object ids in the map)
         unlinktype = self.unlinks_layer.geometryType()
@@ -706,7 +709,10 @@ class UnlinksIdUpdate(QThread):
             axialid = "ROWID"
         else:
             axialid = self.axial_id
-        if unlinktype in (QgsWkbTypes.PolygonGeometry, QgsWkbTypes.LineGeometry):
+        if unlinktype in (
+            QgsWkbTypes.GeometryType.PolygonGeometry,
+            QgsWkbTypes.GeometryType.LineGeometry,
+        ):
             operat_a = "ST_Intersects"
             operat_b = ""
         else:
@@ -787,7 +793,10 @@ class UnlinksIdUpdate(QThread):
         )
         self.verificationProgress.emit(33)
         # prepare variables for update query
-        if unlinktype in (QgsWkbTypes.PolygonGeometry, QgsWkbTypes.LineGeometry):
+        if unlinktype in (
+            QgsWkbTypes.GeometryType.PolygonGeometry,
+            QgsWkbTypes.GeometryType.LineGeometry,
+        ):
             operat_a = "ST_Intersects"
             operat_b = ""
         else:
@@ -872,7 +881,10 @@ class UnlinksIdUpdate(QThread):
         for feature in features:
             geom = feature.geometry()
             # get intersection results
-            if unlinktype == QgsWkbTypes.PointGeometry and self.threshold > 0.0:
+            if (
+                unlinktype == QgsWkbTypes.GeometryType.PointGeometry
+                and self.threshold > 0.0
+            ):
                 buff = geom.buffer(self.threshold, 4)
             else:
                 buff = geom

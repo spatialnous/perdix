@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -121,7 +121,7 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
 
     def get_progress(
         self, analysis_settings, datastore
-    ) -> Tuple[Optional[int], Optional[int], Optional[str]]:
+    ) -> Tuple[Optional[int], Optional[str], Optional[int], Optional[str]]:
         if not self.socket.isReady():
             raise AnalysisEngine.AnalysisEngineError(
                 "Socket connection failed, make sure" "depthmapXNet is running"
@@ -138,16 +138,18 @@ class DepthmapNetEngine(QObject, DepthmapEngine):
             self.analysis_results = DepthmapEngine.process_analysis_result(
                 analysis_settings, datastore, attributes, values
             )
-            return 0, 100, None
+            return 0, None, 100, None
         elif "--comm: 2," in msg:
-            return self.parse_progress(msg)
+            prg = self.parse_progress(msg)
+            return prg[0], None, prg[1], prg[2]
         elif "--comm: 3," in msg:
-            return self.parse_progress(msg)
+            prg = self.parse_progress(msg)
+            return prg[0], None, prg[1], prg[2]
         elif not connected:
             raise AnalysisEngine.AnalysisEngineError(
                 "Socket connection failed, make sure" "depthmapXNet is running"
             )
-        return None, None, None
+        return None, None, None, None
 
     def cleanup(self):
         self.socket.closeSocket()

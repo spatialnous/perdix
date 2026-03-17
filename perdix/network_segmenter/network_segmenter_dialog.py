@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -210,7 +210,7 @@ class NetworkSegmenterDialog(QDialog, Ui_RoadNetworkCleanerDialog):
         elif self.postgisRadioButton.isChecked():
             self.dbsettings_dlg.show()
             # Run the dialog event loop
-            self.dbsettings_dlg.exec_()
+            self.dbsettings_dlg.exec()
             self.dbsettings = self.dbsettings_dlg.getDbSettings()
         return
 

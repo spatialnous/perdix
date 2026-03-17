@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2017 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2017 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -15,9 +15,9 @@
 
 [general]
 name=Perdix
-qgisMinimumVersion=3.38
+qgisMinimumVersion=4.0
 description=Collection of tools for space syntax analysis workflows in a GIS environment.
-version=0.3.10
+version=0.4.0
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
 email=jorge.gil@chalmers.se
 
@@ -33,6 +33,8 @@ about=Perdix is a QGIS plugin forked from the "Space Syntax Toolkit" and offerin
     Dependencies: For network analysis requires depthmapXnet 0.35. It can be downloaded from: http://archtech.gr/varoudis/depthmapX/?dir=depthmapXnet
 category = Vector
 changelog=
+    0.4.0 -
+    * First release for QGIS 4
     0.3.10 -
     * fixes issues #194, #199, #203, #188, #164 and #189
     * fixes issues #205, #206

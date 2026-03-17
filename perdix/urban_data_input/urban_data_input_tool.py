@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -51,7 +51,7 @@ class UrbanDataInputTool(QObject):
 
         # show the dockwidget
         # TODO: fix to allow choice of dock location
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dockwidget)
         self.dockwidget.show()
 
         # set up GUI operation signals

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -44,10 +44,11 @@ class AttributeSymbology(QObject):
         line_width = float(settings["line_width"])
         # calculate ranges: EqualInterval = 0; Quantile  = 1; Jenks = 2; StdDev = 3; Pretty = 4; Custom = 5
         intervals = int(settings["intervals"])
-        mode = int(settings["interval_type"])
+        mode_int = int(settings["interval_type"])
+        mode = QgsGraduatedSymbolRenderer.Mode(mode_int)
         attribute = attribute_vals["name"]
         renderer = None
-        if mode < 3:
+        if mode_int < 3:
             # set symbol type and line width
             symbol = QgsSymbol.defaultSymbol(geometry)
             if symbol:

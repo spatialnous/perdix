@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -116,7 +116,7 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
         # show the dialog
         self.frontagedlg.show()
         # Run the dialog event loop
-        result = self.frontagedlg.exec_()
+        result = self.frontagedlg.exec()
         # See if OK was pressed
         if result:
             pass
@@ -127,7 +127,7 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
         # show the dialog
         self.entrancedlg.show()
         # Run the dialog event loop
-        result = self.entrancedlg.exec_()
+        result = self.entrancedlg.exec()
         # See if OK was pressed
         if result:
             pass
@@ -138,7 +138,7 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
         # show the dialog
         self.ludlg.show()
         # Run the dialog event loop
-        result = self.ludlg.exec_()
+        result = self.ludlg.exec()
         # See if OK was pressed
         if result:
             pass
@@ -229,8 +229,8 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
             self.tableWidgetFrontage.resizeRowsToContents()
             self.tableWidgetFrontage.resizeColumnsToContents()
-            self.tableWidgetFrontage.horizontalHeader().setResizeMode(
-                3, QHeaderView.Stretch
+            self.tableWidgetFrontage.horizontalHeader().setSectionResizeMode(
+                3, QHeaderView.ResizeMode.Stretch
             )
 
     def tableClear(self):
@@ -316,8 +316,8 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
             self.tableWidgetEntrance.resizeRowsToContents()
             self.tableWidgetEntrance.resizeColumnsToContents()
-            self.tableWidgetEntrance.horizontalHeader().setResizeMode(
-                3, QHeaderView.Stretch
+            self.tableWidgetEntrance.horizontalHeader().setSectionResizeMode(
+                3, QHeaderView.ResizeMode.Stretch
             )
 
     def entrancetableClear(self):
@@ -592,8 +592,8 @@ class UrbanDataInputDockWidget(QDockWidget, Ui_UrbanDataInputDockWidget):
 
             self.tableWidgetlanduse.resizeRowsToContents()
             self.tableWidgetlanduse.resizeColumnsToContents()
-            self.tableWidgetlanduse.horizontalHeader().setResizeMode(
-                4, QHeaderView.Stretch
+            self.tableWidgetlanduse.horizontalHeader().setSectionResizeMode(
+                4, QHeaderView.ResizeMode.Stretch
             )
 
     def LUtableClear(self):

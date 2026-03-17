@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -29,7 +29,7 @@ def getLegendLayersNames(iface, geom="all", provider="all"):
     layers_list = []
     for layer in QgsProject.instance().mapLayers().values():
         add_layer = False
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
             if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
                 if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
@@ -103,9 +103,9 @@ def to_layer(fields, crs, encoding, geom_type, layer_type, path):
 
     elif layer_type == "shapefile":
         wkbTypes = {
-            "Point": QgsWkbTypes.Point,
-            "Linestring": QgsWkbTypes.LineString,
-            "Polygon": QgsWkbTypes.Polygon,
+            "Point": QgsWkbTypes.Type.Point,
+            "Linestring": QgsWkbTypes.Type.LineString,
+            "Polygon": QgsWkbTypes.Type.Polygon,
         }
         options = QgsVectorFileWriter.SaveVectorOptions()
         options.driverName = "ESRI Shapefile"
@@ -118,7 +118,7 @@ def to_layer(fields, crs, encoding, geom_type, layer_type, path):
             QgsCoordinateTransformContext(),
             options,
         )
-        if file_writer.hasError() != QgsVectorFileWriter.NoError:
+        if file_writer.hasError() != QgsVectorFileWriter.WriterError.NoError:
             print("Error when creating shapefile: ", file_writer.errorMessage())
         del file_writer
         layer = QgsVectorLayer(path, ntpath.basename(path)[:-4], "ogr")

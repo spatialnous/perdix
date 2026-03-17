@@ -1,6 +1,8 @@
 # Perdix for QGIS
 
 ## News
+17.03.2026 - Ported to QGIS4
+
 19.04.2024 - JISCMAIL mailing list is closing. Post questions, suggestions or comments in the [issues list](https://github.com/SpaceGroupUCL/qgisSpaceSyntaxToolkit/issues) of this repository
 
 03.07.2017 - SST workshop at the 11th International Space Syntax Symposium, in Lisbon, Portugal
@@ -37,3 +39,4 @@ For new problems, technical questions, or suggestions add the issue to the [issu
 ## Development notes:
 * Development of this module has been done primarily using PyCharm, with the top folder (qgisSpaceSyntaxToolkit) selected and the QGIS python selected as an interpreter. This allows for having a similar module loading process as QGIS itself.
 * Unit tests reside in the perdix/tests directory, but have to be carrie out from the top directory of the repository (qgisSpaceSyntaxToolkit).
+* There are three internal packages vendored as git submodules. Therefore to fetch the whole project do `git clone --recurse-submodules https://github.com/spatialnous/perdix`, or add the submodules after the fact: `git submodule update --init`

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -85,7 +85,10 @@ class FrontageTool(QObject):
         layer.startEditing()
 
     def isRequiredLayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+        if (
+            layer.type() == QgsMapLayer.LayerType.VectorLayer
+            and layer.geometryType() == type
+        ):
             if lfh.layerHasFields(
                 layer, [FrontageTool.group_attribute, FrontageTool.type_attribute]
             ):
@@ -115,8 +118,8 @@ class FrontageTool(QObject):
         layers = QgsProject.instance().mapLayers().values()
 
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
-                if layer.geometryType() == QgsWkbTypes.Polygon:
+            if layer.type() == QgsMapLayer.LayerType.VectorLayer:
+                if layer.geometryType() == QgsWkbTypes.Type.Polygon:
                     self.dockwidget.pushIDcomboBox.setEnabled(False)
                     self.dockwidget.pushIDcomboBox.addItem(layer.name(), layer)
 
@@ -127,7 +130,7 @@ class FrontageTool(QObject):
         layer_list = []
         # identify relevant layers
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
+            if layer.type() == QgsMapLayer.LayerType.VectorLayer:
                 if layer.geometryType() == 2:
                     layer_list.append(layer.name())
         # update combo if necessary
@@ -275,7 +278,7 @@ class FrontageTool(QObject):
                 error = QgsVectorLayerExporter.exportLayer(
                     vl, uri.uri(), "postgres", QgsProject.instance().crs()
                 )
-                if error[0] != QgsVectorLayerExporter.NoError:
+                if error[0] != QgsVectorLayerExporter.ExportError.NoError:
                     print("Error when creating postgis layer: ", error[1])
                     vl = "duplicate"
                 else:
@@ -287,20 +290,20 @@ class FrontageTool(QObject):
         if vl == "invalid data source":
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Specify  output path!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
         elif vl == "duplicate":
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Fronatges layer already exists!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
         elif not vl:
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Frontages layer failed to load!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
         else:
             QgsProject.instance().addMapLayer(vl)
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Frontages layer created!")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
             vl.startEditing()
             if self.isRequiredLayer(vl, type):
                 self.dockwidget.useExistingcomboBox.addItem(vl.name(), vl)
@@ -419,7 +422,10 @@ class FrontageTool(QObject):
                 if frontfeat.geometry().intersects(buildfeat.geometry()):
                     frontlayer.startEditing()
 
-                    if frontlayer_caps & QgsVectorDataProvider.ChangeAttributeValues:
+                    if (
+                        frontlayer_caps
+                        & QgsVectorDataProvider.Capability.ChangeAttributeValues
+                    ):
                         frontfeat[newColumn] = buildfeat[buildingID]
                         frontlayer.updateFeature(frontfeat)
                         frontlayer.commitChanges()

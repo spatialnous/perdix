@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -170,7 +170,10 @@ class CatchmentTool(QObject):
     def giveWarningMessage(self, message):
         # Gives warning according to message
         self.iface.messageBar().pushMessage(
-            "Catchment Analyser: ", "%s" % message, level=Qgis.Warning, duration=5
+            "Catchment Analyser: ",
+            "%s" % message,
+            level=Qgis.MessageLevel.Warning,
+            duration=5,
         )
 
     def getAnalysisSettings(self):
@@ -354,7 +357,7 @@ class CatchmentTool(QObject):
     def analysisError(self, e, exception_string):
         QgsMessageLog.logMessage(
             "Catchment Analyser raised an exception: %s" % exception_string,
-            level=Qgis.Critical,
+            level=Qgis.MessageLevel.Critical,
         )
 
         # Closing the dialog

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,6 +12,7 @@ import os
 
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog
 from qgis.PyQt.uic import loadUiType
+from qgis.PyQt.QtCore import Qt
 
 from .DbSettings_dialog import DbSettingsDialog
 
@@ -76,7 +77,7 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         elif self.postgisRadioButton.isChecked():
             self.dbsettings_dlg.show()
             # Run the dialog event loop
-            self.dbsettings_dlg.exec_()
+            self.dbsettings_dlg.exec()
             self.dbsettings = self.dbsettings_dlg.getDbSettings()
         return
 
@@ -283,7 +284,7 @@ class CatchmentAnalyserDialog(QDialog, Ui_CatchmentAnalyserDialog):
         self.costCombo.setEnabled(True)
         self.nameCombo.clear()
         self.nameCombo.setEnabled(False)
-        self.nameCheck.setCheckState(False)
+        self.nameCheck.setCheckState(Qt.CheckState.Unchecked)
         self.distancesText.clear()
         self.networkTolSpin.setValue(1)
         self.polygonTolSpin.setValue(20)

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -8,7 +8,6 @@ from __future__ import print_function
 
 import time
 import sys
-import inspect
 import os
 
 from builtins import str
@@ -28,27 +27,24 @@ try:
     import networkx as nx
 
     has_networkx = True
-
 except ImportError:
-    cmd_subfolder = os.path.realpath(
-        os.path.abspath(
-            os.path.join(
-                os.path.split(inspect.getfile(inspect.currentframe()))[0], "external"
-            )
-        )
-    )
-    if cmd_subfolder not in sys.path:
-        sys.path.insert(0, cmd_subfolder)
-    has_networkx = False
+    try:
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        sys.path.insert(0, os.path.join(project_root, "external", "networkx"))
+        import networkx as nx
+
+        has_networkx = True
+    except ImportError:
+        has_networkx = False
 
 # Import the debug library
-try:
-    import pydevd_pycharm as pydevd
-
-    has_pydevd = True
-except ImportError:
-    has_pydevd = False
 is_debug = False
+
+if is_debug:
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 
 class AxialVerification(QThread):
@@ -82,10 +78,10 @@ class AxialVerification(QThread):
 
     def run(self):
         # QgsMessageLog.logMessage('has nx %s' % str(e), level=Qgis.Critical)
-        if has_pydevd and is_debug:
-            pydevd.settrace(
-                "localhost", port=53100, stdoutToServer=True, stderrToServer=True
-            )
+
+        if is_debug:
+            # old debug entry point, replaced with logger
+            logger.debug("Debug mode enabled in: ", __name__)
 
         self.running = True
         # reset all the errors

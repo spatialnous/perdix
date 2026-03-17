@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -52,7 +52,7 @@ def getVectorLayers(geom="all", provider="all"):
     layers_list = []
     for layer in list(QgsProject.instance().mapLayers().values()):
         add_layer = False
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
             if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
                 if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
@@ -72,7 +72,7 @@ def getLegendLayers(iface, geom="all", provider="all"):
     layers_list = []
     for layer in QgsProject.instance().mapLayers().values():
         add_layer = False
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
             if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
                 if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
@@ -86,7 +86,7 @@ def getCanvasLayers(iface, geom="all", provider="all"):
     layers_list = []
     for layer in iface.mapCanvas().layers():
         add_layer = False
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
             if layer.isSpatial() and (geom == "all" or layer.geometryType() in geom):
                 if provider == "all" or layer.dataProvider().name() in provider:
                     add_layer = True
@@ -99,8 +99,10 @@ def getLineLayers():
     """Get a list of QgsVectorLayer that are of Line geometry"""
     layers_list = []
     for layer in QgsProject.instance().mapLayers().values():
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
-            if layer.isSpatial() and (layer.geometryType() == QgsWkbTypes.LineGeometry):
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
+            if layer.isSpatial() and (
+                layer.geometryType() == QgsWkbTypes.GeometryType.LineGeometry
+            ):
                 layers_list.append(layer.name())
     return layers_list
 
@@ -109,10 +111,13 @@ def getPointPolygonLayers():
     """Get a list of QgsVectorLayer that are of Point or Polygon geometry"""
     layers_list = []
     for layer in QgsProject.instance().mapLayers().values():
-        if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+        if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
             if layer.isSpatial() and (
                 layer.geometryType()
-                in [QgsWkbTypes.PointGeometry, QgsWkbTypes.PolygonGeometry]
+                in [
+                    QgsWkbTypes.GeometryType.PointGeometry,
+                    QgsWkbTypes.GeometryType.PolygonGeometry,
+                ]
             ):
                 layers_list.append(layer.name())
     return layers_list
@@ -440,7 +445,7 @@ def addFields(layer, names, types):
     if layer:
         provider = layer.dataProvider()
         caps = provider.capabilities()
-        if caps & QgsVectorDataProvider.AddAttributes:
+        if caps & QgsVectorDataProvider.Capability.AddAttributes:
             fields = provider.fields()
             for i, name in enumerate(names):
                 # add new field if it doesn't exist
@@ -606,7 +611,7 @@ def createTempLayer(name, srid, attributes, types, values, coords):
 def createIndex(layer):
     provider = layer.dataProvider()
     caps = provider.capabilities()
-    if caps & QgsVectorDataProvider.CreateSpatialIndex:
+    if caps & QgsVectorDataProvider.Capability.CreateSpatialIndex:
         feat = QgsFeature()
         index = QgsSpatialIndex()
         fit = provider.getFeatures()

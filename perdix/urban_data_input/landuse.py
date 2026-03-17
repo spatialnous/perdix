@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -94,7 +94,7 @@ class LanduseTool(QObject):
         layer_list = []
         # identify relevant layers
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
+            if layer.type() == QgsMapLayer.LayerType.VectorLayer:
                 if layer.geometryType() == 2:
                     layer_list.append(layer.name())
         # update combo if necessary
@@ -141,7 +141,10 @@ class LanduseTool(QObject):
         layer.startEditing()
 
     def isRequiredLULayer(self, layer, type):
-        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == type:
+        if (
+            layer.type() == QgsMapLayer.LayerType.VectorLayer
+            and layer.geometryType() == type
+        ):
             if lfh.layerHasFields(
                 layer, [LanduseTool.gf_cat_attribute, LanduseTool.gf_subcat_attribute]
             ):
@@ -174,7 +177,7 @@ class LanduseTool(QObject):
         ):
             msgBar = self.iface.messageBar()
             msg = msgBar.createMessage("Select floors")
-            msgBar.pushWidget(msg, Qgis.Info, 10)
+            msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
 
         else:
             idcolumn = self.ludlg.getSelectedLULayerID()
@@ -310,7 +313,7 @@ class LanduseTool(QObject):
                     error = QgsVectorLayerExporter.exportLayer(
                         vl, uri.uri(), "postgres", vl.crs()
                     )
-                    if error[0] != QgsVectorLayerExporter.NoError:
+                    if error[0] != QgsVectorLayerExporter.ExportError.NoError:
                         print("Error when creating postgis layer: ", error[1])
                         input2 = "duplicate"
                     else:
@@ -324,20 +327,20 @@ class LanduseTool(QObject):
             if input2 == "invalid data source":
                 msgBar = self.iface.messageBar()
                 msg = msgBar.createMessage("Specify output path!")
-                msgBar.pushWidget(msg, Qgis.Info, 10)
+                msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
             elif input2 == "duplicate":
                 msgBar = self.iface.messageBar()
                 msg = msgBar.createMessage("Land use layer already exists!")
-                msgBar.pushWidget(msg, Qgis.Info, 10)
+                msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
             elif not input2:
                 msgBar = self.iface.messageBar()
                 msg = msgBar.createMessage("Land use layer failed to load!")
-                msgBar.pushWidget(msg, Qgis.Info, 10)
+                msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
             else:
                 QgsProject.instance().addMapLayer(input2)
                 msgBar = self.iface.messageBar()
                 msg = msgBar.createMessage("Land use layer created!")
-                msgBar.pushWidget(msg, Qgis.Info, 10)
+                msgBar.pushWidget(msg, Qgis.MessageLevel.Info, 10)
                 input2.startEditing()
 
         self.updateLULayer()

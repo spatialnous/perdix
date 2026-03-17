@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -35,22 +35,20 @@ except ImportError:
 
 import traceback
 
-try:
-    import pydevd
-
-    has_pydevd = True
-except ImportError:
-    has_pydevd = False
-
-
 is_debug = False
+
+if is_debug:
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
 
 class CatchmentAnalysis(QObject):
     # Setup signals
     finished = pyqtSignal(object)
     error = pyqtSignal(Exception, str)
-    progress = pyqtSignal(float)
+    progress = pyqtSignal(int)
     warning = pyqtSignal(str)
 
     def __init__(self, iface, settings):
@@ -61,14 +59,9 @@ class CatchmentAnalysis(QObject):
         self.killed = False
 
     def analysis(self):
-        if has_pydevd and is_debug:
-            pydevd.settrace(
-                "localhost",
-                port=53100,
-                stdoutToServer=True,
-                stderrToServer=True,
-                suspend=False,
-            )
+        if is_debug:
+            logger.debug("Debug mode enabled in: ", __name__)
+
         if self.settings:
             try:
                 # Prepare the origins
@@ -173,7 +166,7 @@ class CatchmentAnalysis(QObject):
 
         # Setting up graph build director
         director = QgsVectorLayerDirector(
-            network, -1, "", "", "", QgsVectorLayerDirector.DirectionBoth
+            network, -1, "", "", "", QgsVectorLayerDirector.Direction.DirectionBoth
         )
 
         # Determining cost calculation
@@ -215,7 +208,7 @@ class CatchmentAnalysis(QObject):
         self.centroids = {}
         i = 0
         for f in network.getFeatures():
-            if f.geometry().type() == QgsWkbTypes.LineGeometry:
+            if f.geometry().type() == QgsWkbTypes.GeometryType.LineGeometry:
                 if not f.geometry().isMultipart():
                     self.attributes_dict[f.id()] = f.attributes()
                     polyline = f.geometry().asPolyline()

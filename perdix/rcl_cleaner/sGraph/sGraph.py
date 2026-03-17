@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -267,7 +267,7 @@ class sGraph(QObject):
                 crossing_points = f_geom.intersection(
                     self.sEdges[line].feature.geometry()
                 )
-                if crossing_points.type() == QgsWkbTypes.PointGeometry:
+                if crossing_points.type() == QgsWkbTypes.GeometryType.PointGeometry:
                     if not crossing_points.isMultipart():
                         if crossing_points.asPoint() in pl[1:-1]:
                             edge_geometry = self.sEdges[sedge.id].feature.geometry()
@@ -313,7 +313,7 @@ class sGraph(QObject):
 
     # group points based on proximity - spatial index is not updated
     def snap_endpoints(self, snap_threshold):
-        QgsMessageLog.logMessage("starting snapping", level=Qgis.Critical)
+        QgsMessageLog.logMessage("starting snapping", level=Qgis.MessageLevel.Critical)
         [
             self.ndSpIndex.addFeature(snode.feature)
             for snode in list(self.sNodes.values())
@@ -342,7 +342,9 @@ class sGraph(QObject):
             if len(nodes) > 0:
                 filtered_nodes[node.id] = nodes
 
-        QgsMessageLog.logMessage("continuing snapping", level=Qgis.Critical)
+        QgsMessageLog.logMessage(
+            "continuing snapping", level=Qgis.MessageLevel.Critical
+        )
         self.step = (len(filtered_nodes) * self.step) / float(len(self.sNodes))
         for group in self.con_comp_iter(filtered_nodes):
             if self.killed is True:
@@ -621,7 +623,7 @@ class sGraph(QObject):
                 self.progress.emit(self.total_progress)
 
                 if (
-                    e.feature.geometry().type() == QgsWkbTypes.LineGeometry
+                    e.feature.geometry().type() == QgsWkbTypes.GeometryType.LineGeometry
                     and e.feature.geometry().isMultipart()
                 ):
                     self.clean_multipart(e)
@@ -792,7 +794,7 @@ class sGraph(QObject):
                     self.sEdges[line].feature.geometry()
                 )
                 # in some cases the startpoint or endpoint is returned - exclude
-                if crossing_points.type() == QgsWkbTypes.PointGeometry:
+                if crossing_points.type() == QgsWkbTypes.GeometryType.PointGeometry:
                     if not crossing_points.isMultipart():
                         un_f = QgsFeature(unlink_feat)
                         un_f.setGeometry(crossing_points)
@@ -824,7 +826,7 @@ class sGraph(QObject):
         longest_feat = self.sEdges[group_edges[lengths.index(max_len)]].feature
         feat.setAttributes(longest_feat.attributes())
         merged_geom = uf.merge_geoms(geoms, angle_threshold)
-        if merged_geom.type() == QgsWkbTypes.LineGeometry:
+        if merged_geom.type() == QgsWkbTypes.GeometryType.LineGeometry:
             if not merged_geom.isMultipart():
                 p0 = merged_geom.asPolyline()[0]
                 p1 = merged_geom.asPolyline()[-1]
@@ -847,7 +849,7 @@ class sGraph(QObject):
                 else:
                     merged_points += points[1:]
             merged_geom = QgsGeometry.fromPolylineXY(merged_points)
-            if merged_geom.wkbType() != QgsWkbTypes.LineString:
+            if merged_geom.wkbType() != QgsWkbTypes.Type.LineString:
                 print("ml", merged_geom.wkbType())
 
         feat.setGeometry(merged_geom)

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Stephen Law <s.law@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -60,8 +60,8 @@ class GateTransformer(QObject):
         layer_objects = []
         for layer in layers:
             if (
-                layer.type() == QgsMapLayer.VectorLayer
-                and layer.geometryType() == QgsWkbTypes.LineGeometry
+                layer.type() == QgsMapLayer.LayerType.VectorLayer
+                and layer.geometryType() == QgsWkbTypes.GeometryType.LineGeometry
             ):
                 layer_objects.append((layer.name(), layer))
 
@@ -91,7 +91,7 @@ class GateTransformer(QObject):
     @staticmethod
     def check_singlepart_lines(layer):
         # do not allow non-line layers
-        if layer.geometryType() != QgsWkbTypes.LineGeometry:
+        if layer.geometryType() != QgsWkbTypes.GeometryType.LineGeometry:
             raise BadInputError("Only line layers can be resized")
 
         # QGis 3 imports shapefiles as MultiLineStrings by default so this check only fails if there are actually

@@ -4,6 +4,7 @@ SPDX-FileCopyrightText: 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 SPDX-FileCopyrightText: 2015 UCL
 SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
+SPDX-FileCopyrightText: 2026 Petros Koutsolampros
 
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
@@ -379,7 +380,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
                   <string>Select y axis attribute of scatter plot.</string>
                  </property>
                  <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+                  <enum>QComboBox::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
                  </property>
                 </widget>
                </item>

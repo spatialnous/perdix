@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -125,13 +125,16 @@ class segmentor(QObject):
     def point_iter(self, interlines, ml_geom):
         for line in interlines:
             inter = ml_geom.intersection(self.feats[line].geometry())
-            if inter.type() == QgsWkbTypes.PointGeometry:
+            if inter.type() == QgsWkbTypes.GeometryType.PointGeometry:
                 if not inter.isMultipart():
                     yield ml_geom.lineLocatePoint(inter), inter.asPoint()
                 else:
                     for i in inter.asMultiPoint():
                         yield ml_geom.lineLocatePoint(QgsGeometry.fromPointXY(i)), i
-            elif self.feats[line].geometry().type() == QgsWkbTypes.LineGeometry:
+            elif (
+                self.feats[line].geometry().type()
+                == QgsWkbTypes.GeometryType.LineGeometry
+            ):
                 inter_line_geom_pl = self.feats[line].geometry().asPolyline()
                 sh_line = (
                     ml_geom.shortestLine(self.feats[line].geometry())
@@ -355,7 +358,7 @@ class segmentor(QObject):
                 pass
             elif f_geom.length() == 0:
                 pass
-            elif f_geom.type() == QgsWkbTypes.LineGeometry:
+            elif f_geom.type() == QgsWkbTypes.GeometryType.LineGeometry:
                 if f_geom.isMultipart():
                     ml_segms = f_geom.asMultiPolyline()
                     for ml in ml_segms:

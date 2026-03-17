@@ -1,0 +1,9 @@
+[submodule "perdix/external/pyqtgraph"]
+	path = perdix/external/pyqtgraph
+	url = https://github.com/pyqtgraph/pyqtgraph
+[submodule "perdix/external/networkx"]
+	path = perdix/external/networkx
+	url = https://github.com/networkx/networkx
+[submodule "perdix/external/colorama"]
+	path = perdix/external/colorama
+	url = https://github.com/tartley/colorama

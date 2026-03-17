@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -22,12 +22,9 @@ from qgis.PyQt.QtCore import (
 )
 from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.uic import loadUiType
 from qgis.core import Qgis, QgsProject, QgsMapLayer
 
-Ui_DrawingToolDockWidget, _ = loadUiType(
-    os.path.join(os.path.dirname(__file__), "ui", "drawing_dock_widget.ui")
-)
+from .drawing_tool_dockwidget import DrawingToolDockWidget
 
 
 class DrawingTool(object):
@@ -231,7 +228,7 @@ class DrawingTool(object):
 
         for layer in QgsProject.instance().mapLayers().values():
             print("l")
-            if layer.isValid() and layer.type() == QgsMapLayer.VectorLayer:
+            if layer.isValid() and layer.type() == QgsMapLayer.LayerType.VectorLayer:
                 if layer.isSpatial() and (layer.geometryType() == geom_type):
                     layers.append(layer.name())
         return layers
@@ -277,7 +274,7 @@ class DrawingTool(object):
             self.iface.messageBar().pushMessage(
                 "Drawing Tool: ",
                 "Rename network layers in the layers panel that have the same names!",
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
                 duration=5,
             )
 
@@ -297,7 +294,7 @@ class DrawingTool(object):
 
         if active_unlinks_idx == 0 and self.dockwidget.unlink_mode:
             self.iface.messageBar().pushMessage(
-                "Unlinks layer not specified!", Qgis.Critical, duration=5
+                "Unlinks layer not specified!", Qgis.MessageLevel.Critical, duration=5
             )
             self.dockwidget.unlink_mode = False
             unlink_icon = QPixmap(
@@ -313,7 +310,7 @@ class DrawingTool(object):
             self.iface.messageBar().pushMessage(
                 "Drawing Tool: ",
                 "Rename point layers in the layers panel that have the same names!",
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
                 duration=5,
             )
 
@@ -347,14 +344,16 @@ class DrawingTool(object):
             #    removed on close (see self.onClosePlugin method)
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = Ui_DrawingToolDockWidget(self.iface)
+                self.dockwidget = DrawingToolDockWidget(self.iface)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
+            self.iface.addDockWidget(
+                Qt.DockWidgetArea.LeftDockWidgetArea, self.dockwidget
+            )
             self.dockwidget.show()
 
             self.pop_layer()

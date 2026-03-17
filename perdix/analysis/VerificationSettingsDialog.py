@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -35,7 +35,9 @@ class VerificationSettingsDialog(QtWidgets.QDialog, Ui_VerificationSettingsDialo
         self.linksThresholdEdit.hide()
 
         #
-        self.ok = self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok)
+        self.ok = self.closeButtonBox.button(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok
+        )
         self.settings = settings
         self.restoreSettings()
 

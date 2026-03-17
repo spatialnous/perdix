@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -70,10 +70,16 @@ class DepthmapAdvancedDialog(QtWidgets.QDialog, Ui_DepthmapAdvancedDialog):
     def checkRemoveStubs(self):
         try:
             int(self.axialStubsEdit.text())
-            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setDisabled(False)
-            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setToolTip("")
+            self.closeButtonBox.button(
+                QtWidgets.QDialogButtonBox.StandardButton.Ok
+            ).setDisabled(False)
+            self.closeButtonBox.button(
+                QtWidgets.QDialogButtonBox.StandardButton.Ok
+            ).setToolTip("")
         except ValueError:
-            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setDisabled(True)
-            self.closeButtonBox.button(QtWidgets.QDialogButtonBox.Ok).setToolTip(
-                "Please enter a valid stubs removal % (integer)."
-            )
+            self.closeButtonBox.button(
+                QtWidgets.QDialogButtonBox.StandardButton.Ok
+            ).setDisabled(True)
+            self.closeButtonBox.button(
+                QtWidgets.QDialogButtonBox.StandardButton.Ok
+            ).setToolTip("Please enter a valid stubs removal % (integer).")

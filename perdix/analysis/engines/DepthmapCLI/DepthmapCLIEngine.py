@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd.
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,6 +12,9 @@ import re
 import subprocess
 import tempfile
 import threading
+
+from enum import Enum, auto
+from queue import Queue
 
 from builtins import str
 from typing import Optional, Tuple
@@ -46,6 +49,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         self.analysis_process = None
         self.analysis_graph_file = None
         self.analysis_results = None
+        self.currstep = -1
 
     @staticmethod
     def get_engine_name() -> str:
@@ -158,71 +162,76 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
     @staticmethod
     def get_prep_commands(settings, unlinks_file_name):
         commands = []
-        if settings["type"] == 0:
-            commands.append(
-                ["-m", "MAPCONVERT", "-co", "axial", "-con", "Axial Map", "-cir"]
-            )
+        if settings["type"] == 0:  # axial
+            commands.append({
+                "name": "Converting to axial map",
+                "nsteps": 1,
+                "args": [
+                    "-m", "MAPCONVERT",
+                    "-co", "axial",
+                    "-con", "Axial Map",
+                    "-cir"
+                ]
+            })  # fmt: skip
             if unlinks_file_name:
-                commands.append(
-                    [
-                        "-m",
-                        "LINK",
-                        "-lm",
-                        "unlink",
-                        "-lt",
-                        "coords",
-                        "-lmt",
-                        "shapegraphs",
-                        "-lf",
-                        unlinks_file_name,
+                commands.append({
+                    "name": "Linking",
+                    "nsteps": 1,
+                    "args": [
+                        "-m", "LINK",
+                        "-lm", "unlink",
+                        "-lt", "coords",
+                        "-lmt", "shapegraphs",
+                        "-lf", unlinks_file_name,
                     ]
-                )
-        elif settings["type"] == 1:
-            commands.append(
-                ["-m", "MAPCONVERT", "-co", "axial", "-con", "Axial Map", "-coc"]
-            )
+                })  # fmt: skip
+        elif settings["type"] == 1:  # axial then segment
+            commands.append({
+                "name": "Converting to axial map",
+                "nsteps": 1,
+                "args": [
+                    "-m", "MAPCONVERT",
+                    "-co", "axial",
+                    "-con", "Axial Map",
+                    "-coc"
+                ]
+            })  # fmt: skip
             if unlinks_file_name:
-                commands.append(
-                    [
-                        "-m",
-                        "LINK",
-                        "-lm",
-                        "unlink",
-                        "-lt",
-                        "coords",
-                        "-lmt",
-                        "shapegraphs",
-                        "-lf",
-                        unlinks_file_name,
+                commands.append({
+                    "name": "Linking",
+                    "nsteps": 1,
+                    "args": [
+                        "-m", "LINK",
+                        "-lm", "unlink",
+                        "-lt", "coords",
+                        "-lmt", "shapegraphs",
+                        "-lf", unlinks_file_name,
                     ]
-                )
-            commands.append(
-                [
-                    "-m",
-                    "MAPCONVERT",
-                    "-co",
-                    "segment",
-                    "-con",
-                    "Segment Map",
+                })  # fmt: skip
+            commands.append({
+                "name": "Converting to segment map",
+                "nsteps": 1,
+                "args": [
+                    "-m", "MAPCONVERT",
+                    "-co", "segment",
+                    "-con", "Segment Map",
                     "-cir",
                     "-coc",
-                    "-crsl",
-                    str(settings["stubs"]),
+                    "-crsl", str(settings["stubs"]),
                 ]
-            )
-        elif settings["type"] == 2:
-            commands.append(
-                [
-                    "-m",
-                    "MAPCONVERT",
-                    "-co",
-                    "segment",
-                    "-con",
-                    "Segment Map",
+            })  # fmt: skip
+        elif settings["type"] == 2:  # segment
+            commands.append({
+                "name": "Converting to segment map",
+                "nsteps": 1,
+                "args": [
+                    "-m", "MAPCONVERT",
+                    "-co", "segment",
+                    "-con", "Segment Map",
                     "-coc",
                     "-cir",
                 ]
-            )
+            })  # fmt: skip
         return commands
 
     def setup_analysis(self, layers, settings):
@@ -234,9 +243,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
             return True
         return False
 
-    def start_analysis(self):
-        depthmap_cli = DepthmapCLIEngine.get_depthmap_cli()
-
+    def _setup_line_file(self, context):
         line_data_file = tempfile.NamedTemporaryFile("w+t", suffix=".csv", delete=False)
         line_data_file.write(self.prep_line_data)
         line_data_file.close()
@@ -244,92 +251,128 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
         self.analysis_graph_file = tempfile.NamedTemporaryFile(
             "w+t", suffix=".graph", delete=False
         )
-        maxlog = 5
-        lastlog = []
-        process = subprocess.Popen(
-            [
-                depthmap_cli,
-                "-f",
-                line_data_file.name,
-                "-o",
-                self.analysis_graph_file.name,
-                "-m",
-                "IMPORT",
-                "-it",
-                "data",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            startupinfo=DepthmapCLIEngine.getStartupInfo(),
-        )
-        while True:
-            current_line = process.stdout.readline()
-            lastlog.append(current_line.decode("utf-8"))
-            if len(lastlog) > maxlog:
-                lastlog.pop(0)
-            if self.inDebugMode:
-                print("import:  " + current_line.decode("utf-8"))
-            if not current_line:
-                break
-        process.communicate()
-        os.unlink(line_data_file.name)
-        if process.returncode != 0:
-            raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
+        return {
+            "line_data_filename": line_data_file.name,
+            "analysis_graph_filename": self.analysis_graph_file.name,
+        }
 
-        unlink_data_file = tempfile.NamedTemporaryFile(
-            "w+t", suffix=".tsv", delete=False
+    def _cleanup_line_file(self, context):
+        if "line_data_filename" in context and os.path.exists(
+            context["line_data_filename"]
+        ):
+            os.unlink(context["line_data_filename"])
+        return {}
+
+    def _setup_unlinks(self, context):
+        unlink_data_filename = ""
+        if self.prep_unlink_data:
+            unlink_data_file = tempfile.NamedTemporaryFile(
+                "w+t", suffix=".tsv", delete=False
+            )
+            unlink_data_file.write(self.prep_unlink_data)
+            unlink_data_file.close()
+            unlink_data_filename = unlink_data_file.name
+        return {"unlink_data_filename": unlink_data_filename}
+
+    def _cleanup_unlinks(self, context):
+        if "unlink_data_filename" in context and os.path.exists(
+            context["unlink_data_filename"]
+        ):
+            os.unlink(context["unlink_data_filename"])
+        return {}
+
+    def _setup_export(self, context):
+        export_data_file = tempfile.NamedTemporaryFile(
+            "w+t", suffix=".csv", delete=False
         )
-        unlink_data_file.write(self.prep_unlink_data)
-        unlink_data_file.close()
+        export_data_file.close()
+        return {"export_data_filename": export_data_file.name}
+
+    def _cleanup_export(self, context):
+        if "export_data_filename" in context and os.path.exists(
+            context["export_data_filename"]
+        ):
+            attributes, values = self.parse_result_file(context["export_data_filename"])
+            os.unlink(context["export_data_filename"])
+            return {"attributes": attributes, "values": values}
+        return {}
+
+    def start_analysis(self):
+        depthmap_cli = DepthmapCLIEngine.get_depthmap_cli()
+
+        cmdSets = []
+
+        cmdSets.append({
+            "setup": self._setup_line_file,
+            "cmds": [{
+                "name": "Importing lines to graph file",
+                "nsteps": 1,
+                "args": [
+                    depthmap_cli,
+                    "-f", "{line_data_filename}",
+                    "-o", "{analysis_graph_filename}",
+                    "-m", "IMPORT",
+                    "-it", "data",
+            ]}],
+            "cleanup": self._cleanup_line_file
+        })  # fmt: skip
 
         prep_commands = DepthmapCLIEngine.get_prep_commands(
-            self.analysis_settings, unlink_data_file.name
+            self.analysis_settings, "{unlink_data_filename}"
         )
-
+        cli_commands = []
         for prep_command in prep_commands:
             cli_command = [
                 depthmap_cli,
-                "-f",
-                self.analysis_graph_file.name,
-                "-o",
-                self.analysis_graph_file.name,
-            ]
-            cli_command.extend(prep_command)
-            maxlog = 5
-            lastlog = []
-            process = subprocess.Popen(
-                cli_command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                startupinfo=DepthmapCLIEngine.getStartupInfo(),
-            )
-            while True:
-                current_line = process.stdout.readline()
-                lastlog.append(current_line.decode("utf-8"))
-                if len(lastlog) > maxlog:
-                    lastlog.pop(0)
-                if self.inDebugMode:
-                    print("prep:  " + current_line.decode("utf-8"))
-                if not current_line:
-                    break
-            process.communicate()
-            if process.returncode != 0:
-                raise AnalysisEngine.AnalysisEngineError("\n".join(lastlog))
-        os.unlink(unlink_data_file.name)
+                "-f", "{analysis_graph_filename}",
+                "-o", "{analysis_graph_filename}",
+            ]  # fmt: skip
+            cli_command.extend(prep_command["args"])
 
-        command = DepthmapCLIEngine.get_analysis_command(self.analysis_settings)
-        cli_command = [
-            depthmap_cli,
-            "-f",
-            self.analysis_graph_file.name,
-            "-o",
-            self.analysis_graph_file.name,
-            "-p",
-        ]
-        cli_command.extend(command)
+            cli_commands.append(
+                {"name": prep_command["name"], "nsteps": 1, "args": cli_command}
+            )
+
+        cmdSets.append({
+            "setup": self._setup_unlinks,
+            "cmds": cli_commands,
+            "cleanup": self._cleanup_line_file
+        })  # fmt: skip
+
+        cmdSets.append({
+            "setup": lambda ctx: {
+                'analysis_graph_filename':
+                    ctx['analysis_graph_filename']
+            },
+            "cmds": [{
+                "name": "Starting analysis",
+                "nsteps": 1,
+                "args": [
+                    depthmap_cli,
+                    "-f", "{analysis_graph_filename}",
+                    "-o", "{analysis_graph_filename}",
+                    "-p",
+                ] + DepthmapCLIEngine.get_analysis_command(self.analysis_settings)
+            }],
+            "cleanup": lambda ctx: {}
+        })  # fmt: skip
+
+        cmdSets.append({
+            "setup": self._setup_export,
+            "cmds": [{
+                "name": "Exporting to QGIS",
+                "nsteps": 1,
+                "args": [
+                    depthmap_cli,
+                    "-f", "{analysis_graph_filename}",
+                    "-o", "{export_data_filename}",
+                ] + DepthmapCLIEngine.get_export_command()
+            }],
+            "cleanup": self._cleanup_export,
+        })  # fmt: skip
 
         self.analysis_process = DepthmapCLIEngine.AnalysisThread(
-            cli_command, self.inDebugMode()
+            cmdSets, self.inDebugMode()
         )
         self.analysis_process.start()
 
@@ -350,85 +393,159 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 return step, relprog, ""
         return None, None, None
 
+    # [{
+    #     setup: function(),
+    #     cmds: [],
+    #     cleanup: function()
+    # }]
     class AnalysisThread(threading.Thread):
-        def __init__(self, cmd, inDebugMode):
-            self.cmd = cmd
+        class State(Enum):
+            NOT_STARTED = auto()
+            RUNNING = auto()
+            COMPLETED = auto()
+            CANCELLED = auto()
+
+        def __init__(self, cmdsets, inDebugMode):
+            self.cmdsets = cmdsets
+            self.cmdset = None  # current
+            self.cmd = None  # current
             self.p = None
             self.maxlog = 5
             self.lastlog = []
             self.current_line = ""
             self.inDebugMode = inDebugMode
+            self.context = {}
+            self.state = self.State.NOT_STARTED
+            self.step_queue = Queue()
+            self.nsteps = 0
+            self.nstepscmds = 0
             threading.Thread.__init__(self)
 
         def run(self):
-            self.p = subprocess.Popen(
-                self.cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                startupinfo=DepthmapCLIEngine.getStartupInfo(),
-            )
-            while True:
-                self.current_line = self.p.stdout.readline()
-                self.lastlog.append(self.current_line.decode("utf-8"))
-                if len(self.lastlog) > self.maxlog:
-                    self.lastlog.pop(0)
-                if self.inDebugMode:
-                    print("out:  " + self.current_line.decode("utf-8"))
-                if not self.current_line:
+            self.context = {}
+            self.state = self.State.RUNNING
+            self.step_queue = Queue()
+            self.nsteps = 0
+            self.nstepscmds = 0
+            stepcount = 1
+            for self.cmdset in self.cmdsets:
+                self.nsteps += len(self.cmdset["cmds"])
+                for self.cmd in self.cmdset["cmds"]:
+                    self.nstepscmds += self.cmd["nsteps"] - 1
+            for self.cmdset in self.cmdsets:
+                if self.state == self.State.CANCELLED:
                     break
-            self.p.stdout.close()
+                if "setup" in self.cmdset:
+                    self.context.update(self.cmdset["setup"](self.context))
+                    del self.cmdset["setup"]
+                for self.cmd in self.cmdset["cmds"]:
+                    self.step_queue.put({"step": stepcount, "name": self.cmd["name"]})
+                    if self.state == self.State.CANCELLED:
+                        break
+                    final_cmd = [c.format(**self.context) for c in self.cmd["args"]]
+                    self.p = subprocess.Popen(
+                        final_cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        startupinfo=DepthmapCLIEngine.getStartupInfo(),
+                    )
+                    while True:
+                        self.current_line = self.p.stdout.readline()
+                        self.lastlog.append(self.current_line.decode("utf-8"))
+                        if len(self.lastlog) > self.maxlog:
+                            self.lastlog.pop(0)
+                        if self.inDebugMode:
+                            print("out:  " + self.current_line.decode("utf-8"))
+                        if not self.current_line:
+                            break
+                    self.p.stdout.close()
+                    stepcount = stepcount + 1
+                if "cleanup" in self.cmdset:
+                    self.context.update(self.cmdset["cleanup"](self.context))
+                    del self.cmdset["cleanup"]
+            self.cmdset = None
+            self.state = self.State.COMPLETED
 
         def terminate(self):
+            if self.state != self.State.COMPLETED and "cleanup" in self.cmdset:
+                self.context.update(self.cmdset["cleanup"](self.context))
+                del self.cmdset["cleanup"]
+            self.context = {}
             self.p.terminate()
+            self.state = self.State.CANCELLED
 
     def get_progress(
         self, settings, datastore
-    ) -> Tuple[Optional[int], Optional[int], Optional[str]]:
-        rc = self.analysis_process.p.poll()
-        if rc is None:
+    ) -> Tuple[Optional[int], Optional[str], Optional[int], Optional[str]]:
+        if self.analysis_process is None or self.analysis_process.p is None:
+            return None, None, None, None
+        # rc = self.analysis_process.p.poll()
+        # if rc is None:
+        if self.analysis_process.state == self.AnalysisThread.State.RUNNING:
             # process still running
             # read the last line from it...
             output = self.analysis_process.current_line
             prg = self.parse_progress(str(output))
-            return prg
-        elif rc == 0:
+            cmdstep = prg[0]
+            if cmdstep is None:
+                cmdstep = 0
+            laststep = self.currstep
+            allstepnames = []
+            while not self.analysis_process.step_queue.empty():
+                stepdata = self.analysis_process.step_queue.get()
+                laststep = stepdata["step"]
+                allstepnames.append(
+                    "["
+                    + str(stepdata["step"])
+                    + "/"
+                    + str(self.analysis_process.nsteps)
+                    + "] "
+                    + stepdata["name"]
+                )
+                if laststep != self.currstep:
+                    self.currstep = laststep
+            progress = prg[1]
+            if progress is None and self.currstep >= 0:
+                progress = 0
+            return self.currstep + cmdstep, "\n".join(allstepnames), progress, prg[2]
+        # elif rc == 0:
+        elif self.analysis_process.state == self.AnalysisThread.State.CANCELLED:
+            raise AnalysisEngine.AnalysisEngineError("User cancelled")
+        elif self.analysis_process.state == self.AnalysisThread.State.COMPLETED:
             # process exited normally
-            export_data_file = tempfile.NamedTemporaryFile(
-                "w+t", suffix=".csv", delete=False
-            )
-            export_command = DepthmapCLIEngine.get_export_command()
-            depthmap_cli = DepthmapCLIEngine.get_depthmap_cli()
-            cli_command = [
-                depthmap_cli,
-                "-f",
-                self.analysis_graph_file.name,
-                "-o",
-                export_data_file.name,
-            ]
-            cli_command.extend(export_command)
-            process = subprocess.Popen(
-                cli_command, startupinfo=DepthmapCLIEngine.getStartupInfo()
-            )
-            process.wait()
+            if "attributes" in self.analysis_process.context:
+                attributes = self.analysis_process.context["attributes"]
+            else:
+                raise AnalysisEngine.AnalysisEngineError(
+                    "attributes not found in context"
+                    + "\n".join(self.analysis_process.lastlog)
+                )
 
-            attributes, values = self.parse_result_file(export_data_file.name)
-            export_data_file.close()
-            os.unlink(export_data_file.name)
+            if "values" in self.analysis_process.context:
+                values = self.analysis_process.context["values"]
+            else:
+                raise AnalysisEngine.AnalysisEngineError(
+                    "values not found in context"
+                    + "\n".join(self.analysis_process.lastlog)
+                )
 
             self.analysis_results = DepthmapEngine.process_analysis_result(
                 settings, datastore, attributes, values
             )
-            return 0, 100, "Completed"
+            return 0, None, 100, "Completed"
         else:
             # process errored
             raise AnalysisEngine.AnalysisEngineError(
                 "\n".join(self.analysis_process.lastlog)
             )
-        return None, None, None
+        return None, None, None, None
+
+    def terminate(self):
+        if self.analysis_process is not None:
+            self.analysis_process.terminate()
 
     def cleanup(self):
         if self.analysis_process is not None:
-            self.analysis_process.terminate()
             self.analysis_process = None
         if os.path.isfile(self.analysis_graph_file.name):
             self.analysis_graph_file.close()
