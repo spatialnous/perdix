@@ -62,7 +62,7 @@ SPDX-FileCopyrightText = "A. Pasotti, V. Picavet"
 SPDX-License-Identifier = "GPL-2.0-or-later"
 
 [[annotations]]
-path = "**/analysis/engines/DepthmapCLI/depthmapXcli/**"
+path = "**/analysis/engines/DepthmapCLI/exec/**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "depthmapX developers"
 SPDX-License-Identifier = "GPL-3.0-or-later"

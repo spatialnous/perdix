@@ -62,7 +62,7 @@ class DrawingTool(object):
         self.menu = self.tr("&Drawing Tool")
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar("DrawingTool")
-        self.toolbar.setObjectName("DrawingTool")
+        self.toolbar.setObjectName("Perdix.DrawingTool")
 
         # print "** INITIALIZING DrawingTool"
 

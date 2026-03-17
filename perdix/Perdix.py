@@ -76,6 +76,7 @@ class Perdix(object):
         # Save reference to the QGIS interface
         self.iface = iface
         self.toolbar = self.iface.addToolBar("Perdix")
+        self.toolbar.setObjectName("Perdix.main")
         self.menu = self.tr("&Perdix")
         self.actions = []
 

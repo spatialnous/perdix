@@ -73,16 +73,13 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
 
     @staticmethod
     def get_depthmap_cli() -> str:
-        if platform.system() == "Windows":
-            ext = "exe"
-        elif platform.system() == "Darwin":
-            ext = "darwin"
-        elif platform.system() == "Linux":
-            ext = "linux"
+        basedir = os.path.dirname(os.path.realpath(__file__))
+        sys = platform.system()
+        machine = platform.machine()
+        if sys == "Windows":
+            return os.path.join(basedir, "exec", sys + "_" + machine, "dmcli.exe")
         else:
-            raise ValueError("Unknown platform: " + platform.system())
-        basepath = os.path.dirname(os.path.realpath(__file__))
-        return os.path.join(basepath, "depthmapXcli/depthmapXcli." + ext)
+            return os.path.join(basedir, "exec", sys + "_" + machine, "dmcli")
 
     @staticmethod
     def ready() -> bool:
@@ -170,7 +167,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     "-m", "MAPCONVERT",
                     "-co", "axial",
                     "-con", "Axial Map",
-                    "-cir"
+                    "-cir",
+                    "-p",
                 ]
             })  # fmt: skip
             if unlinks_file_name:
@@ -183,6 +181,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                         "-lt", "coords",
                         "-lmt", "shapegraphs",
                         "-lf", unlinks_file_name,
+                        "-p",
                     ]
                 })  # fmt: skip
         elif settings["type"] == 1:  # axial then segment
@@ -193,7 +192,8 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     "-m", "MAPCONVERT",
                     "-co", "axial",
                     "-con", "Axial Map",
-                    "-coc"
+                    "-coc",
+                    "-p",
                 ]
             })  # fmt: skip
             if unlinks_file_name:
@@ -206,6 +206,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                         "-lt", "coords",
                         "-lmt", "shapegraphs",
                         "-lf", unlinks_file_name,
+                        "-p",
                     ]
                 })  # fmt: skip
             commands.append({
@@ -218,6 +219,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     "-cir",
                     "-coc",
                     "-crsl", str(settings["stubs"]),
+                    "-p",
                 ]
             })  # fmt: skip
         elif settings["type"] == 2:  # segment
@@ -230,6 +232,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     "-con", "Segment Map",
                     "-coc",
                     "-cir",
+                    "-p",
                 ]
             })  # fmt: skip
         return commands
@@ -313,6 +316,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     "-o", "{analysis_graph_filename}",
                     "-m", "IMPORT",
                     "-it", "data",
+                    "-p",
             ]}],
             "cleanup": self._cleanup_line_file
         })  # fmt: skip
@@ -326,6 +330,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 depthmap_cli,
                 "-f", "{analysis_graph_filename}",
                 "-o", "{analysis_graph_filename}",
+                    "-p",
             ]  # fmt: skip
             cli_command.extend(prep_command["args"])
 
@@ -366,6 +371,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                     depthmap_cli,
                     "-f", "{analysis_graph_filename}",
                     "-o", "{export_data_filename}",
+                    "-p",
                 ] + DepthmapCLIEngine.get_export_command()
             }],
             "cleanup": self._cleanup_export,
@@ -459,6 +465,9 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                         if not self.current_line:
                             break
                     self.p.stdout.close()
+                    self.p.stderr.close()
+                    self.p.terminate()
+                    self.p.wait()
                     stepcount = stepcount + 1
                 if "cleanup" in self.cmdset:
                     self.context.update(self.cmdset["cleanup"](self.context))
@@ -471,8 +480,11 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 self.context.update(self.cmdset["cleanup"](self.context))
                 del self.cmdset["cleanup"]
             self.context = {}
-            self.p.terminate()
             self.state = self.State.CANCELLED
+            self.p.stdout.close()
+            self.p.stderr.close()
+            self.p.terminate()
+            self.p.wait()
 
     def get_progress(
         self, settings, datastore
