@@ -20,8 +20,8 @@ from qgis.core import (
     QgsPoint,
 )
 
-from perdix.utilities import gui_helpers as guih
-from perdix.utilities.exceptions import BadInputError
+from ..utilities import gui_helpers as guih
+from ..utilities.exceptions import BadInputError
 from .network_transformer_dialog import NetworkTransformerDialog
 
 

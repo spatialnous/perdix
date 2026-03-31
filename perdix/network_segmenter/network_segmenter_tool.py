@@ -17,7 +17,7 @@ from builtins import range, str, zip
 from qgis.PyQt.QtCore import QThread, QObject, pyqtSignal
 from qgis.core import Qgis, QgsProject, QgsGeometry, QgsMessageLog
 
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from ..utilities import db_helpers as dbh, layer_field_helpers as lfh
 from . import utilityFunctions as uf
 from .network_segmenter_dialog import NetworkSegmenterDialog
 from .segment_tools import segmentor

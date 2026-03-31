@@ -13,7 +13,7 @@ from qgis.PyQt.sip import isdeleted
 from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsProject, NULL, QgsRenderContext
 
-from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
+from ..utilities import layer_field_helpers as lfh, utility_functions as uf
 from .AttributeCharts import AttributeCharts
 from .AttributeSymbology import AttributeSymbology
 

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,7 +12,7 @@ from qgis.core import QgsProject
 
 from rcl_cleaner.sGraph.sGraph import sGraph
 from rcl_cleaner.sGraph.utilityFunctions import clean_features_iter, to_layer
-from perdix.utilities import layer_field_helpers as lfh
+from ..utilities import layer_field_helpers as lfh
 
 # parameters
 layer_name = "gb_roadlink_test"

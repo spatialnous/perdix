@@ -29,7 +29,7 @@ except ImportError:
         print("Could not import pyqtgraph:", e)
         has_pyqtgraph = False
 
-from perdix.utilities import utility_functions as uf
+from ..utilities import utility_functions as uf
 
 Ui_ExplorerDialog, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "explorer_dock_widget.ui")

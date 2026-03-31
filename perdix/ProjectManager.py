@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsProject
 from qgis.PyQt.uic import loadUiType
 
-from perdix.utilities import db_helpers as dbh, shapefile_helpers as shph
+from .utilities import db_helpers as dbh, shapefile_helpers as shph
 
 Ui_ProjectDialog, _ = loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "project_dialog.ui")

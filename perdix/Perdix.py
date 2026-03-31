@@ -23,14 +23,14 @@ from .ProjectManager import ProjectManager
 ###########
 ###########
 # Import tool modules
-from perdix.analysis import AnalysisTool
-from perdix.explorer import ExplorerTool
-from perdix.gate_transformer import TransformerAnalysis
-from perdix.rcl_cleaner import road_network_cleaner_tool
-from perdix.catchment_analyser import CatchmentAnalyser
-from perdix.urban_data_input import urban_data_input_tool
-from perdix.network_segmenter import network_segmenter_tool
-from perdix.drawing import DrawingTool
+from .analysis import AnalysisTool
+from .explorer import ExplorerTool
+from .gate_transformer import TransformerAnalysis
+from .rcl_cleaner import road_network_cleaner_tool
+from .catchment_analyser import CatchmentAnalyser
+from .urban_data_input import urban_data_input_tool
+from .network_segmenter import network_segmenter_tool
+from .drawing import DrawingTool
 
 # Import the debug library
 is_debug = False

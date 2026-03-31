@@ -24,7 +24,7 @@ from qgis.core import (
     Qgis,
 )
 
-from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
+from ..utilities import layer_field_helpers as lfh, shapefile_helpers as shph
 
 
 class EntranceTool(QObject):

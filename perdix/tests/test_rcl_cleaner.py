@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,10 +14,10 @@ from qgis.core import (
     QgsPoint,
 )
 
-from perdix.network_segmenter.segment_tools import segmentor
-from perdix.rcl_cleaner.road_network_cleaner_dialog import RoadNetworkCleanerDialog
-from perdix.rcl_cleaner.sGraph.sGraph import sGraph
-from perdix.rcl_cleaner.sGraph.utilityFunctions import clean_features_iter
+from .network_segmenter.segment_tools import segmentor
+from .rcl_cleaner.road_network_cleaner_dialog import RoadNetworkCleanerDialog
+from .rcl_cleaner.sGraph.sGraph import sGraph
+from .rcl_cleaner.sGraph.utilityFunctions import clean_features_iter
 
 qgs = QgsApplication([], False)
 qgs.initQgis()

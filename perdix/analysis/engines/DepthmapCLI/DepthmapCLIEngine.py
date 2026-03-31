@@ -21,12 +21,12 @@ from typing import Optional, Tuple
 
 from qgis.PyQt.QtCore import QObject
 
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
-from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
-from perdix.utilities import layer_field_helpers as lfh
-from perdix.utilities.utility_functions import overrides
-from perdix.utilities.exceptions import BadInputError
-from perdix.analysis.engines.DepthmapCLI.DepthmapCLISettingsWidget import (
+from ....utilities import layer_field_helpers as lfh
+from ....utilities.utility_functions import overrides
+from ....utilities.exceptions import BadInputError
+from ..AnalysisEngine import AnalysisEngine
+from ..Depthmap.DepthmapEngine import DepthmapEngine
+from .DepthmapCLISettingsWidget import (
     DepthmapCLISettingsWidget,
 )
 

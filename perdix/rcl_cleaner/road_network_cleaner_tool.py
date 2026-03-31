@@ -18,7 +18,7 @@ from .sGraph.sGraph import (
     sGraph,
 )  # better give these a name to make it explicit to which module the methods belong
 from .sGraph import utilityFunctions as utf
-from perdix.utilities import (
+from ..utilities import (
     db_helpers as dbh,
     layer_field_helpers as lfh,
     utility_functions as uf,

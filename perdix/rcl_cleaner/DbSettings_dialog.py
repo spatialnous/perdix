@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2017 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2017 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -13,7 +13,7 @@ from builtins import str
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 
-from perdix.utilities import db_helpers as dbh
+from ..utilities import db_helpers as dbh
 
 Ui_DbSettingsDialog, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "db_settings_dialog.ui")

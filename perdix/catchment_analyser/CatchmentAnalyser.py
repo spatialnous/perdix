@@ -33,7 +33,7 @@ from . import utility_functions as uf
 
 # Import the code for the dialog
 from .catchment_analyser_dialog import CatchmentAnalyserDialog
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from ..utilities import db_helpers as dbh, layer_field_helpers as lfh
 
 
 class CatchmentTool(QObject):

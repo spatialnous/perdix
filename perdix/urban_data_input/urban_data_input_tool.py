@@ -13,7 +13,7 @@ from .entrances import EntranceTool
 from .frontages import FrontageTool
 from .landuse import LanduseTool
 from .urban_data_input_dockwidget import UrbanDataInputDockWidget
-from perdix.utilities import utility_functions as uf
+from ..utilities import utility_functions as uf
 
 
 class UrbanDataInputTool(QObject):

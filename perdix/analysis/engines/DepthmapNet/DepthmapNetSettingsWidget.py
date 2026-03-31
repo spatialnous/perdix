@@ -7,19 +7,20 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-from perdix.analysis.engines.DepthmapNet.DepthmapAdvancedDialog import (
-    DepthmapAdvancedDialog,
-)
-from perdix.utilities import (
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.uic import loadUiType
+
+from ....utilities import (
     layer_field_helpers as lfh,
     shapefile_helpers as shph,
     db_helpers as dbh,
 )
-from perdix.utilities.utility_functions import overrides
-from perdix.analysis.engines.SettingsWidget import SettingsWidget
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.PyQt.uic import loadUiType
+from ....utilities.utility_functions import overrides
+from ..SettingsWidget import SettingsWidget
+from .DepthmapAdvancedDialog import (
+    DepthmapAdvancedDialog,
+)
 
 Ui_DepthmapNetSettingsWidget, _ = loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "settings_widget.ui")

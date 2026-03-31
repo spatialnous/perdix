@@ -9,7 +9,7 @@ from builtins import str
 
 from qgis.PyQt import QtWidgets, uic
 
-from perdix.utilities import utility_functions as uf
+from ..utilities import utility_functions as uf
 
 Ui_VerificationSettingsDialog, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "verification_settings_dialog.ui")

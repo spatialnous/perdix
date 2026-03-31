@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QSize
 from qgis.PyQt.QtGui import QPixmap, QIcon
 from qgis.core import QgsProject, QgsSnappingConfig, QgsTolerance, Qgis
 
-from perdix.utilities import layer_field_helpers as lfh
+from ..utilities import layer_field_helpers as lfh
 
 Ui_DrawingToolDockWidget, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "drawing_dock_widget.ui")

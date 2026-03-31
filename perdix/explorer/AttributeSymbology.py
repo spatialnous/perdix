@@ -20,7 +20,7 @@ from qgis.core import (
     QgsGradientStop,
 )
 
-from perdix.utilities import gui_helpers as guih
+from ..utilities import gui_helpers as guih
 
 
 class AttributeSymbology(QObject):

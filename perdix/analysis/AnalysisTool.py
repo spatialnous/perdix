@@ -16,7 +16,7 @@ import os.path
 from qgis.PyQt.QtCore import QObject, QTimer, pyqtSignal, QVariant
 from qgis.core import QgsProject, QgsVectorDataProvider, Qgis, QgsWkbTypes
 
-from perdix.utilities import (
+from ..utilities import (
     shapefile_helpers as shph,
     layer_field_helpers as lfh,
     db_helpers as dbh,
@@ -24,11 +24,11 @@ from perdix.utilities import (
 
 # Import required modules
 from .AnalysisDialog import AnalysisDialog
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
+from .engines.AnalysisEngine import AnalysisEngine
 from .AxialVerification import AxialVerification
 
 from .UnlinksVerification import UnlinksVerification, UnlinksIdUpdate
-from perdix.analysis.engines.EngineRegistry import EngineRegistry
+from .engines.EngineRegistry import EngineRegistry
 
 
 class AnalysisTool(QObject):
