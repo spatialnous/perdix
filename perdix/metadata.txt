@@ -14,10 +14,11 @@
 # Mandatory items:
 
 [general]
-name=Perdix-ltr
+name=Perdix
 qgisMinimumVersion=3.38
 qgisMaximumVersion=3.44
-description=Collection of tools for space syntax analysis workflows in a GIS environment. Version compatible with QGIS Long-term support version
+description=Collection of tools for space syntax analysis workflows in a GIS environment.
+
 version=0.3.10
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
 email=jorge.gil@chalmers.se
