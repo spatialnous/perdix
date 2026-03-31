@@ -30,13 +30,13 @@ LAST_VERSION_HASH=$(git log -s -1 --format=format:%H -L $LINE_NUMBER,$LINE_NUMBE
 COMMITS_SINCE_LAST_VERSION=$(git rev-list $LAST_VERSION_HASH.. --count)
 
 # Create a zip file archive from zip
-git archive --format zip -o $DIR/.generated/$NAME.zip --prefix="${OUT_NAME}"/ HEAD
+git archive --format zip -o $DIR/.generated/$OUT_NAME.zip --prefix="${OUT_NAME}"/ HEAD
 
 # Unzip the file to /tmp, modify the metadata.txt (append the number of commits
 # to the version) and update the zip
 rm -rf /tmp/${PRJ_NAME}
 mkdir -p /tmp/${PRJ_NAME}
-unzip $DIR/.generated/$NAME.zip ${OUT_NAME}/metadata.txt -d /tmp/${PRJ_NAME}/
+unzip $DIR/.generated/$OUT_NAME.zip ${OUT_NAME}/metadata.txt -d /tmp/${PRJ_NAME}/
 
 cd /tmp/${PRJ_NAME}/${OUT_NAME}
 sed -i "s/$VERSION_PATT/&.$COMMITS_SINCE_LAST_VERSION/g" metadata.txt
@@ -47,4 +47,4 @@ if [ -n "$IS_LTR" ]; then
 fi
 
 cd ..
-zip --update "$DIR/.generated/$NAME.zip" "${OUT_NAME}/metadata.txt"
+zip --update "$DIR/.generated/$OUT_NAME.zip" "${OUT_NAME}/metadata.txt"
