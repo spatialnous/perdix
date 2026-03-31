@@ -330,7 +330,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
                 depthmap_cli,
                 "-f", "{analysis_graph_filename}",
                 "-o", "{analysis_graph_filename}",
-                    "-p",
+                "-p",
             ]  # fmt: skip
             cli_command.extend(prep_command["args"])
 
