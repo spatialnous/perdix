@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2019 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2019 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,7 +19,7 @@ from qgis.core import (
 import catchment_analyser.catchment_analysis as catchment
 import catchment_analyser.utility_functions as uf
 from catchment_analyser.analysis_tools import CustomCost
-from perdix.utilities import layer_field_helpers as lfh
+from ..utilities import layer_field_helpers as lfh
 from qgis.networkanalysis import QgsDistanceArcProperter, QgsLineVectorLayerDirector
 
 origin_vector = lfh.getLayerByName("2595D_pr_tfl_bus_stops")

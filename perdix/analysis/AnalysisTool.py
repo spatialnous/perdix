@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -16,7 +16,7 @@ import os.path
 from qgis.PyQt.QtCore import QObject, QTimer, pyqtSignal, QVariant
 from qgis.core import QgsProject, QgsVectorDataProvider, Qgis, QgsWkbTypes
 
-from perdix.utilities import (
+from ..utilities import (
     shapefile_helpers as shph,
     layer_field_helpers as lfh,
     db_helpers as dbh,
@@ -24,11 +24,11 @@ from perdix.utilities import (
 
 # Import required modules
 from .AnalysisDialog import AnalysisDialog
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
+from .engines.AnalysisEngine import AnalysisEngine
 from .AxialVerification import AxialVerification
 
 from .UnlinksVerification import UnlinksVerification, UnlinksIdUpdate
-from perdix.analysis.engines.EngineRegistry import EngineRegistry
+from .engines.EngineRegistry import EngineRegistry
 
 
 class AnalysisTool(QObject):

@@ -1,12 +1,12 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import unittest
 
-from perdix.utilities import utility_functions as uf
+from ..utilities import utility_functions as uf
 
 
 class TestUtilityFunctions(unittest.TestCase):

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -17,7 +17,7 @@ from qgis.core import QgsProject
 from .CreateNew_Entrance_dialog import CreateNew_EntranceDialog
 from .CreateNew_LU_dialog import CreateNew_LUDialog
 from .CreateNew_dialog import CreatenewDialog
-from perdix.utilities import layer_field_helpers as lfh
+from ..utilities import layer_field_helpers as lfh
 from .landuse import LanduseTool
 
 Ui_UrbanDataInputDockWidget, _ = loadUiType(

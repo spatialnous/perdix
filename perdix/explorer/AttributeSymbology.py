@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -20,7 +20,7 @@ from qgis.core import (
     QgsGradientStop,
 )
 
-from perdix.utilities import gui_helpers as guih
+from ..utilities import gui_helpers as guih
 
 
 class AttributeSymbology(QObject):

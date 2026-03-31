@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
 # SPDX-FileCopyrightText: 2020 - 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 - 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,13 +12,13 @@ from typing import Optional, Tuple
 from qgis.PyQt.QtCore import QObject, QThread, pyqtSignal
 from qgis.core import QgsVertexId
 
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
-from perdix.analysis.engines.Depthmap.DepthmapEngine import DepthmapEngine
-from perdix.analysis.engines.DepthmapNet.DepthmapNetSocket import DepthmapNetSocket
-from perdix.utilities import layer_field_helpers as lfh
-from perdix.utilities import utility_functions as uf
-from perdix.utilities.utility_functions import overrides
-from perdix.analysis.engines.DepthmapNet.DepthmapNetSettingsWidget import (
+from ....utilities import layer_field_helpers as lfh
+from ....utilities import utility_functions as uf
+from ....utilities.utility_functions import overrides
+from ..AnalysisEngine import AnalysisEngine
+from ..Depthmap.DepthmapEngine import DepthmapEngine
+from .DepthmapNetSocket import DepthmapNetSocket
+from .DepthmapNetSettingsWidget import (
     DepthmapNetSettingsWidget,
 )
 

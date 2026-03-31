@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 - 2018 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 - 2018 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -18,7 +18,7 @@ from future import standard_library
 from qgis.PyQt.QtCore import QThread, QObject, pyqtSignal
 from qgis.core import Qgis, QgsProject, QgsGeometry, QgsMessageLog
 
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from ..utilities import db_helpers as dbh, layer_field_helpers as lfh
 from . import utilityFunctions as uf
 from .network_segmenter_dialog import NetworkSegmenterDialog
 from .segment_tools import segmentor

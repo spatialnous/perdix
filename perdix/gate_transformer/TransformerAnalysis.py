@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Stephen Law <s.law@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -20,8 +20,8 @@ from qgis.core import (
     QgsPoint,
 )
 
-from perdix.utilities import gui_helpers as guih
-from perdix.utilities.exceptions import BadInputError
+from ..utilities import gui_helpers as guih
+from ..utilities.exceptions import BadInputError
 from .network_transformer_dialog import NetworkTransformerDialog
 
 

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -19,7 +19,7 @@ from builtins import zip
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.core import QgsGeometry, QgsFeatureRequest
 
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from ..utilities import db_helpers as dbh, layer_field_helpers as lfh
 
 # try to import installed networkx, if not
 # available use the one shipped with this package

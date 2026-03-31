@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Ioanna Kolovou <i.kolovou@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -20,7 +20,7 @@ from .sGraph.sGraph import (
     sGraph,
 )  # better give these a name to make it explicit to which module the methods belong
 from .sGraph import utilityFunctions as utf
-from perdix.utilities import (
+from ..utilities import (
     db_helpers as dbh,
     layer_field_helpers as lfh,
     utility_functions as uf,

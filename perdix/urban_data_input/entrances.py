@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -24,7 +24,7 @@ from qgis.core import (
     Qgis,
 )
 
-from perdix.utilities import layer_field_helpers as lfh, shapefile_helpers as shph
+from ..utilities import layer_field_helpers as lfh, shapefile_helpers as shph
 
 
 class EntranceTool(QObject):

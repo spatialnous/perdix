@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,7 +12,7 @@ import numpy as np
 from qgis.PyQt.QtCore import QObject
 from qgis.core import QgsProject, NULL, QgsRenderContext
 
-from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
+from ..utilities import layer_field_helpers as lfh, utility_functions as uf
 from .AttributeCharts import AttributeCharts
 from .AttributeSymbology import AttributeSymbology
 

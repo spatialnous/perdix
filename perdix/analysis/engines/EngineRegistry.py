@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: 2021 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2021 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from typing import Dict
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
-from perdix.analysis.engines.DepthmapNet.DepthmapNetEngine import DepthmapNetEngine
-from perdix.analysis.engines.DepthmapCLI.DepthmapCLIEngine import DepthmapCLIEngine
+from .AnalysisEngine import AnalysisEngine
+from .DepthmapNet.DepthmapNetEngine import DepthmapNetEngine
+from .DepthmapCLI.DepthmapCLIEngine import DepthmapCLIEngine
 
 
 class EngineRegistry:

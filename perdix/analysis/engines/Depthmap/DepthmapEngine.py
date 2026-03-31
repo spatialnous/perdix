@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -9,9 +9,9 @@ import math
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import NULL
 
-from perdix.analysis.engines.AnalysisEngine import AnalysisEngine
-from perdix.utilities import layer_field_helpers as lfh, utility_functions as uf
-from perdix.utilities.utility_functions import overrides
+from ....utilities import layer_field_helpers as lfh, utility_functions as uf
+from ....utilities.utility_functions import overrides
+from ..AnalysisEngine import AnalysisEngine
 
 
 class DepthmapEngine(AnalysisEngine):

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Abhimanyu Acharya <a.acharya@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -11,7 +11,7 @@ import os
 
 from qgis.PyQt import QtCore, QtWidgets, uic
 
-from perdix.utilities import db_helpers as dbh
+from ..utilities import db_helpers as dbh
 from .DbSettings_dialog import DbSettingsDialog
 
 Ui_CreateNewDialog, _ = uic.loadUiType(

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2016 Laurens Versluis <l.versluis@spacesyntax.com>
 # SPDX-FileCopyrightText: 2016 Space Syntax Limited
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -33,7 +33,7 @@ from . import utility_functions as uf
 
 # Import the code for the dialog
 from .catchment_analyser_dialog import CatchmentAnalyserDialog
-from perdix.utilities import db_helpers as dbh, layer_field_helpers as lfh
+from ..utilities import db_helpers as dbh, layer_field_helpers as lfh
 
 
 class CatchmentTool(QObject):

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2020 Petros Koutsolampros <p.koutsolampros@spacesyntax.com>
 # SPDX-FileCopyrightText: 2020 Space Syntax Ltd
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -15,8 +15,8 @@ from qgis.core import (
     QgsMultiLineString,
 )
 
-from perdix.gate_transformer import TransformerAnalysis
-from perdix.utilities.exceptions import BadInputError
+from .gate_transformer import TransformerAnalysis
+from ..utilities.exceptions import BadInputError
 
 qgs = QgsApplication([], False)
 qgs.initQgis()

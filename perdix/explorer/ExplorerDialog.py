@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -24,7 +24,7 @@ except ImportError:
     except ImportError:
         has_pyqtgraph = False
 
-from perdix.utilities import utility_functions as uf
+from ..utilities import utility_functions as uf
 
 Ui_ExplorerDialog, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "explorer_dock_widget.ui")

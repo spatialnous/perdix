@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2014 - 2015 Jorge Gil <jorge.gil@ucl.ac.uk>
 # SPDX-FileCopyrightText: 2014 - 2015 UCL
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsProject
 from qgis.PyQt.uic import loadUiType
 
-from perdix.utilities import db_helpers as dbh, shapefile_helpers as shph
+from .utilities import db_helpers as dbh, shapefile_helpers as shph
 
 Ui_ProjectDialog, _ = loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "project_dialog.ui")

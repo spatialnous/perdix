@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 Petros Koutsolampros
+# SPDX-FileCopyrightText: 2024 - 2026 Petros Koutsolampros
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -69,7 +69,7 @@ for fd in fileData:
         nocpr.append(fd)
         continue
     for cpr in fileData[fd]["copyright"]:
-        m = re.match("[12][0-9]{3}\s?-\s?([12][0-9]{3}).*?", cpr)
+        m = re.match("[12][0-9]{3}\\s?-\\s?([12][0-9]{3}).*?", cpr)
         if m:
             year = int(m.group(1))
             if year > 1900 and year > fileData[fd]["maxyear"]:
