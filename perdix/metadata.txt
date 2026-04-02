@@ -17,7 +17,7 @@
 name=Perdix
 qgisMinimumVersion=4.0
 description=Collection of tools for space syntax analysis workflows in a GIS environment.
-version=0.4.2
+version=4.2
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
 email=jorge.gil@chalmers.se
 
@@ -33,6 +33,8 @@ about=Perdix is a QGIS plugin forked from the "Space Syntax Toolkit" and offerin
     Dependencies: For network analysis requires depthmapXnet 0.35. It can be downloaded from: http://archtech.gr/varoudis/depthmapX/?dir=depthmapXnet
 category = Vector
 changelog=
+    4.2 -
+    * Drop prefix 0. from version. Leave first number following QGIS version"
     0.4.2 -
     * Internal: Make local imports relative
     0.4.1 -
