@@ -39,7 +39,10 @@ mkdir -p /tmp/${PRJ_NAME}
 unzip $DIR/.generated/$OUT_NAME.zip ${OUT_NAME}/metadata.txt -d /tmp/${PRJ_NAME}/
 
 cd /tmp/${PRJ_NAME}/${OUT_NAME}
-sed -i "s/$VERSION_PATT/&.$COMMITS_SINCE_LAST_VERSION/g" metadata.txt
+if [ "$COMMITS_SINCE_LAST_VERSION" -gt "0" ]; then
+    echo "Making bumped-commits version: $VERSION_PATT.$COMMITS_SINCE_LAST_VERSION"
+    sed -i "s/$VERSION_PATT/&.$COMMITS_SINCE_LAST_VERSION/g" metadata.txt
+fi
 if [ -n "$IS_LTR" ]; then
     sed -i "s/^name=$PRJ_LABEL$/&-ltr/" metadata.txt
     grep -q 'Version compatible with QGIS Long-term support version.' metadata.txt || \
