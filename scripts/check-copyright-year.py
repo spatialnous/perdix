@@ -28,6 +28,8 @@ cprs = []
 for line in reusedata:
     if line.startswith("FileName:"):
         fileName = line[len("FileName:") :].strip()
+        if "dmcli" in fileName:
+            continue
         if fileName.startswith("./"):
             fileName = fileName[len("./") :]
         if fileName in filesNeeded:
