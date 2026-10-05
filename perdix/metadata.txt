@@ -17,7 +17,7 @@
 name=Perdix
 qgisMinimumVersion=4.0
 description=Collection of tools for space syntax analysis workflows in a GIS environment.
-version=4.2
+version=4.3
 author=Jorge Gil, Ioanna Kovolou, Abhimanyu Acharya, Stephen Law, Laurens Versluis, Petros Koutsolampros
 email=jorge.gil@chalmers.se
 
@@ -33,6 +33,14 @@ about=Perdix is a QGIS plugin forked from the "Space Syntax Toolkit" and offerin
     Dependencies: For network analysis requires depthmapXnet 0.35. It can be downloaded from: http://archtech.gr/varoudis/depthmapX/?dir=depthmapXnet
 category = Vector
 changelog=
+    4.3 -
+    * Update to the latest depthmap CLIs (Sala library)
+    * Sala: Change Choice in Tulip analysis to be full instead of only from the leafs
+    * Sala: Expose Penn's Relative Asymmetry (RA [Penn])
+    * Sala: Fix Integration [P-Value] to use pyramid normalisation
+    * Sala: Make all platforms agree on floating-point arithmetic (-ffp-contract=off)
+    * Sala: Metric tulip miscalculation fixed (c6307d0)
+    * Sala: Long double removed, precision change across some analyses
     4.2 -
     * Drop prefix 0. from version. Leave first number following QGIS version"
     0.4.2 -
