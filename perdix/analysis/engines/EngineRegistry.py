@@ -16,11 +16,11 @@ class EngineRegistry:
     available_engines: Dict[str, str] = {}
 
     def __init__(self):
-        self.available_engines[DepthmapNetEngine.get_engine_name()] = (
-            "DepthmapNetEngine"
-        )
         self.available_engines[DepthmapCLIEngine.get_engine_name()] = (
             "DepthmapCLIEngine"
+        )
+        self.available_engines[DepthmapNetEngine.get_engine_name()] = (
+            "DepthmapNetEngine"
         )
 
     def get_available_engines(self) -> [str]:

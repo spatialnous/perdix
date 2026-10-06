@@ -53,7 +53,7 @@ class DepthmapCLIEngine(QObject, DepthmapEngine):
 
     @staticmethod
     def get_engine_name() -> str:
-        return "depthmapXcli"
+        return "dmcli"
 
     def create_settings_widget(self, dock_widget):
         return DepthmapCLISettingsWidget(dock_widget)
