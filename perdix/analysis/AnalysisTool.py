@@ -13,7 +13,7 @@ import os.path
 
 # Import the PyQt and QGIS libraries
 
-from qgis.PyQt.QtCore import QObject, QTimer, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QTimer
 from qgis.core import QgsProject, QgsVectorDataProvider, Qgis, QgsWkbTypes
 
 from ..utilities import (
@@ -930,11 +930,6 @@ class AnalysisTool(QObject):
             ):
                 create_table = True
 
-            # convert type of choice columns to float
-            for attr in attributes:
-                if "CH" in attr:
-                    idx = attributes.index(attr)
-                    types[idx] = QVariant.Double
             # write a new file
             if "shapefile" not in provider.lower() or create_table:
                 new_layer = shph.create_shapefile_full_layer_data_provider(

@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import math
+import re
 
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import NULL
@@ -373,24 +374,50 @@ class DepthmapEngine(AnalysisEngine):
                 attributes.pop(i)
                 values.pop(i)
             values = list(zip(*values))
-        # remove spaces
-        attributes = [x.replace(" ", "_") for x in attributes]
         # get data type of attributes
+        column_type_matches = {
+            r"^ref$": QVariant.Int,
+            r"^connectivity$": QVariant.Int,
+            r"^nach$": QVariant.Double,
+            r"^nain$": QVariant.Double,
+            r"\bchoice\b": QVariant.Double,
+            r"\bcontrol\b": QVariant.Double,
+            r"\bcontrollability\b": QVariant.Double,
+            r"\bharmonic\b": QVariant.Double,
+            r"\bentropy\b": QVariant.Double,
+            r"\bmean\bdepth\b": QVariant.Double,
+            r"\bintegration\b": QVariant.Double,
+            r"\bintensity\b": QVariant.Double,
+            r"\blength\b": QVariant.Double,
+        }
         types = []
         data_sample = [uf.convertNumeric(x) for x in values[0]]
-        for data in data_sample:
+        for index, data in enumerate(data_sample):
+            name = attributes[index]
             data_type = None
-            # get the data types
-            if type(data).__name__ == "int":
-                data_type = QVariant.Int
-            elif type(data).__name__ == "long":
-                data_type = QVariant.LongLong
-            elif type(data).__name__ == "str":
-                data_type = QVariant.String
-            elif type(data).__name__ == "float":
-                data_type = QVariant.Double
+
+            # search for known types
+            type_matched = False
+            for ctm, ctype in column_type_matches.items():
+                print("Checking: ", name, ctm)
+                if re.search(ctm, name, re.IGNORECASE):
+                    data_type = ctype
+                    type_matched = True
+
+            if not type_matched:
+                # pull from the data (first value)
+                if type(data).__name__ == "int":
+                    data_type = QVariant.Int
+                elif type(data).__name__ == "long":
+                    data_type = QVariant.LongLong
+                elif type(data).__name__ == "str":
+                    data_type = QVariant.String
+                elif type(data).__name__ == "float":
+                    data_type = QVariant.Double
             # store the attributes type
             types.append(data_type)
+        # remove spaces
+        attributes = [x.replace(" ", "_") for x in attributes]
         # get coords
         coords = [
             attributes.index("x1"),
